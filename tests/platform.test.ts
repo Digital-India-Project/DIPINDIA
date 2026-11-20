@@ -2214,8 +2214,8 @@ describe('P0 Security Hardening, Unified Pipeline & Compliance Tools', () => {
       sub: 'uid-citizen-99',
       email: 'citizen@example.com',
       email_verified: true,
-      aud: 'gen-lang-client-0294214396',
-      iss: 'https://securetoken.google.com/gen-lang-client-0294214396',
+      aud: 'digitalindiaproject-portal',
+      iss: 'https://securetoken.google.com/digitalindiaproject-portal',
       iat: nowSec - 10,
       exp: nowSec + 3600,
     };

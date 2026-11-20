@@ -1,12 +1,12 @@
 {
-  "projectId": "gen-lang-client-0294214396",
-  "appId": "1:520982792771:web:adf7f93b07ba67eb41a2f6",
-  "apiKey": "AIzaSyCV5OWuoj2EGrAzcUDrObKiQhrUlX4WT3Y",
-  "authDomain": "gen-lang-client-0294214396.firebaseapp.com",
+  "projectId": "digitalindiaproject-portal",
+  "appId": "1:49386507162:web:6129267750858cd8c2c823",
+  "apiKey": "AIzaSyC64NTrEzqkgXztiPaIK1WJ8siCeXHmn80",
+  "authDomain": "digitalindiaproject-portal.firebaseapp.com",
   "firestoreDatabaseId": "ai-studio-dipindia-8df12812-95d2-4c97-aafb-7ee0d14a643f",
-  "storageBucket": "gen-lang-client-0294214396.firebasestorage.app",
-  "messagingSenderId": "520982792771",
+  "storageBucket": "digitalindiaproject-portal.firebasestorage.app",
+  "messagingSenderId": "49386507162",
   "measurementId": "",
-  "oAuthClientId": "520982792771-5c5qs81qrtsbi0cd8nvc2uouri095ep2.apps.googleusercontent.com",
+  "oAuthClientId": "49386507162-6icc8gaales5b6d3ac72jc2382oorcii.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }

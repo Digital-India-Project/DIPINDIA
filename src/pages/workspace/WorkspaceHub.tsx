@@ -1319,7 +1319,7 @@ Official Domain: https://digitalindiaproject.com`;
               <ul className="space-y-1.5 text-slate-600 dark:text-slate-300 list-disc pl-4">
                 <li><strong>Storage Bindings:</strong> 10 logical R2 buckets (`r2-01`..`r2-10`) + preserved `r1-01` (`karta-legacy-r1`).</li>
                 <li><strong>SQL Shards:</strong> 10 logical D1 shards (`d1-01`..`d1-10`) + preserved `d2-01` (`digital-tools-tray-db`).</li>
-                <li><strong>Firebase Fleet:</strong> DIP-Official (`gen-lang-client-0294214396`), Tools-Tray (`gen-lang-client-0226759782`), and active provisioned Firestore database.</li>
+                <li><strong>Firebase Fleet:</strong> Digital India Project (`digitalindiaproject-portal`), Tools-Tray (`gen-lang-client-0226759782`), and active provisioned Firestore database.</li>
                 <li><strong>Zero-Knowledge E2EE:</strong> Web Crypto PBKDF2-SHA256 (100k iterations) + AES-256-GCM prior to cloud sync.</li>
               </ul>
             </div>

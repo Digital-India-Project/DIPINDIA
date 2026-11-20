@@ -10,7 +10,7 @@ import {
 import { buildApiResponse } from './security';
 import { DatabaseRegistry } from '../config/database';
 
-const FIREBASE_PROJECT_ID = 'gen-lang-client-0294214396';
+const FIREBASE_PROJECT_ID = 'digitalindiaproject-portal';
 const ACTIVE_FIREBASE_PROJECT_IDS = [
   FIREBASE_PROJECT_ID,
 ];
