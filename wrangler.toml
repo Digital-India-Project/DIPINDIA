@@ -3,6 +3,9 @@ main = "worker/index.ts"
 compatibility_date = "2025-05-01"
 compatibility_flags = ["nodejs_compat"]
 
+[build]
+command = "npm run build"
+
 [vars]
 APP_DOMAIN = "https://digitalindiaproject.com"
 BUSINESS_EMAIL = "support@digitalindiaproject.com"
