@@ -13,6 +13,7 @@ import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { OperationType, type KartaFileRecord } from '../../types/platform';
 import {
   BookOpen,
+  Briefcase,
   CheckCircle2,
   ClipboardCheck,
   Cloud,
@@ -23,21 +24,25 @@ import {
   FileCheck2,
   FolderHeart,
   FolderLock,
+  Home,
   Landmark,
   Layers,
   Lock,
   PenTool,
   QrCode,
+  Receipt,
   RefreshCw,
   Scale,
   ScanText,
   Search,
   ShieldCheck,
+  Sparkles,
   Stamp,
   Tag,
   Trash2,
   Unlock,
   Upload,
+  User,
   Wrench,
   X,
 } from 'lucide-react';
@@ -123,6 +128,30 @@ interface PendingSealRequest {
   customTags?: string[];
 }
 
+const TEMPLATE_CATEGORY_TABS: Array<{
+  id: string;
+  label: string;
+  icon: typeof Layers;
+}> = [
+  { id: 'all', label: 'All Categories', icon: Layers },
+  { id: 'Legal', label: 'Legal', icon: Scale },
+  { id: 'Personal', label: 'Personal', icon: User },
+  { id: 'Business', label: 'Business', icon: Briefcase },
+  { id: 'Property', label: 'Property', icon: Home },
+  { id: 'Tax & Compliance', label: 'Tax & Compliance', icon: Receipt },
+  { id: 'Popular', label: 'Popular', icon: Sparkles },
+  { id: 'New', label: 'New', icon: Tag },
+];
+
+const LEGAL_CATEGORY_GROUP_NAMES = new Set([
+  'Affidavits',
+  'Legal Notices',
+  'Petitions, Plaints & Pleadings',
+  'Powers of Attorney',
+  'Wills & Family Law',
+  'Deeds & Conveyancing',
+]);
+
 export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
   initialTemplateId = '',
   onNavigate,
@@ -145,6 +174,52 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
     null
   );
   const [backendError, setBackendError] = useState<string | null>(null);
+
+  // Reactive Template Library Search & Category Filter State
+  const [templateSearchQuery, setTemplateSearchQuery] = useState('');
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>('all');
+  const [selectedCategoryGroup, setSelectedCategoryGroup] = useState<string>('all');
+  const [selectedRawCategory, setSelectedRawCategory] = useState<string>('all');
+  const [selectedReviewStatus, setSelectedReviewStatus] = useState<string>('all');
+  const [selectedProcessingStatus, setSelectedProcessingStatus] = useState<string>('all');
+  const [libraryPage, setLibraryPage] = useState<number>(1);
+  const [libraryResultMeta, setLibraryResultMeta] = useState<{
+    total: number;
+    loading: boolean;
+  }>({ total: 0, loading: true });
+
+  const resetTemplateFilters = () => {
+    setTemplateSearchQuery('');
+    setSelectedCategoryTab('all');
+    setSelectedCategoryGroup('all');
+    setSelectedRawCategory('all');
+    setSelectedReviewStatus('all');
+    setSelectedProcessingStatus('all');
+    setLibraryPage(1);
+  };
+
+  const hasActiveTemplateFilters =
+    Boolean(templateSearchQuery.trim()) ||
+    selectedCategoryTab !== 'all' ||
+    selectedCategoryGroup !== 'all' ||
+    selectedRawCategory !== 'all' ||
+    selectedReviewStatus !== 'all' ||
+    selectedProcessingStatus !== 'all';
+
+  const getCategoryTabCount = (tabId: string): number | undefined => {
+    if (!report) return undefined;
+    if (tabId === 'all') return report.totalTemplatesCreated;
+    if (tabId === 'Legal') {
+      const legalSum = (report.categoryGroups || [])
+        .filter((g) => LEGAL_CATEGORY_GROUP_NAMES.has(g.name))
+        .reduce((sum, g) => sum + g.processed, 0);
+      if (legalSum > 0) return legalSum;
+      return report.tagCounts?.find((t) => t.tag === 'Litigation')?.count;
+    }
+    return report.tagCounts?.find(
+      (t) => t.tag.toLowerCase() === tabId.toLowerCase()
+    )?.count;
+  };
 
   // Browser-local vault state
   const [savedDrafts, setSavedDrafts] = useState<SavedUserDocument[]>(() =>
@@ -1101,12 +1176,156 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
 
       {/* MAIN VIEWS */}
       {view === 'library' && (
-        <LibraryBrowser
-          report={report}
-          providerStatus={providerStatus}
-          onSelectTemplate={handleSelectTemplate}
-          onOpenValidateAid={() => setView('validate_aid')}
-        />
+        <>
+          {/* Reactive Search Bar & Category Tab/Chip Filter Bar */}
+          <section
+            aria-label="Search and filter legal templates"
+            className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="w-4 h-4 text-[#FF671F] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={templateSearchQuery}
+                    onChange={(e) => {
+                      setTemplateSearchQuery(e.target.value);
+                      setLibraryPage(1);
+                    }}
+                    placeholder="Search templates by name or tag (e.g., Affidavit, Business, Personal, Leave & License, NDA, GST)..."
+                    aria-label="Search templates by name or tag"
+                    className="w-full h-11 pl-10 pr-10 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-[#202124] dark:text-slate-100 placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F] transition-colors"
+                  />
+                  {templateSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTemplateSearchQuery('');
+                        setLibraryPage(1);
+                      }}
+                      aria-label="Clear template search"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    {libraryResultMeta.loading
+                      ? 'Filtering templates...'
+                      : `${libraryResultMeta.total.toLocaleString('en-IN')} matching`}
+                  </span>
+                  {hasActiveTemplateFilters && (
+                    <button
+                      type="button"
+                      onClick={resetTemplateFilters}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40 text-xs font-semibold text-[#FF671F] hover:bg-orange-100 dark:hover:bg-orange-950/70 whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Category Tabs / Chips */}
+              <div
+                role="tablist"
+                aria-label="Filter templates by category"
+                className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto scrollbar-none scroll-touch -mx-1 px-1 pb-0.5"
+              >
+                {TEMPLATE_CATEGORY_TABS.map((cat) => {
+                  const Icon = cat.icon;
+                  const active = selectedCategoryTab === cat.id;
+                  const count = getCategoryTabCount(cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => {
+                        const nextTab =
+                          active && cat.id !== 'all' ? 'all' : cat.id;
+                        setSelectedCategoryTab(nextTab);
+                        setSelectedCategoryGroup('all');
+                        setSelectedRawCategory('all');
+                        setLibraryPage(1);
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+                        active
+                          ? 'bg-[#FF671F] text-white border-[#FF671F] shadow-2xs'
+                          : 'bg-[#F7F8FA] dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#FF671F] hover:text-[#FF671F]'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{cat.label}</span>
+                      {typeof count === 'number' && count > 0 && (
+                        <span
+                          className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                            active
+                              ? 'bg-white/20 text-white'
+                              : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                          }`}
+                        >
+                          {count.toLocaleString('en-IN')}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <LibraryBrowser
+            report={report}
+            providerStatus={providerStatus}
+            onSelectTemplate={handleSelectTemplate}
+            onOpenValidateAid={() => setView('validate_aid')}
+            searchQuery={templateSearchQuery}
+            onSearchQueryChange={(val) => {
+              setTemplateSearchQuery(val);
+              setLibraryPage(1);
+            }}
+            selectedCategoryTag={selectedCategoryTab}
+            onSelectCategoryTag={(val) => {
+              setSelectedCategoryTab(val);
+              setSelectedCategoryGroup('all');
+              setSelectedRawCategory('all');
+              setLibraryPage(1);
+            }}
+            categoryGroup={selectedCategoryGroup}
+            onCategoryGroupChange={(val) => {
+              setSelectedCategoryGroup(val);
+              setSelectedRawCategory('all');
+              setLibraryPage(1);
+            }}
+            rawCategory={selectedRawCategory}
+            onRawCategoryChange={(val) => {
+              setSelectedRawCategory(val);
+              setLibraryPage(1);
+            }}
+            reviewStatus={selectedReviewStatus}
+            onReviewStatusChange={(val) => {
+              setSelectedReviewStatus(val);
+              setLibraryPage(1);
+            }}
+            processingStatus={selectedProcessingStatus}
+            onProcessingStatusChange={(val) => {
+              setSelectedProcessingStatus(val);
+              setLibraryPage(1);
+            }}
+            page={libraryPage}
+            onPageChange={setLibraryPage}
+            onResetFilters={resetTemplateFilters}
+            onResultMetaChange={setLibraryResultMeta}
+            hideInternalSearchAndTags={true}
+          />
+        </>
       )}
 
       {view === 'editor' && (

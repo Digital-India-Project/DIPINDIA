@@ -11,6 +11,7 @@ import {
   Search,
   ShieldAlert,
   Stamp,
+  X,
 } from 'lucide-react';
 import { LibraryAuditReport, PublicProviderStatus, TemplateSummary } from '../shared/types';
 import { CATEGORY_GROUPS, CATEGORY_THEMES, TEMPLATE_TAGS } from '../shared/constants';
@@ -21,6 +22,23 @@ interface Props {
   providerStatus: PublicProviderStatus | null;
   onSelectTemplate: (templateId: string) => void;
   onOpenValidateAid: () => void;
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
+  selectedCategoryTag?: string;
+  onSelectCategoryTag?: (value: string) => void;
+  categoryGroup?: string;
+  onCategoryGroupChange?: (value: string) => void;
+  rawCategory?: string;
+  onRawCategoryChange?: (value: string) => void;
+  reviewStatus?: string;
+  onReviewStatusChange?: (value: string) => void;
+  processingStatus?: string;
+  onProcessingStatusChange?: (value: string) => void;
+  page?: number;
+  onPageChange?: (value: number) => void;
+  onResetFilters?: () => void;
+  onResultMetaChange?: (meta: { total: number; loading: boolean }) => void;
+  hideInternalSearchAndTags?: boolean;
 }
 
 const REVIEW_FILTERS = [
@@ -40,15 +58,66 @@ export function LibraryBrowser({
   providerStatus,
   onSelectTemplate,
   onOpenValidateAid,
+  searchQuery: controlledSearchQuery,
+  onSearchQueryChange,
+  selectedCategoryTag: controlledTag,
+  onSelectCategoryTag,
+  categoryGroup: controlledCategoryGroup,
+  onCategoryGroupChange,
+  rawCategory: controlledRawCategory,
+  onRawCategoryChange,
+  reviewStatus: controlledReviewStatus,
+  onReviewStatusChange,
+  processingStatus: controlledProcessingStatus,
+  onProcessingStatusChange,
+  page: controlledPage,
+  onPageChange,
+  onResetFilters,
+  onResultMetaChange,
+  hideInternalSearchAndTags = false,
 }: Props) {
-  const [query, setQuery] = useState('');
+  const [internalQuery, setInternalQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [categoryGroup, setCategoryGroup] = useState('all');
-  const [rawCategory, setRawCategory] = useState('all');
-  const [selectedTag, setSelectedTag] = useState('all');
-  const [reviewStatus, setReviewStatus] = useState('all');
-  const [processingStatus, setProcessingStatus] = useState('all');
-  const [page, setPage] = useState(1);
+  const [internalCategoryGroup, setInternalCategoryGroup] = useState('all');
+  const [internalRawCategory, setInternalRawCategory] = useState('all');
+  const [internalSelectedTag, setInternalSelectedTag] = useState('all');
+  const [internalReviewStatus, setInternalReviewStatus] = useState('all');
+  const [internalProcessingStatus, setInternalProcessingStatus] = useState('all');
+  const [internalPage, setInternalPage] = useState(1);
+
+  const query = controlledSearchQuery !== undefined ? controlledSearchQuery : internalQuery;
+  const setQuery = onSearchQueryChange ?? setInternalQuery;
+
+  const categoryGroup =
+    controlledCategoryGroup !== undefined ? controlledCategoryGroup : internalCategoryGroup;
+  const setCategoryGroup = onCategoryGroupChange ?? setInternalCategoryGroup;
+
+  const rawCategory =
+    controlledRawCategory !== undefined ? controlledRawCategory : internalRawCategory;
+  const setRawCategory = onRawCategoryChange ?? setInternalRawCategory;
+
+  const selectedTag = controlledTag !== undefined ? controlledTag : internalSelectedTag;
+  const setSelectedTag = onSelectCategoryTag ?? setInternalSelectedTag;
+
+  const reviewStatus =
+    controlledReviewStatus !== undefined ? controlledReviewStatus : internalReviewStatus;
+  const setReviewStatus = onReviewStatusChange ?? setInternalReviewStatus;
+
+  const processingStatus =
+    controlledProcessingStatus !== undefined
+      ? controlledProcessingStatus
+      : internalProcessingStatus;
+  const setProcessingStatus = onProcessingStatusChange ?? setInternalProcessingStatus;
+
+  const page = controlledPage !== undefined ? controlledPage : internalPage;
+  const setPage = (next: number | ((prev: number) => number)) => {
+    const resolved = typeof next === 'function' ? next(page) : next;
+    if (onPageChange) {
+      onPageChange(resolved);
+    } else {
+      setInternalPage(resolved);
+    }
+  };
 
   const [items, setItems] = useState<TemplateSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -58,10 +127,15 @@ export function LibraryBrowser({
   const [heroImgFailed, setHeroImgFailed] = useState(false);
 
   useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setDebouncedQuery('');
+      return;
+    }
     const t = setTimeout(() => {
-      setDebouncedQuery(query);
+      setDebouncedQuery(trimmed);
       setPage(1);
-    }, 200);
+    }, 180);
     return () => clearTimeout(t);
   }, [query]);
 
@@ -69,6 +143,7 @@ export function LibraryBrowser({
     let cancelled = false;
     setLoading(true);
     setError(null);
+    onResultMetaChange?.({ total, loading: true });
     fetchTemplates({
       q: debouncedQuery,
       categoryGroup,
@@ -84,10 +159,12 @@ export function LibraryBrowser({
         setItems(res.items);
         setTotal(res.total);
         setTotalPages(res.totalPages);
+        onResultMetaChange?.({ total: res.total, loading: false });
       })
       .catch((err) => {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Unable to load templates.');
+        onResultMetaChange?.({ total: 0, loading: false });
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -116,7 +193,13 @@ export function LibraryBrowser({
     processingStatus !== 'all';
 
   const resetAllFilters = () => {
+    if (onResetFilters) {
+      onResetFilters();
+      setDebouncedQuery('');
+      return;
+    }
     setQuery('');
+    setDebouncedQuery('');
     setCategoryGroup('all');
     setRawCategory('all');
     setSelectedTag('all');
@@ -161,19 +244,35 @@ export function LibraryBrowser({
               </p>
             </div>
 
-            {/* Integrated Portal Search */}
+            {/* Integrated Portal Search & Actions */}
             <div className="space-y-3">
-              <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-[#FF671F] absolute left-4 pointer-events-none" />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search affidavits, leave & license, Sec 138 notices, GPA, wills, sale deeds, GST..."
-                  aria-label="Search legal documents"
-                  className="w-full h-12 pl-11 pr-4 bg-[#F7F8FA] border border-slate-200 rounded-xl text-sm text-[#202124] placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F] transition-colors"
-                />
-              </div>
+              {!hideInternalSearchAndTags && (
+                <div className="relative flex items-center">
+                  <Search className="w-4 h-4 text-[#FF671F] absolute left-4 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search affidavits, leave & license, Sec 138 notices, GPA, wills, sale deeds, GST..."
+                    aria-label="Search legal documents"
+                    className="w-full h-12 pl-11 pr-10 bg-[#F7F8FA] border border-slate-200 rounded-xl text-sm text-[#202124] placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F] transition-colors"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuery('');
+                        setDebouncedQuery('');
+                        setPage(1);
+                      }}
+                      aria-label="Clear template search"
+                      className="absolute right-3 p-1 rounded-md text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center gap-3">
                 <button
@@ -432,61 +531,63 @@ export function LibraryBrowser({
             </div>
           </div>
 
-          {/* Interactive Tag Filter Controls */}
-          <div
-            role="group"
-            aria-label="Filter templates by tag"
-            className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2"
-          >
-            <span className="text-xs font-semibold text-slate-500 mr-1 whitespace-nowrap shrink-0">
-              Tags:
-            </span>
-            <button
-              type="button"
-              aria-pressed={selectedTag === 'all'}
-              onClick={() => {
-                setSelectedTag('all');
-                setPage(1);
-              }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                selectedTag === 'all'
-                  ? 'bg-[#202124] text-white border-[#202124]'
-                  : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
-              }`}
+          {/* Interactive Tag Filter Controls (hidden when rendered by KartaFilesPage top filter bar) */}
+          {!hideInternalSearchAndTags && (
+            <div
+              role="group"
+              aria-label="Filter templates by tag"
+              className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2"
             >
-              <span>All Tags</span>
-            </button>
-            {tagOptions.map(({ tag, count }) => {
-              const active = selectedTag === tag;
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => {
-                    setSelectedTag(active ? 'all' : tag);
-                    setPage(1);
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    active
-                      ? 'bg-[#FF671F] text-white border-[#FF671F]'
-                      : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
-                  }`}
-                >
-                  <span>{tag}</span>
-                  {count > 0 && (
-                    <span
-                      className={`font-mono-tabular text-[11px] ${
-                        active ? 'text-white/90' : 'text-slate-500'
-                      }`}
-                    >
-                      {count.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+              <span className="text-xs font-semibold text-slate-500 mr-1 whitespace-nowrap shrink-0">
+                Tags:
+              </span>
+              <button
+                type="button"
+                aria-pressed={selectedTag === 'all'}
+                onClick={() => {
+                  setSelectedTag('all');
+                  setPage(1);
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  selectedTag === 'all'
+                    ? 'bg-[#202124] text-white border-[#202124]'
+                    : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
+                }`}
+              >
+                <span>All Tags</span>
+              </button>
+              {tagOptions.map(({ tag, count }) => {
+                const active = selectedTag === tag;
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSelectedTag(active ? 'all' : tag);
+                      setPage(1);
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      active
+                        ? 'bg-[#FF671F] text-white border-[#FF671F]'
+                        : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
+                    }`}
+                  >
+                    <span>{tag}</span>
+                    {count > 0 && (
+                      <span
+                        className={`font-mono-tabular text-[11px] ${
+                          active ? 'text-white/90' : 'text-slate-500'
+                        }`}
+                      >
+                        {count.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Results Grid */}
@@ -508,20 +609,56 @@ export function LibraryBrowser({
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-12 text-center space-y-3">
-              <p className="text-base font-medium text-[#202124]">
-                No matching legal templates found
-              </p>
-              <p className="text-sm text-slate-500">
-                Try clearing your search query, tag selection, or switching to All Categories.
-              </p>
-              <button
-                type="button"
-                onClick={resetAllFilters}
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#FF671F] rounded-lg hover:bg-[#E55A16] cursor-pointer"
-              >
-                Reset Filters
-              </button>
+            <div className="bg-white border border-slate-200 rounded-xl p-10 sm:p-12 text-center space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200 text-[#FF671F] flex items-center justify-center mx-auto">
+                <Search className="w-5 h-5" />
+              </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <p className="text-base font-semibold text-[#202124]">
+                  {query.trim()
+                    ? `No matching templates found for "${query.trim()}"`
+                    : 'No matching legal templates found'}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {selectedTag !== 'all' || categoryGroup !== 'all'
+                    ? 'No templates matched the active search and category filter combination. Try clearing your search query or switching back to All Categories.'
+                    : 'Try searching by document title or tag (e.g., Affidavit, Business, Personal, Property, NDA, GST).'}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                {query.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery('');
+                      setDebouncedQuery('');
+                      setPage(1);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold text-[#202124] bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 cursor-pointer"
+                  >
+                    Clear Search Query
+                  </button>
+                )}
+                {selectedTag !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedTag('all');
+                      setPage(1);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold text-[#202124] bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 cursor-pointer"
+                  >
+                    All Categories
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={resetAllFilters}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-[#FF671F] rounded-lg hover:bg-[#E55A16] cursor-pointer"
+                >
+                  Reset All Filters
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

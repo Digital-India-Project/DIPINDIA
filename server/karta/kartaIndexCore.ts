@@ -664,6 +664,15 @@ export function buildKartaIndexFromData(
   return { byId, ordered, auditReport, manifests };
 }
 
+const LEGAL_DOMAIN_GROUPS = new Set([
+  'Affidavits',
+  'Legal Notices',
+  'Petitions, Plaints & Pleadings',
+  'Powers of Attorney',
+  'Wills & Family Law',
+  'Deeds & Conveyancing',
+]);
+
 export function queryKartaTemplatesFromIndex(
   index: KartaIndex,
   params: {
@@ -685,6 +694,8 @@ export function queryKartaTemplatesFromIndex(
 } {
   const { ordered } = index;
   const q = (params.q || '').trim().toLowerCase();
+  const qTokens = q ? q.split(/[\s,]+/).filter(Boolean) : [];
+  const normalizedTag = (params.tag || '').trim().toLowerCase();
   const page = Math.max(1, params.page || 1);
   const limit = Math.min(60, Math.max(1, params.limit || 18));
 
@@ -695,8 +706,18 @@ export function queryKartaTemplatesFromIndex(
     if (params.rawCategory && params.rawCategory !== 'all' && t.rawCategory !== params.rawCategory) {
       return false;
     }
-    if (params.tag && params.tag !== 'all' && !t.tags.includes(params.tag)) {
-      return false;
+    if (normalizedTag && normalizedTag !== 'all') {
+      if (normalizedTag === 'legal') {
+        const isLegalTag = t.tags.some((tg) => {
+          const low = tg.toLowerCase();
+          return low === 'legal' || low === 'litigation';
+        });
+        if (!isLegalTag && !LEGAL_DOMAIN_GROUPS.has(t.categoryGroup)) {
+          return false;
+        }
+      } else if (!t.tags.some((tg) => tg.toLowerCase() === normalizedTag)) {
+        return false;
+      }
     }
     if (params.usableOnly) {
       if (
@@ -719,7 +740,7 @@ export function queryKartaTemplatesFromIndex(
     }
     if (q) {
       const hay = `${t.title} ${t.description} ${t.rawCategory} ${t.categoryGroup} ${t.sourcePath} ${t.tags.join(' ')}`.toLowerCase();
-      if (!hay.includes(q)) return false;
+      if (!hay.includes(q) && !qTokens.every((tok) => hay.includes(tok))) return false;
     }
     return true;
   });
