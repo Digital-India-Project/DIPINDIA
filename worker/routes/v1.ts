@@ -2152,7 +2152,11 @@ v1Router.post('/payments/applications/status', requireAuth, async (c) => {
   const user = c.get('user')!;
   const body = await c.req.json().catch(() => ({} as Record<string, any>));
   const rawApps = Array.isArray(body?.applications) ? body.applications : [];
-  const preferredMode = typeof body?.preferredMode === 'string' ? body.preferredMode : undefined;
+  const preferredMode =
+    body?.preferredMode === 'production' || body?.preferredMode === 'sandbox'
+      ? body.preferredMode
+      : undefined;
+  const cfConfig = await loadEffectiveCashfreeConfig(c.env, preferredMode);
 
   if (rawApps.length === 0) {
     const emptyCheckedAt = new Date().toISOString();
@@ -2165,15 +2169,14 @@ v1Router.post('/payments/applications/status', requireAuth, async (c) => {
         data: {
           items: [],
           summary: { total: 0, paid: 0, pending: 0, failed: 0 },
-          gatewayConfigured: resolveCashfreeConfig(c.env, preferredMode).configured,
-          mode: resolveCashfreeConfig(c.env, preferredMode).mode,
+          gatewayConfigured: cfConfig.configured,
+          mode: cfConfig.mode,
           checkedAt: emptyCheckedAt,
         },
       })
     );
   }
 
-  const cfConfig = resolveCashfreeConfig(c.env, preferredMode);
   if (cfConfig.isProductionRuntime && !cfConfig.configured) {
     return c.json(
       buildApiResponse({

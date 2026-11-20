@@ -579,6 +579,15 @@ export function queryKartaTemplates(params: {
     if (params.tag && params.tag !== 'all' && !t.tags.includes(params.tag)) {
       return false;
     }
+    if (params.usableOnly) {
+      if (
+        t.processingStatus === 'invalid_lock_artifact' ||
+        t.processingStatus === 'unsupported_legacy_doc' ||
+        (t.reviewStatus as string) === 'disabled'
+      ) {
+        return false;
+      }
+    }
     if (params.reviewStatus && params.reviewStatus !== 'all' && t.reviewStatus !== params.reviewStatus) {
       return false;
     }

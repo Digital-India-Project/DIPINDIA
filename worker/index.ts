@@ -63,7 +63,7 @@ import { generateDigitalProductPayload } from '../src/data/catalogue/digitalGene
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
-const FIREBASE_AUTH_HOST = 'gen-lang-client-0294214396.firebaseapp.com';
+const FIREBASE_AUTH_HOST = 'gen-lang-client-0594646237.firebaseapp.com';
 
 async function proxyFirebaseAuthRequest(rawRequest: Request): Promise<Response> {
   const url = new URL(rawRequest.url);
@@ -528,7 +528,11 @@ app.post('/api/payments/verify', async (c) => {
 app.post('/api/payments/applications/status', async (c) => {
   const body = await c.req.json().catch(() => ({} as Record<string, any>));
   const rawApps = Array.isArray(body?.applications) ? body.applications : [];
-  const cfConfig = resolveCashfreeConfig(c.env, body?.preferredMode);
+  const preferredMode =
+    body?.preferredMode === 'production' || body?.preferredMode === 'sandbox'
+      ? body.preferredMode
+      : undefined;
+  const cfConfig = await loadEffectiveCashfreeConfig(c.env, preferredMode);
   if (cfConfig.isProductionRuntime) {
     const authUser = await resolveUserFromRequest(c.req.header('authorization'), c.env);
     if (!authUser) {

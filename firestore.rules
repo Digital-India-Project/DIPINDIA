@@ -55,12 +55,6 @@ service cloud.firestore {
       );
     }
 
-    function isApprovedOperator() {
-      return isVerifiedUser() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'operator';
-    }
-
     // -------------------------------------------------------------------------
     // Entity Validation Blueprints (Anti-Update-Gap)
     // -------------------------------------------------------------------------
@@ -575,7 +569,6 @@ service cloud.firestore {
         existing().userId == request.auth.uid ||
         existing().collectedByUid == request.auth.uid ||
         existing().assignedOperatorId == request.auth.uid ||
-        isApprovedOperator() ||
         isManagerOrAdmin()
       );
       allow list: if isSignedIn() && (
@@ -595,7 +588,7 @@ service cloud.firestore {
       allow update: if isSignedIn() && isValidId(applicationId) && isValidApplication(incoming()) && (
         (isManagerOrAdmin() && incoming().userId == existing().userId) ||
         (
-          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid || isApprovedOperator())
+          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid)
           && incoming().userId == existing().userId
           && incoming().totalAmount == existing().totalAmount
           && incoming().diff(existing()).affectedKeys().hasOnly([
@@ -632,7 +625,7 @@ service cloud.firestore {
       allow update: if isSignedIn() && isValidId(applicationId) && isValidTrackingRecord(incoming()) && (
         (isManagerOrAdmin() && incoming().ownerUid == existing().ownerUid) ||
         (
-          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid || isApprovedOperator())
+          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid)
           && incoming().ownerUid == existing().ownerUid
           && incoming().totalAmount == existing().totalAmount
           && incoming().diff(existing()).affectedKeys().hasOnly([

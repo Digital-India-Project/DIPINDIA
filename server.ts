@@ -154,6 +154,68 @@ app.use(['/__/auth', '/__/firebase'], async (req, res) => {
   }
 });
 
+// Shared Express Admin Verification (Firebase ID Token + Strict Admin Role/Email)
+const EXPRESS_BOOTSTRAP_ADMIN_EMAILS = new Set([
+  'allindiadigitalseva@gmail.com',
+  'cyber.sundial@gmail.com',
+]);
+
+async function resolveExpressAdminFromRequest(
+  req: express.Request
+): Promise<{ uid: string; email: string } | null> {
+  const token = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7).trim()
+    : '';
+  if (!token) return null;
+  const verified = await verifyFirebaseIdToken(token).catch(() => null);
+  if (!verified) return null;
+  const uid = String(verified.sub || verified.user_id || '').trim();
+  const email = String(verified.email || '').trim().toLowerCase();
+  const role = String((verified as Record<string, unknown>).role || '').trim().toLowerCase();
+  const isAdminEmail = Boolean(verified.email_verified && EXPRESS_BOOTSTRAP_ADMIN_EMAILS.has(email));
+  const isAdminRole = role === 'admin' || role === 'super_admin';
+  if (!uid || (!isAdminEmail && !isAdminRole)) {
+    return null;
+  }
+  return { uid, email };
+}
+
+const requireExpressAdmin: express.RequestHandler = async (req, res, next) => {
+  const token = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7).trim()
+    : '';
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      status: 'REJECTED',
+      message: 'Admin authentication required.',
+      error_code: 'UNAUTHORIZED',
+    });
+  }
+  const verified = await verifyFirebaseIdToken(token).catch(() => null);
+  if (!verified) {
+    return res.status(401).json({
+      success: false,
+      status: 'REJECTED',
+      message: 'Invalid or expired authentication token.',
+      error_code: 'UNAUTHORIZED',
+    });
+  }
+  const email = String(verified.email || '').trim().toLowerCase();
+  const role = String((verified as Record<string, unknown>).role || '').trim().toLowerCase();
+  const isAdminEmail = Boolean(verified.email_verified && EXPRESS_BOOTSTRAP_ADMIN_EMAILS.has(email));
+  const isAdminRole = role === 'admin' || role === 'super_admin';
+  if (!isAdminEmail && !isAdminRole) {
+    return res.status(403).json({
+      success: false,
+      status: 'REJECTED',
+      message: 'Administrator privileges required.',
+      error_code: 'FORBIDDEN',
+    });
+  }
+  return next();
+};
+
 // 1. Health check
 app.get('/api/health', (req, res) => {
   res.json({
@@ -1069,7 +1131,7 @@ let localGatewayConfigState = {
   timeoutMs: 12000,
 };
 
-app.get('/api/admin/payments/config', (_req, res) => {
+app.get('/api/admin/payments/config', requireExpressAdmin, (_req, res) => {
   const cfConfig = resolveCashfreeConfig(process.env);
   return res.json({
     success: true,
@@ -1091,7 +1153,7 @@ app.get('/api/admin/payments/config', (_req, res) => {
   });
 });
 
-app.put('/api/admin/payments/config', (req, res) => {
+app.put('/api/admin/payments/config', requireExpressAdmin, (req, res) => {
   const body = req.body || {};
   localGatewayConfigState = {
     environment: body.environment === 'production' ? 'production' : 'sandbox',
@@ -1105,7 +1167,7 @@ app.put('/api/admin/payments/config', (req, res) => {
   return res.json({ success: true, status: 'SUCCESS', message: 'Local dev Cashfree config updated', data: localGatewayConfigState });
 });
 
-app.get('/api/admin/payments/analytics', (_req, res) => {
+app.get('/api/admin/payments/analytics', requireExpressAdmin, (_req, res) => {
   const orders = Array.from(localCashfreeOrderStore.values());
   const paid = orders.filter((o) => o.status === 'PAID');
   const totalCollectedInr = paid.reduce((sum, o) => sum + Number(o.totalInr || 0), 0);
@@ -1129,7 +1191,7 @@ app.get('/api/admin/payments/analytics', (_req, res) => {
   });
 });
 
-app.get('/api/admin/payments', (_req, res) => {
+app.get('/api/admin/payments', requireExpressAdmin, (_req, res) => {
   const items = Array.from(localCashfreeOrderStore.entries()).map(([orderId, order]) => ({
     orderId,
     applicationId: orderId,
@@ -1152,15 +1214,15 @@ app.get('/api/admin/payments', (_req, res) => {
   });
 });
 
-app.get('/api/admin/payments/refunds', (_req, res) => {
+app.get('/api/admin/payments/refunds', requireExpressAdmin, (_req, res) => {
   return res.json({ success: true, status: 'SUCCESS', data: [] });
 });
 
-app.get('/api/admin/payments/webhooks', (_req, res) => {
+app.get('/api/admin/payments/webhooks', requireExpressAdmin, (_req, res) => {
   return res.json({ success: true, status: 'SUCCESS', data: [] });
 });
 
-app.post('/api/admin/payments/reconcile', (_req, res) => {
+app.post('/api/admin/payments/reconcile', requireExpressAdmin, (_req, res) => {
   return res.json({
     success: true,
     status: 'SUCCESS',
@@ -1169,7 +1231,7 @@ app.post('/api/admin/payments/reconcile', (_req, res) => {
   });
 });
 
-app.post('/api/admin/payments/cutover-check', async (_req, res) => {
+app.post('/api/admin/payments/cutover-check', requireExpressAdmin, async (_req, res) => {
   const cfConfig = resolveCashfreeConfig(process.env);
   const probe = await probeCashfreeGatewayCredentials(cfConfig);
   const testSecret = cfConfig.webhookSecret || cfConfig.clientSecret || 'dip_local_sandbox_test_secret';
@@ -1800,14 +1862,20 @@ async function resolveExpressApiSathiUser(req: express.Request) {
   const verified = token ? await verifyFirebaseIdToken(token).catch(() => null) : null;
   const uid = String(verified?.sub || verified?.user_id || '');
   if (uid) {
+    const email = String(verified?.email || '').trim().toLowerCase();
+    const role = String(((verified || {}) as Record<string, unknown>).role || '').trim().toLowerCase();
+    const isAdmin =
+      Boolean(verified?.email_verified && EXPRESS_BOOTSTRAP_ADMIN_EMAILS.has(email)) ||
+      role === 'admin' ||
+      role === 'super_admin';
     return {
       id: uid,
-      isAdmin: String(verified?.email || '').toLowerCase() === 'allindiadigitalseva@gmail.com' || true,
+      isAdmin,
       firebaseIdToken: token,
     };
   }
   if (!isProductionEnvironment(process.env)) {
-    return { id: 'local_dev_user', isAdmin: true, firebaseIdToken: null as string | null };
+    return { id: 'local_dev_user', isAdmin: false, firebaseIdToken: null as string | null };
   }
   return null;
 }
@@ -2350,14 +2418,7 @@ app.get('/api/v1/integrations/status', (req, res) => {
 });
 
 // Local Node Dev Parity: Cloudflare Free-Plan Registry Metadata Inspection
-app.get('/api/admin/infrastructure', async (req, res) => {
-  if (isProductionEnvironment(process.env)) {
-    const token = req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7).trim() : '';
-    const verified = token ? await verifyFirebaseIdToken(token) : null;
-    if (!verified) {
-      return res.status(401).json({ success: false, message: 'Admin authentication required', error_code: 'UNAUTHORIZED' });
-    }
-  }
+app.get('/api/admin/infrastructure', requireExpressAdmin, async (_req, res) => {
   return res.json(
     buildStandardResponse({
       success: true,
@@ -2635,7 +2696,7 @@ app.post('/api/v1/products/:slug/purchase', (req, res) => {
   });
 });
 
-const handleLocalProductDownload: express.RequestHandler = (req, res) => {
+const handleLocalProductDownload: express.RequestHandler = async (req, res) => {
   const slug = String(req.params.slug || '').trim();
   const orderId = String(req.query.orderId || '').trim();
   const product = findCatalogueItem(slug, localCatalogueItems);
@@ -2644,19 +2705,35 @@ const handleLocalProductDownload: express.RequestHandler = (req, res) => {
   }
   const stored = orderId ? localCashfreeOrderStore.get(orderId) : undefined;
   const isPaidOrder = Boolean(stored && (stored.paid || stored.status === 'PAID') && (!stored.serviceSlug || stored.serviceSlug === product.slug));
-  if (!orderId && !req.headers.authorization?.startsWith('Bearer ')) {
-    return res.status(401).json({
-      success: false,
-      error_code: 'UNAUTHORIZED',
-      message: 'Authentication or a verified paid order ID is required to download this digital product.',
-    });
-  }
+  const authHeader = req.headers.authorization;
+  const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+
   if (!isPaidOrder) {
-    return res.status(403).json({
-      success: false,
-      error_code: 'PAYMENT_REQUIRED',
-      message: 'Verified purchase required before downloading this digital product.',
-    });
+    if (!bearer) {
+      return res.status(orderId ? 403 : 401).json({
+        success: false,
+        error_code: orderId ? 'PAYMENT_REQUIRED' : 'UNAUTHORIZED',
+        message: orderId
+          ? 'Verified purchase required before downloading this digital product.'
+          : 'Authentication or a verified paid order ID is required to download this digital product.',
+      });
+    }
+    const adminUser = await resolveExpressAdminFromRequest(req);
+    if (!adminUser) {
+      const verifiedToken = await verifyFirebaseIdToken(bearer).catch(() => null);
+      if (!verifiedToken) {
+        return res.status(401).json({
+          success: false,
+          error_code: 'UNAUTHORIZED',
+          message: 'Invalid or expired authentication token.',
+        });
+      }
+      return res.status(403).json({
+        success: false,
+        error_code: 'PAYMENT_REQUIRED',
+        message: 'Verified purchase required before downloading this digital product.',
+      });
+    }
   }
   const payload = generateDigitalProductPayload(
     product.digitalAsset?.generatorKey,
@@ -2672,14 +2749,7 @@ const handleLocalProductDownload: express.RequestHandler = (req, res) => {
 app.get('/api/v1/products/:slug/download', handleLocalProductDownload);
 app.get('/api/products/:slug/download', handleLocalProductDownload);
 
-app.post('/api/admin/catalogue/import', async (req, res) => {
-  if (isProductionEnvironment(process.env)) {
-    const token = req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7).trim() : '';
-    const verified = token ? await verifyFirebaseIdToken(token) : null;
-    if (!verified) {
-      return res.status(401).json({ success: false, message: 'Admin authentication required', error_code: 'UNAUTHORIZED' });
-    }
-  }
+app.post('/api/admin/catalogue/import', requireExpressAdmin, async (req, res) => {
   const body = req.body || {};
   const { mergedItems, report } = runIdempotentCatalogueImport({
     existingItems: localCatalogueItems,

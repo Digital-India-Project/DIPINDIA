@@ -9,6 +9,7 @@ import {
 } from '../../lib/workflow';
 import { SwipeableActionItem } from '../../components/common/SwipeableActionItem';
 import { issueSignedFileDownloadUrl, uploadFileToR2 } from '../../services/backendApi';
+import { openExternalSafeUrl } from '../../lib/navigationController';
 import {
   Shield,
   FileCheck,
@@ -604,7 +605,7 @@ export const OperatorDashboard: React.FC<{
                             onClick={async () => {
                               const signed = await issueSignedFileDownloadUrl(doc.fileId!);
                               if (signed.ok && signed.data?.downloadUrl) {
-                                window.open(signed.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                                openExternalSafeUrl(signed.data.downloadUrl);
                               }
                             }}
                             className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-[11px] px-3 py-1 rounded-lg transition inline-flex items-center gap-1 cursor-pointer"

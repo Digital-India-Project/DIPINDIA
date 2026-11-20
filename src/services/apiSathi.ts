@@ -16,14 +16,16 @@
  *   8. Aadhaar, PAN, mobile, and email fields are masked BEFORE any logging or DB persistence.
  */
 
+import firebaseConfig from '../../firebase-applet-config.json';
+
 export const API_SATHI_BASE_URL = 'https://apisathi.in/gw/v1';
 export const API_SATHI_RATES_URL = 'https://apisathi.in/api/v1/rates';
 export const API_SATHI_TIMEOUT_MS = 20_000;
 export const API_SATHI_5XX_RETRY_BACKOFF_MS = [2000, 6000] as const;
 
 export const DEFAULT_FIREBASE_TARGET = {
-  projectId: 'gen-lang-client-0294214396',
-  firestoreDatabaseId: 'ai-studio-digitalindiaproj-180a918f-2fe4-4760-acaa-188e54a6b013',
+  projectId: firebaseConfig.projectId,
+  firestoreDatabaseId: firebaseConfig.firestoreDatabaseId,
 } as const;
 
 export type ApiSathiKeyMode = 'unconfigured' | 'sandbox_test' | 'live_production' | 'unknown';

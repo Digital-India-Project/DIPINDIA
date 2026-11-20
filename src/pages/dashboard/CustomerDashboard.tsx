@@ -47,6 +47,7 @@ import {
 } from '../../data/toolPlans';
 import type { PaidToolPurchaseRecord, ToolDefinition } from '../../types/tool';
 import { CashfreeModal } from '../../components/payment/CashfreeModal';
+import { openExternalSafeUrl } from '../../lib/navigationController';
 import {
   getApplicationProgress,
   getKycVerificationProgress,
@@ -241,13 +242,13 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     if (extractedId) {
       const signed = await issueSignedFileDownloadUrl(extractedId);
       if (signed.ok && signed.data?.downloadUrl) {
-        window.open(signed.data.downloadUrl, '_blank', 'noopener,noreferrer');
+        openExternalSafeUrl(signed.data.downloadUrl);
         setVaultNotice(`Opened signed download for "${app.completionFileName || 'Certificate'}".`);
         return;
       }
     }
     if (/^(https?:|blob:|data:)/i.test(rawUrl)) {
-      window.open(rawUrl, '_blank', 'noopener,noreferrer');
+      openExternalSafeUrl(rawUrl);
       return;
     }
     setVaultNotice(
@@ -1820,7 +1821,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                               onClick={async () => {
                                 const signed = await issueSignedFileDownloadUrl(item.file_id!);
                                 if (signed.ok && signed.data?.downloadUrl) {
-                                  window.open(signed.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                                  openExternalSafeUrl(signed.data.downloadUrl);
                                 } else {
                                   setVaultNotice(signed.message || 'Unable to generate signed R2 link.');
                                 }
@@ -1856,7 +1857,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                           if (doc.fileId) {
                             const signed = await issueSignedFileDownloadUrl(doc.fileId);
                             if (signed.ok && signed.data?.downloadUrl) {
-                              window.open(signed.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                              openExternalSafeUrl(signed.data.downloadUrl);
                               return;
                             }
                           }

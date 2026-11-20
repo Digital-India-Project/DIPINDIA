@@ -2,6 +2,11 @@ import { createWorker, OEM } from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cacheSnapshot, getCachedSnapshot } from '../../lib/offlineQueue';
 
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
+
 export type OcrLanguageCode = 'eng' | 'eng+hin' | 'hin';
 
 export interface OcrPageBreakdown {

@@ -1,5 +1,7 @@
-import { Router } from 'express';
+import crypto from 'node:crypto';
+import { Router, type RequestHandler } from 'express';
 import { z } from 'zod';
+import { verifyFirebaseIdToken } from '../../worker/middleware/auth';
 import {
   getKartaAuditReport,
   getKartaCuratedTemplates,
@@ -21,6 +23,65 @@ import {
   verifyEStampWithProvider,
 } from './providerService';
 import { buildDocxBuffer, buildPdfBuffer } from './exportService';
+
+const KARTA_ADMIN_EMAILS = new Set([
+  'allindiadigitalseva@gmail.com',
+  'cyber.sundial@gmail.com',
+]);
+
+function safeCompareSecret(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+const requireKartaAdmin: RequestHandler = async (req, res, next) => {
+  const headerKey = String(req.headers['x-admin-key'] || '').trim();
+  const configuredKey = String(process.env.ADMIN_API_KEY || '').trim();
+  if (headerKey && configuredKey && safeCompareSecret(headerKey, configuredKey)) {
+    return next();
+  }
+
+  const bearer = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7).trim()
+    : '';
+  if (bearer) {
+    const verified = await verifyFirebaseIdToken(bearer).catch(() => null);
+    if (!verified) {
+      res.status(401).json({
+        error: 'Invalid or expired admin authentication token.',
+        adminAuthRequired: true,
+      });
+      return;
+    }
+    const email = String(verified.email || '').trim().toLowerCase();
+    const role = String((verified as Record<string, unknown>).role || '').trim().toLowerCase();
+    const isAdminEmail = Boolean(verified.email_verified && KARTA_ADMIN_EMAILS.has(email));
+    const isAdminRole = role === 'admin' || role === 'super_admin';
+    if (!isAdminEmail && !isAdminRole) {
+      res.status(403).json({
+        error: 'Administrator privileges required.',
+        adminAuthRequired: true,
+      });
+      return;
+    }
+    return next();
+  }
+
+  if (headerKey) {
+    res.status(403).json({
+      error: 'Invalid admin key.',
+      adminAuthRequired: true,
+    });
+    return;
+  }
+
+  res.status(401).json({
+    error: 'Admin authentication required.',
+    adminAuthRequired: true,
+  });
+};
 
 export function createKartaRouter(): Router {
   const router = Router();
@@ -162,7 +223,7 @@ export function createKartaRouter(): Router {
     }
   });
 
-  router.get('/admin/providers', (_req, res) => {
+  router.get('/admin/providers', requireKartaAdmin, (_req, res) => {
     try {
       res.json(getAdminProviderConfigMasked());
     } catch (err) {

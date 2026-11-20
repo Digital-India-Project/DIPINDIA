@@ -1,3 +1,4 @@
+import { auth } from '../../services/firebase';
 import type {
   AdminProviderConfig,
   DocumentValidationReport,
@@ -28,9 +29,24 @@ export interface IngestionJobState {
   totalCount: number;
 }
 
-function getAdminHeaders(): Record<string, string> {
+async function getAdminHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {};
   const key = sessionStorage.getItem('di_admin_key') || '';
-  return key ? { 'x-admin-key': key } : {};
+  if (key) {
+    headers['x-admin-key'] = key;
+  }
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    try {
+      const token = await currentUser.getIdToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Fallback to x-admin-key if token retrieval fails
+    }
+  }
+  return headers;
 }
 
 async function handleJson<T>(res: Response): Promise<T> {
@@ -242,8 +258,9 @@ export async function requestEStampQuote(payload: {
 }
 
 export async function fetchAdminProviderConfig(): Promise<AdminProviderConfig> {
+  const headers = await getAdminHeaders();
   const res = await fetch('/api/karta/admin/providers', {
-    headers: getAdminHeaders(),
+    headers,
   });
   return handleJson(res);
 }

@@ -428,7 +428,11 @@ export async function pdfToWordDoc(file: File): Promise<ProcessedFileResult> {
     .map((line) => `<p style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; margin: 4pt 0;">${line || '&nbsp;'}</p>`)
     .join('\n');
 
-  const docHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${file.name}</title></head><body>${escaped}</body></html>`;
+  const safeTitle = file.name
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  const docHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${safeTitle}</title></head><body>${escaped}</body></html>`;
   const blob = new Blob([docHtml], { type: 'application/msword' });
   return {
     blob,
@@ -625,7 +629,11 @@ export async function createEncryptedPdfVault(
     return btoa(bin);
   };
 
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Protected PDF – ${file.name}</title><style>body{font-family:system-ui,sans-serif;background:#FAFAF7;color:#252525;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}main{background:#fff;border:1px solid #EAEAEA;border-radius:12px;padding:32px;max-width:420px;width:90%}input,button{width:100%;padding:10px 12px;border-radius:8px;margin-top:10px;box-sizing:border-box}input{border:1px solid #ccc}button{background:#F5C542;border:0;font-weight:700;cursor:pointer}#err{color:#dc2626;font-size:13px;margin-top:8px}</style></head><body><main><h2>Protected PDF Vault</h2><p>Enter password to decrypt and open <strong>${file.name.replace(/</g, '&lt;')}</strong> locally in your browser.</p><input id="pw" type="password" placeholder="Enter password" /><button onclick="unlock()">Decrypt & Download PDF</button><div id="err"></div></main><script>
+  const safeVaultName = file.name
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Protected PDF – ${safeVaultName}</title><style>body{font-family:system-ui,sans-serif;background:#FAFAF7;color:#252525;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}main{background:#fff;border:1px solid #EAEAEA;border-radius:12px;padding:32px;max-width:420px;width:90%}input,button{width:100%;padding:10px 12px;border-radius:8px;margin-top:10px;box-sizing:border-box}input{border:1px solid #ccc}button{background:#F5C542;border:0;font-weight:700;cursor:pointer}#err{color:#dc2626;font-size:13px;margin-top:8px}</style></head><body><main><h2>Protected PDF Vault</h2><p>Enter password to decrypt and open <strong>${safeVaultName}</strong> locally in your browser.</p><input id="pw" type="password" placeholder="Enter password" /><button onclick="unlock()">Decrypt & Download PDF</button><div id="err"></div></main><script>
 const S="${toB64(salt)}",I="${toB64(iv)}",D="${toB64(cipher)}",N=${JSON.stringify(file.name)};
 function b64(s){const b=atob(s),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
 async function unlock(){document.getElementById('err').textContent='';try{const p=document.getElementById('pw').value;const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveKey']);const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(S),iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(I)},k,b64(D));const u=URL.createObjectURL(new Blob([pt],{type:'application/pdf'}));const a=document.createElement('a');a.href=u;a.download=N;a.click();}catch(e){document.getElementById('err').textContent='Incorrect password.';}}

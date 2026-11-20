@@ -1468,7 +1468,7 @@ unifiedRouter.patch(
       ? gatewayRes.refundStatus
       : decision === 'Processed'
       ? 'SUCCESS'
-      : 'SUCCESS';
+      : 'PENDING';
 
     await billingDb
       .prepare(

@@ -1815,16 +1815,24 @@ adminRouter.put('/payments/config', requirePermission('integrations.manage'), as
   if (intDb) {
     await intDb
       .prepare(
-        `INSERT INTO api_integrations (id, code, name, environment, is_enabled, public_config_json, updated_by, updated_at)
-         VALUES ('int_cashfree', 'cashfree', 'Cashfree Payment Gateway', ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `INSERT INTO api_integrations (id, code, display_name, environment, is_enabled, is_configured, public_config_json, updated_by, updated_at)
+         VALUES ('int-cashfree', 'cashfree', 'Cashfree Payment Gateway', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
          ON CONFLICT(code) DO UPDATE SET
+           display_name = excluded.display_name,
            environment = excluded.environment,
            is_enabled = excluded.is_enabled,
+           is_configured = excluded.is_configured,
            public_config_json = excluded.public_config_json,
            updated_by = excluded.updated_by,
            updated_at = CURRENT_TIMESTAMP`
       )
-      .bind(environment, isEnabled ? 1 : 0, publicConfigJson, actor.id)
+      .bind(
+        environment,
+        isEnabled ? 1 : 0,
+        resolveCashfreeConfig(c.env).configured ? 1 : 0,
+        publicConfigJson,
+        actor.id
+      )
       .run();
   }
 

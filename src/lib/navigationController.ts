@@ -660,3 +660,22 @@ export function resolveDynamicNavigation(
     },
   };
 }
+
+/**
+ * Opens an external URL or signed download link cleanly without window.open(),
+ * avoiding popup blockers and iframe runtime restrictions.
+ */
+export function openExternalSafeUrl(url: string): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  const trimmed = String(url || '').trim();
+  if (!trimmed) return false;
+  const anchor = document.createElement('a');
+  anchor.href = trimmed;
+  anchor.target = '_blank';
+  anchor.rel = 'noopener noreferrer';
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  return true;
+}

@@ -27,6 +27,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { SchemaMigrationPanel } from '../workspace/SchemaMigrationPanel';
+import { openExternalSafeUrl } from '../../lib/navigationController';
 
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
@@ -148,7 +149,7 @@ export const InfrastructureTab: React.FC = () => {
   const handleSignedDownload = async (fileId: string) => {
     const res = await issueSignedFileDownloadUrl(fileId);
     if (res.ok && res.data?.downloadUrl) {
-      window.open(res.data.downloadUrl, '_blank', 'noopener,noreferrer');
+      openExternalSafeUrl(res.data.downloadUrl);
     } else {
       setErrorMessage(res.message);
     }
@@ -178,8 +179,8 @@ export const InfrastructureTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Action Bar */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="space-y-1">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="space-y-1 flex-[1_1_280px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FF671F] uppercase tracking-wider">
             <Cloud className="w-4 h-4 shrink-0" />
             <span>Cloudflare Free-Plan Central Registry · digitalindiaproject.com</span>
@@ -192,7 +193,7 @@ export const InfrastructureTab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 max-w-full">
           <button
             type="button"
             onClick={handleHealthProbe}

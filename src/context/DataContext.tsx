@@ -44,7 +44,13 @@ import { resolveCouponValidation } from '../lib/catalogueServer';
 import { INITIAL_BLOG_POSTS } from '../data/initialBlogPosts';
 import { slugifyBlogTitle, estimateReadingTime } from '../lib/blogSeo';
 import { useAuth } from './AuthContext';
-import { auth, db, handleFirestoreError, OperationType } from '../services/firebase';
+import {
+  ADMIN_BOOTSTRAP_EMAILS,
+  auth,
+  db,
+  handleFirestoreError,
+  OperationType,
+} from '../services/firebase';
 import {
   addPartnerCustomerBackend,
   assignApplicationBackend,
@@ -1029,9 +1035,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // 1b. Live Public Published Blog Subscription (/blog_posts)
   useEffect(() => {
+    const authEmail = (auth.currentUser?.email || user?.email || '').trim().toLowerCase();
     const isVerifiedAdmin =
-      auth.currentUser?.email?.toLowerCase() === 'allindiadigitalseva@gmail.com' ||
-      user?.email?.toLowerCase() === 'allindiadigitalseva@gmail.com';
+      ADMIN_BOOTSTRAP_EMAILS.has(authEmail) || isSuperAdminRole(user?.role);
     const blogQuery = isVerifiedAdmin
       ? collection(db, 'blog_posts')
       : query(collection(db, 'blog_posts'), where('status', '==', 'published'));
@@ -1811,7 +1817,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
 
-    if (auth.currentUser && isSuperAdminRole(user?.role)) {
+    const canSyncAppToFirestore =
+      Boolean(auth.currentUser) &&
+      (updatedApp.userId === auth.currentUser?.uid ||
+        isSuperAdminRole(user?.role) ||
+        user?.role === 'manager' ||
+        user?.role === 'admin');
+    if (canSyncAppToFirestore) {
       await syncApplicationToFirestore(updatedApp);
     }
   };

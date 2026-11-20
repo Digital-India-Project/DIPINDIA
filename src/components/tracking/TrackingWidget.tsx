@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { InlineSkeletonPulse, TrackingResultSkeleton } from '../common/SkeletonLoaders';
 import { trackInteraction } from '../../lib/perfMonitor';
+import { openExternalSafeUrl } from '../../lib/navigationController';
 
 interface TrackingWidgetProps {
   initialAppId?: string;
@@ -227,8 +228,8 @@ export const TrackingWidget: React.FC<TrackingWidgetProps> = ({ initialAppId = '
         {!loading && application && (
           <div className="mt-6 border-t border-[#E5E7EB] pt-6 space-y-6 animate-fadeIn">
             {/* Top Summary Bar */}
-            <div className="p-4 bg-[#F7F8FA] rounded-xl border border-[#E5E7EB] flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
+            <div className="p-4 bg-[#F7F8FA] rounded-xl border border-[#E5E7EB] flex flex-wrap items-start md:items-center justify-between gap-4">
+              <div className="space-y-1 flex-[1_1_280px] min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm font-bold text-[#FF671F]">{application.id}</span>
                   <span className="text-slate-400">·</span>
@@ -293,11 +294,11 @@ export const TrackingWidget: React.FC<TrackingWidgetProps> = ({ initialAppId = '
                           if (match?.[1]) {
                             const signed = await issueSignedFileDownloadUrl(match[1]);
                             if (signed.ok && signed.data?.downloadUrl) {
-                              window.open(signed.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                              openExternalSafeUrl(signed.data.downloadUrl);
                               return;
                             }
                           }
-                          window.open(rawUrl, '_blank', 'noopener,noreferrer');
+                          openExternalSafeUrl(rawUrl);
                         }
                       }}
                       disabled={!application.completionFileUrl || application.completionFileUrl.startsWith('#')}
