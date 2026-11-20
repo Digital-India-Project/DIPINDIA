@@ -16,6 +16,7 @@ import {
   partnerRouter,
   publicBlogRouter,
 } from './routes/portalAndJunctionRoutes';
+import { kartaRouter } from './routes/kartaRoutes';
 import {
   getAvailableAiProviders,
   runMultiProviderAssistant,
@@ -185,6 +186,7 @@ app.route('/api/integrations', integrationsRouter);
 app.route('/api/blog', publicBlogRouter);
 app.route('/api/directory', publicDirectoryRouter);
 app.route('/api/admin/directory', adminDirectoryRouter);
+app.route('/api/karta', kartaRouter);
 
 app.get('/api/ai/providers', (c) => {
   return c.json({

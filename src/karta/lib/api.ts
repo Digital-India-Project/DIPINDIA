@@ -67,12 +67,33 @@ async function handleJson<T>(res: Response): Promise<T> {
   return data as T;
 }
 
+async function fetchWithFallback<T>(
+  request: () => Promise<Response>,
+  fallback: () => Promise<T> | T
+): Promise<T> {
+  try {
+    const res = await request();
+    if (res.status === 404) {
+      return await fallback();
+    }
+    return await handleJson<T>(res);
+  } catch (err) {
+    const status = (err as { status?: number })?.status;
+    if (status === 404 || err instanceof TypeError) {
+      return await fallback();
+    }
+    throw err;
+  }
+}
+
 export async function fetchAuditReport(): Promise<{
   report: LibraryAuditReport;
   job: IngestionJobState;
 }> {
-  const res = await fetch('/api/karta/audit');
-  return handleJson(res);
+  return fetchWithFallback(
+    () => fetch('/api/karta/audit'),
+    async () => (await import('./kartaLocalFallback')).fallbackFetchAuditReport()
+  );
 }
 
 export async function fetchTemplates(params: {
@@ -102,13 +123,17 @@ export async function fetchTemplates(params: {
   }
   if (params.page) sp.set('page', String(params.page));
   if (params.limit) sp.set('limit', String(params.limit));
-  const res = await fetch(`/api/karta/templates?${sp.toString()}`);
-  return handleJson(res);
+  return fetchWithFallback(
+    () => fetch(`/api/karta/templates?${sp.toString()}`),
+    async () => (await import('./kartaLocalFallback')).fallbackFetchTemplates(params)
+  );
 }
 
 export async function fetchTemplateDetail(id: string): Promise<TemplateDetail> {
-  const res = await fetch(`/api/karta/templates/${encodeURIComponent(id)}`);
-  return handleJson(res);
+  return fetchWithFallback(
+    () => fetch(`/api/karta/templates/${encodeURIComponent(id)}`),
+    async () => (await import('./kartaLocalFallback')).fallbackFetchTemplateDetail(id)
+  );
 }
 
 export async function renderDraft(payload: {
@@ -116,12 +141,15 @@ export async function renderDraft(payload: {
   formValues: Record<string, string>;
   repeatableValues?: Record<string, Array<Record<string, string>>>;
 }): Promise<GeneratedDocumentResult> {
-  const res = await fetch('/api/karta/drafts/render', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  return handleJson(res);
+  return fetchWithFallback(
+    () =>
+      fetch('/api/karta/drafts/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+    async () => (await import('./kartaLocalFallback')).fallbackRenderDraft(payload)
+  );
 }
 
 export async function validateDocument(payload: {
@@ -134,12 +162,15 @@ export async function validateDocument(payload: {
   eStampMode?: 'none' | 'sample_preview' | 'existing_certificate';
   eStampCertNumber?: string;
 }): Promise<DocumentValidationReport> {
-  const res = await fetch('/api/karta/validate-document', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  return handleJson(res);
+  return fetchWithFallback(
+    () =>
+      fetch('/api/karta/validate-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+    async () => (await import('./kartaLocalFallback')).fallbackValidateDocument(payload)
+  );
 }
 
 export async function validateUploadedDocument(payload: {
@@ -223,8 +254,10 @@ export async function downloadExportFile(
 }
 
 export async function fetchProviderStatus(): Promise<PublicProviderStatus> {
-  const res = await fetch('/api/karta/providers/status');
-  return handleJson(res);
+  return fetchWithFallback(
+    () => fetch('/api/karta/providers/status'),
+    async () => (await import('./kartaLocalFallback')).fallbackFetchProviderStatus()
+  );
 }
 
 export async function verifyEStampCertificate(payload: {
@@ -232,12 +265,15 @@ export async function verifyEStampCertificate(payload: {
   state?: string;
   purchaseDate?: string;
 }): Promise<EStampVerifyResult> {
-  const res = await fetch('/api/karta/estamp/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  return handleJson(res);
+  return fetchWithFallback(
+    () =>
+      fetch('/api/karta/estamp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+    async () => (await import('./kartaLocalFallback')).fallbackVerifyEStamp(payload)
+  );
 }
 
 export async function requestEStampQuote(payload: {
@@ -249,12 +285,15 @@ export async function requestEStampQuote(payload: {
   secondParty?: string;
   documentTitle?: string;
 }): Promise<EStampQuoteResult> {
-  const res = await fetch('/api/karta/estamp/request-quote', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  return handleJson(res);
+  return fetchWithFallback(
+    () =>
+      fetch('/api/karta/estamp/request-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+    async () => (await import('./kartaLocalFallback')).fallbackRequestEStampQuote(payload)
+  );
 }
 
 export async function fetchAdminProviderConfig(): Promise<AdminProviderConfig> {
