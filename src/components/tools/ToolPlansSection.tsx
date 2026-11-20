@@ -164,8 +164,8 @@ export const ToolPlansSection: React.FC<ToolPlansSectionProps> = ({
   return (
     <div className={compact ? 'space-y-4' : 'space-y-6'}>
       {/* Active Status + Primary Purchase Mode Toggle */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
-        <div className="space-y-1.5">
+      <div className="flex flex-wrap items-start xl:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+        <div className="space-y-1.5 flex-[1_1_320px] min-w-0">
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
             <Crown className="w-3.5 h-3.5 shrink-0" />
             <span>
@@ -207,7 +207,7 @@ export const ToolPlansSection: React.FC<ToolPlansSectionProps> = ({
         </div>
 
         {/* Mode Toggle: One-time Use (10 INR) vs Monthly Subscription */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 max-w-full">
           <div
             role="tablist"
             aria-label="Purchase Mode Toggle"
@@ -396,8 +396,8 @@ export const ToolPlansSection: React.FC<ToolPlansSectionProps> = ({
       {pricingMode === 'one_time' && (
         <div className="space-y-4">
           {/* Captured Selection Checkout Bar */}
-          <div className="p-4 sm:p-5 rounded-2xl border-2 border-[#FF671F] bg-gradient-to-r from-orange-50/90 via-amber-50/50 to-white dark:from-orange-950/35 dark:via-slate-900 dark:to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
-            <div className="space-y-1">
+          <div className="p-4 sm:p-5 rounded-2xl border-2 border-[#FF671F] bg-gradient-to-r from-orange-50/90 via-amber-50/50 to-white dark:from-orange-950/35 dark:via-slate-900 dark:to-slate-950 flex flex-wrap items-start md:items-center justify-between gap-4 shadow-xs">
+            <div className="space-y-1 flex-[1_1_280px] min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-100 dark:bg-orange-950/70 text-[#E55B1B] dark:text-orange-300 text-[10px] font-bold uppercase">
                   <Ticket className="w-3 h-3" />
@@ -419,7 +419,7 @@ export const ToolPlansSection: React.FC<ToolPlansSectionProps> = ({
               type="button"
               onClick={() => selectedPassTool && startOneTimeCheckout(selectedPassTool)}
               disabled={!selectedPassTool}
-              className="px-5 py-2.5 rounded-xl bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs whitespace-nowrap tabular-nums disabled:opacity-50"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap tabular-nums disabled:opacity-50"
             >
               <Ticket className="w-4 h-4" />
               <span>Unlock {selectedPassTool?.name || 'Tool'} for ₹{TOOL_SINGLE_USE_PRICE_INR}</span>

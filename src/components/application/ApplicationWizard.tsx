@@ -590,7 +590,10 @@ export const ApplicationWizard: React.FC<ApplicationWizardProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden max-h-[84vh] flex flex-col">
+    <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl border-t sm:border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden max-h-[92dvh] sm:max-h-[86dvh] pb-safe flex flex-col">
+      <div className="sm:hidden pt-2 pb-0.5 flex justify-center bg-gradient-to-r from-[#FFFDF8] via-white to-[#F7F8FA] dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 shrink-0">
+        <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+      </div>
       <div className="bg-gradient-to-r from-[#FFFDF8] via-white to-[#F7F8FA] dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 px-4 py-3 border-b border-slate-200 dark:border-slate-800 space-y-2 shrink-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -616,7 +619,7 @@ export const ApplicationWizard: React.FC<ApplicationWizardProps> = ({
             type="button"
             onClick={onCancel}
             aria-label="Close application popup"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flutter-press transition cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>

@@ -199,7 +199,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
     onCloseMobile();
   };
 
-  const renderNavRow = (item: ControlledNavItem, isCompactRail: boolean) => {
+  const renderNavRow = (item: ControlledNavItem, isCompactRail: boolean, isMobileDrawer = false) => {
     const Icon = SIDEBAR_ICON_MAP[item.iconKey] || Compass;
     const active = isItemActive(item);
     const label = lang === 'hi' && item.labelHi ? item.labelHi : item.label;
@@ -211,11 +211,15 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
         onClick={(e) => handleItemClick(e, item)}
         title={isCompactRail ? label : undefined}
         aria-current={active ? 'page' : undefined}
-        className={`group flex items-center ${
-          isCompactRail ? 'justify-center px-2 py-2' : 'justify-between gap-2 px-2.5 py-1.5'
-        } rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+        className={`group flex items-center flutter-press ${
+          isCompactRail
+            ? 'justify-center px-2 py-2.5 rounded-2xl'
+            : isMobileDrawer
+            ? 'justify-between gap-2.5 px-3.5 py-2.5 min-h-[44px] rounded-full'
+            : 'justify-between gap-2 px-3 py-2 rounded-xl'
+        } text-xs font-medium transition-colors cursor-pointer ${
           active
-            ? 'bg-[#FFF5EE] dark:bg-orange-950/40 text-[#FF671F] font-bold border border-[#FF671F]/25'
+            ? 'bg-[#FFF5EE] dark:bg-orange-950/45 text-[#FF671F] font-bold border border-[#FF671F]/25 shadow-2xs'
             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-950 dark:hover:text-white border border-transparent'
         }`}
       >
@@ -230,7 +234,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           {!isCompactRail && <span className="truncate">{label}</span>}
         </div>
         {!isCompactRail && item.badge && (
-          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
             {item.badge}
           </span>
         )}
@@ -265,12 +269,16 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
       lang === 'hi' ? controlled.sidebar.roleGroupTitleHi : controlled.sidebar.roleGroupTitle;
 
     return (
-      <div className="flex flex-col h-full bg-white dark:bg-slate-950 select-none">
+      <div
+        className={`flex flex-col h-full bg-white dark:bg-slate-950 select-none ${
+          isMobileDrawer ? 'pt-safe pb-safe' : ''
+        }`}
+      >
         {/* Sidebar Top Strip */}
         <div
           className={`flex items-center ${
-            isRail ? 'justify-center px-2' : 'justify-between px-3'
-          } py-2.5 border-b border-slate-200 dark:border-slate-800 shrink-0`}
+            isRail ? 'justify-center px-2' : 'justify-between px-3.5'
+          } py-3 border-b border-slate-200 dark:border-slate-800 shrink-0`}
         >
           {isMobileDrawer ? (
             <a
@@ -350,7 +358,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                   {lang === 'hi' ? 'मुख्य दृश्य' : 'Primary Navigation'}
                 </div>
                 <div className="space-y-0.5">
-                  {mobilePrimaryItems.map((item) => renderNavRow(item, false))}
+                  {mobilePrimaryItems.map((item) => renderNavRow(item, false, true))}
                 </div>
               </div>
               <div className="border-t border-slate-100 dark:border-slate-800/80" />
@@ -374,7 +382,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               )}
               {(isRail || portalGroupOpen) && (
                 <div className="space-y-0.5">
-                  {roleWorkspaceItems.map((item) => renderNavRow(item, isRail))}
+                  {roleWorkspaceItems.map((item) => renderNavRow(item, isRail, isMobileDrawer))}
                 </div>
               )}
             </div>
@@ -399,7 +407,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 )}
                 {(isRail || oversightGroupOpen) && (
                   <div className="space-y-0.5">
-                    {oversightItems.map((item) => renderNavRow(item, isRail))}
+                    {oversightItems.map((item) => renderNavRow(item, isRail, isMobileDrawer))}
                   </div>
                 )}
               </div>
@@ -425,7 +433,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 )}
                 {(isRail || toolsGroupOpen) && (
                   <div className="space-y-0.5">
-                    {toolTrayItems.map((item) => renderNavRow(item, isRail))}
+                    {toolTrayItems.map((item) => renderNavRow(item, isRail, isMobileDrawer))}
                   </div>
                 )}
               </div>
@@ -451,7 +459,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 )}
                 {(isRail || exploreGroupOpen) && (
                   <div className="space-y-0.5">
-                    {exploreItems.map((item) => renderNavRow(item, isRail))}
+                    {exploreItems.map((item) => renderNavRow(item, isRail, isMobileDrawer))}
                   </div>
                 )}
               </div>
@@ -477,7 +485,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 ) : null}
                 {(isRail || supportGroupOpen) && (
                   <div className="space-y-0.5">
-                    {supportItems.map((item) => renderNavRow(item, isRail))}
+                    {supportItems.map((item) => renderNavRow(item, isRail, isMobileDrawer))}
                   </div>
                 )}
               </div>
@@ -575,21 +583,21 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
   return (
     <>
-      {/* Desktop / Large-Tablet Collapsible Sticky Sidebar Rail */}
+      {/* Desktop / Large-Tablet Collapsible Sticky Flutter NavigationRail */}
       <aside
         aria-label="Collapsible Navigation Sidebar"
         style={{
           top: 'var(--dip-header-h, 93px)',
-          height: 'calc(100vh - var(--dip-header-h, 93px))',
+          height: 'calc(100dvh - var(--dip-header-h, 93px))',
         }}
-        className={`hidden lg:block shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-[width] duration-200 ease-out sticky z-30 ${
-          collapsed ? 'w-16' : 'w-60'
+        className={`hidden lg:block shrink-0 border-r border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)] sticky z-30 ${
+          collapsed ? 'w-16' : 'w-64'
         }`}
       >
         {renderSidebarBody(false)}
       </aside>
 
-      {/* Mobile & Tablet Slide-Over Collapsible Drawer */}
+      {/* Mobile & Tablet Slide-Over Flutter Material 3 NavigationDrawer */}
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 z-50 flex animate-fadeIn"
@@ -601,7 +609,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             className="fixed inset-0 bg-slate-950/55 backdrop-blur-xs"
             onClick={onCloseMobile}
           />
-          <aside className="relative z-10 w-68 max-w-[82vw] h-full border-r border-slate-200 dark:border-slate-800 shadow-2xl">
+          <aside className="relative z-10 w-72 max-w-[85vw] h-dvh rounded-r-3xl overflow-hidden border-r border-slate-200/80 dark:border-slate-800/80 shadow-2xl">
             {renderSidebarBody(true)}
           </aside>
         </div>

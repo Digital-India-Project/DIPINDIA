@@ -426,10 +426,10 @@ export const B2BPortal: React.FC<{ initialTab?: string; onNavigate: (route: stri
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-xs text-slate-700 dark:text-slate-200">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#202124] to-[#1E293B] text-white p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="bg-gradient-to-r from-[#202124] to-[#1E293B] text-white p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FFC928] uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-[#138808]" />
+            <ShieldCheck className="w-4 h-4 text-[#138808] shrink-0" />
             <span>Digital India Project — B2B & Enterprise Portal</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black mt-1">
@@ -443,10 +443,10 @@ export const B2BPortal: React.FC<{ initialTab?: string; onNavigate: (route: stri
         </div>
 
         {(user.role === 'admin' || user.role === 'super_admin') && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap max-w-full">
             <button
               onClick={() => onNavigate('admin')}
-              className="text-xs font-bold text-blue-300 hover:text-white bg-blue-950 px-3 py-2 rounded-xl border border-blue-800 cursor-pointer"
+              className="text-xs font-bold text-blue-300 hover:text-white bg-blue-950 px-3 py-2 rounded-xl border border-blue-800 cursor-pointer whitespace-nowrap"
             >
               Admin Console →
             </button>

@@ -287,12 +287,12 @@ export const ToolWorkspacePage: React.FC<ToolWorkspacePageProps> = ({ slug, onNa
 
       {/* Tool Header Card */}
       <section className="p-4 sm:p-6 rounded-2xl border border-orange-200/80 dark:border-orange-900/45 bg-gradient-to-r from-orange-50/85 via-white to-sky-50/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 space-y-4">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div className="flex items-start gap-3.5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-start gap-3.5 flex-[1_1_300px] min-w-0">
             <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 flex items-center justify-center text-[#FF671F] shrink-0 shadow-2xs">
               <LucideIcon name={tool.iconName} className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   {tool.name}
@@ -310,7 +310,7 @@ export const ToolWorkspacePage: React.FC<ToolWorkspacePageProps> = ({ slug, onNa
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2">
             {showExportButton && canRenderWorkspace && (
               <button
                 type="button"

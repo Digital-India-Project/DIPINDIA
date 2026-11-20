@@ -95,7 +95,7 @@ export const BecomePartnerPage: React.FC<BecomePartnerPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] dark:bg-[#0B1120] pb-16">
+    <div className="min-h-dvh bg-[#F7F8FA] dark:bg-[#0B1120] pb-16">
       {/* Executive Dark Hero */}
       <section className="bg-[#1E293B] text-white border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">

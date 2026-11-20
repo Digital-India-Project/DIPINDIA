@@ -351,14 +351,14 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden">
-        <div className="bg-[#202124] text-white px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-[#FF671F] flex items-center justify-center text-white font-black text-xs">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+      <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl max-w-lg w-full border-t sm:border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden max-h-[92dvh] flex flex-col pb-safe animate-sheet-up sm:animate-scaleUp">
+        <div className="bg-[#202124] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded bg-[#FF671F] flex items-center justify-center text-white font-black text-xs shrink-0">
               CF
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-xs font-bold tracking-tight">
                 <span>Cashfree Payments</span>
                 <span
@@ -377,7 +377,7 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
                     : 'Cashfree Sandbox'}
                 </span>
               </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-[10px] text-slate-400 truncate">
                 {activeOrderId ? `Order #${activeOrderId}` : 'Secure 2023-08-01 Checkout'}
               </div>
             </div>
@@ -389,13 +389,13 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
               onClose();
             }}
             disabled={processing && step === 'success'}
-            className="p-1 rounded-md text-slate-400 hover:text-white transition disabled:opacity-30 cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-white transition disabled:opacity-30 cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto scroll-touch">
           {step === 'checkout' && (
             <div className="space-y-5">
               <div className="bg-[#F7F8FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-2 tabular-nums">

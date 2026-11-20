@@ -93,7 +93,7 @@ export const DigitalToolsTray: React.FC<DigitalToolsTrayProps> = ({ onNavigate }
         onClick={() => setTrayOpen(false)}
       />
 
-      <aside className="relative z-10 w-full max-w-md h-full bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col">
+      <aside className="relative z-10 w-full sm:max-w-md h-dvh pt-safe pb-safe bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 sm:rounded-l-3xl shadow-2xl flex flex-col overflow-hidden">
         {/* Drawer Header */}
         <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-orange-50/90 via-white to-emerald-50/80 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -114,7 +114,7 @@ export const DigitalToolsTray: React.FC<DigitalToolsTrayProps> = ({ onNavigate }
             type="button"
             onClick={() => setTrayOpen(false)}
             aria-label="Close Digital Tools Tray"
-            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:border-[#FF671F] cursor-pointer shrink-0"
+            className="w-10 h-10 sm:w-8 sm:h-8 rounded-xl sm:rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:border-[#FF671F] flutter-press cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -167,7 +167,7 @@ export const DigitalToolsTray: React.FC<DigitalToolsTrayProps> = ({ onNavigate }
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none scroll-touch pb-0.5">
             {(
               [
                 { id: 'popular', label: 'Popular' },
@@ -186,7 +186,7 @@ export const DigitalToolsTray: React.FC<DigitalToolsTrayProps> = ({ onNavigate }
                   setQuery('');
                   setActiveTab(tab.id);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap shrink-0 cursor-pointer transition ${
+                className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap shrink-0 flutter-press cursor-pointer transition ${
                   activeTab === tab.id && !query
                     ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-orange-950/40'
@@ -199,7 +199,7 @@ export const DigitalToolsTray: React.FC<DigitalToolsTrayProps> = ({ onNavigate }
         </div>
 
         {/* Scrollable Quick Tool Grid + Category Pills */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        <div className="flex-1 overflow-y-auto scroll-touch p-3 space-y-4">
           {/* Quick Category Chips */}
           {!query && (
             <div>

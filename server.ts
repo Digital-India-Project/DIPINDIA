@@ -106,7 +106,7 @@ if (apiKey) {
 
 // Reverse-proxy Firebase Auth handler/iframe paths so authDomain works on digitalindiaproject.com
 const FIREBASE_AUTH_HOST =
-  process.env.FIREBASE_AUTH_HOST || 'gen-lang-client-0294214396.firebaseapp.com';
+  process.env.FIREBASE_AUTH_HOST || 'gen-lang-client-0594646237.firebaseapp.com';
 app.use(['/__/auth', '/__/firebase'], async (req, res) => {
   try {
     const targetUrl = `https://${FIREBASE_AUTH_HOST}${req.originalUrl}`;

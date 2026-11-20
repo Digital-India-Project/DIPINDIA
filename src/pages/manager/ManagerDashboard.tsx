@@ -170,10 +170,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FFC928] uppercase tracking-wider">
-            <Shield className="w-4 h-4 text-[#FF671F]" />
+            <Shield className="w-4 h-4 text-[#FF671F] shrink-0" />
             <span>Operations Manager Command · Scope: {user.managerScope || 'All Regional Desks'}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black mt-1">
@@ -184,17 +184,17 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap max-w-full">
           <button
             onClick={() => onNavigate('operator')}
-            className="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-emerald-300 px-3.5 py-2 rounded-xl border border-slate-700 cursor-pointer"
+            className="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-emerald-300 px-3.5 py-2 rounded-xl border border-slate-700 cursor-pointer whitespace-nowrap"
           >
             Open Verification Desk
           </button>
           {isSuperAdminRole(normalizedRole) && (
             <button
               onClick={() => onNavigate('admin')}
-              className="text-xs font-bold bg-[#FF671F] hover:bg-[#E55B1B] text-white px-3.5 py-2 rounded-xl cursor-pointer flex items-center gap-1"
+              className="text-xs font-bold bg-[#FF671F] hover:bg-[#E55B1B] text-white px-3.5 py-2 rounded-xl cursor-pointer flex items-center gap-1 whitespace-nowrap"
             >
               <span>Super Admin</span>
               <ArrowRight className="w-3.5 h-3.5" />

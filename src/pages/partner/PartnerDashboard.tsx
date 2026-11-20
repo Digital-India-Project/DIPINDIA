@@ -342,10 +342,10 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Top Partner Hero */}
-      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
+      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="space-y-1 flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FFC928] uppercase tracking-wider">
-            <Handshake className="w-4 h-4 text-[#138808]" />
+            <Handshake className="w-4 h-4 text-[#138808] shrink-0" />
             <span>
               Partner Workspace · Status:{' '}
               <span className="text-emerald-300">{myPartnerProfile?.approvalStatus || 'Active'}</span>
@@ -370,12 +370,12 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 max-w-full">
           <button
             type="button"
             disabled={!isApprovedPartner}
             onClick={() => onStartAssistedApplication(services[0], { partnerId: myPartnerId })}
-            className="bg-[#FF671F] hover:bg-[#E55B1B] disabled:opacity-50 text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center gap-2 cursor-pointer"
+            className="bg-[#FF671F] hover:bg-[#E55B1B] disabled:opacity-50 text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center gap-2 cursor-pointer whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             <span>File Assisted Application</span>
@@ -384,7 +384,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
           <button
             type="button"
             onClick={() => setSandboxTestOpen(true)}
-            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 font-bold text-xs px-4 py-3 rounded-xl flex items-center gap-1.5 cursor-pointer transition"
+            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 font-bold text-xs px-4 py-3 rounded-xl flex items-center gap-1.5 cursor-pointer transition whitespace-nowrap"
           >
             <FlaskConical className="w-4 h-4" />
             <span>Test Payment</span>

@@ -526,10 +526,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onApplyForServic
           {/* SECTION 4B: DIGITAL TOOLS TRAY (150+ UTILITIES + FREE & PAID PLANS) */}
           <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div className="bg-gradient-to-br from-orange-50/85 via-white to-indigo-50/65 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30 border border-orange-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-7 shadow-xs space-y-5">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
-                    <Wrench className="w-3.5 h-3.5" />
+              <div className="flex flex-wrap items-start xl:items-center justify-between gap-4">
+                <div className="flex-[1_1_320px] min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
+                    <Wrench className="w-3.5 h-3.5 shrink-0" />
                     <span>Integrated Digital Tools Tray · 150+ Browser &amp; AI Utilities</span>
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -540,7 +540,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onApplyForServic
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -648,8 +648,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onApplyForServic
 
           {/* SECTION 5: POPULAR SERVICES */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-              <div>
+            <div className="flex flex-wrap items-start md:items-end justify-between mb-6 gap-4">
+              <div className="flex-[1_1_280px] min-w-0">
                 <div className="text-xs font-bold text-[#FF671F] uppercase tracking-wider mb-1">
                   Complete Online Facilitation
                 </div>
@@ -672,7 +672,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onApplyForServic
             </div>
 
             {/* Category Filter Strip (compact chips on phone/tablet, wrapped on desktop) */}
-            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none pb-2 lg:flex-wrap mb-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none scroll-touch pb-2 lg:flex-wrap mb-4">
               <button
                 type="button"
                 onClick={() => {
@@ -967,8 +967,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onApplyForServic
             </div>
 
             {/* Regional Presence Strip */}
-            <div className="bg-gradient-to-r from-orange-50/75 via-white to-emerald-50/70 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 border border-orange-200/70 dark:border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
+            <div className="bg-gradient-to-r from-orange-50/75 via-white to-emerald-50/70 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 border border-orange-200/70 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-wrap items-start xl:items-center justify-between gap-4">
+              <div className="flex-[1_1_300px] min-w-0 space-y-1">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
                   Regional Headquarters &amp; Pan-India Online Desk
                 </div>

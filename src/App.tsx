@@ -402,7 +402,7 @@ function MainApp() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50/40 via-sky-50/35 to-emerald-50/40 dark:from-[#0B1120] dark:via-[#0E172A] dark:to-[#091521] text-[#202124] dark:text-slate-100">
+    <div className="min-h-dvh overflow-x-clip flex flex-col bg-gradient-to-br from-orange-50/40 via-sky-50/35 to-emerald-50/40 dark:from-[#0B1120] dark:via-[#0E172A] dark:to-[#091521] text-[#202124] dark:text-slate-100">
       {/* Always-visible Fixed Top Header */}
       <div ref={topHeaderRef} className="fixed top-0 left-0 right-0 z-40">
         <Header
@@ -441,7 +441,7 @@ function MainApp() {
           onCloseMobile={() => setMobileSidebarOpen(false)}
         />
 
-        <div className="flex-1 min-w-0 flex flex-col pb-16 lg:pb-0">
+        <div className="flex-1 min-w-0 flex flex-col pb-[calc(4.75rem+env(safe-area-inset-bottom))] lg:pb-0">
           <PullToRefresh onRefresh={handleReloadFromTop}>
             <main key={viewRefreshKey} className="flex-1 animate-fadeIn">
               <React.Suspense
@@ -721,11 +721,11 @@ function MainApp() {
       </React.Suspense>
 
       {applyingService && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-fadeIn">
-          <div className="max-w-xl w-full my-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="max-w-xl w-full my-0 sm:my-auto animate-sheet-up sm:animate-scaleUp">
             <React.Suspense
               fallback={
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center text-xs text-slate-500">
+                <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl p-8 text-center text-xs text-slate-500 pb-safe">
                   Loading application wizard...
                 </div>
               }
@@ -748,8 +748,9 @@ function MainApp() {
       )}
 
       {redirectVerifyState && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-700 rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 pb-safe shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-sheet-up sm:animate-scaleUp">
+            <div className="sm:hidden w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto -mt-1 mb-1" />
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400">

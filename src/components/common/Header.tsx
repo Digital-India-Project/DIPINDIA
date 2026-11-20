@@ -267,7 +267,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-2xs">
+    <header className="w-full pt-safe bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 shadow-[0_1px_12px_rgba(15,23,42,0.04)]">
       {/* Compact Top Facilitation Bar (Desktop only to honor 15% mobile/tablet sticky cap) */}
       <div className="hidden lg:block bg-[#FFFDF8] dark:bg-slate-900 border-b border-[#F1E8D9] dark:border-slate-800 px-3 sm:px-6 lg:px-8 py-1 text-[11px] text-slate-600 dark:text-slate-400">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
@@ -322,9 +322,9 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Main Single-Row Persistent Navigation Bar */}
-      <div className="relative max-w-[1440px] mx-auto px-2.5 sm:px-5 lg:px-6 h-12 sm:h-14 lg:h-16 flex items-center justify-between gap-2 lg:gap-4">
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+      {/* Main Single-Row Persistent Flutter Adaptive AppBar */}
+      <div className="relative max-w-[1440px] mx-auto px-2.5 sm:px-5 lg:px-6 h-14 lg:h-16 flex items-center justify-between gap-2 lg:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink-0">
           {/* Mobile & Tablet Drawer Toggle */}
           {onToggleMobileSidebar && (
             <button
@@ -334,9 +334,9 @@ export const Header: React.FC<HeaderProps> = ({
                 trackInteraction('ui', 'sidebar_drawer_toggle', mobileSidebarOpen ? 'close' : 'open', currentRoute);
               }}
               aria-label="Toggle sidebar menu"
-              className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 hover:border-[#FF671F] active:scale-95 transition cursor-pointer shrink-0"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 active:scale-95 transition cursor-pointer shrink-0"
             >
-              {mobileSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           )}
 
@@ -350,7 +350,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               aria-label={sidebarCollapsed ? 'Expand sidebar menu' : 'Collapse sidebar menu'}
               title={sidebarCollapsed ? 'Expand Sidebar Menu' : 'Collapse Sidebar Menu'}
-              className="hidden lg:flex w-8 h-8 items-center justify-center text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 hover:border-[#FF671F] hover:text-[#FF671F] transition cursor-pointer shrink-0"
+              className="hidden lg:flex w-9 h-9 items-center justify-center text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 hover:border-[#FF671F] hover:text-[#FF671F] transition cursor-pointer shrink-0"
             >
               {sidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
             </button>
@@ -359,7 +359,7 @@ export const Header: React.FC<HeaderProps> = ({
           <a
             href={buildUrlForRoute('home')}
             onClick={(e) => handleLinkClick(e, 'home')}
-            className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF671F] rounded-lg transition-opacity hover:opacity-90 cursor-pointer shrink-0"
+            className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF671F] rounded-xl transition-opacity hover:opacity-90 cursor-pointer shrink-0"
           >
             <Logo size="md" showSubtitle={false} />
           </a>
@@ -462,157 +462,163 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </nav>
 
-        {/* Right-Aligned Action Controls (Desktop, Tablet & Mobile) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto lg:ml-0">
-          <div className="hidden md:flex items-center gap-1.5 xl:gap-2 shrink-0">
+        {/* Right-Aligned Flutter Adaptive AppBar Action Controls (Mobile, Tablet & Desktop) */}
+        <div className="flex items-center gap-1 sm:gap-1.5 xl:gap-2 shrink-0 ml-auto lg:ml-0">
+          {/* Tools Tray Quick Action (All screens) */}
+          <button
+            type="button"
+            onClick={() => {
+              trackInteraction('ui', 'tools_tray_open', 'header', currentRoute);
+              setTrayOpen(true);
+            }}
+            title="Open Digital Tools Tray (150+ PDF, CSC, QR, Tax & AI Utilities)"
+            aria-label="Open Digital Tools Tray"
+            className="w-9 h-9 md:w-auto md:h-auto md:px-2.5 md:py-1.5 flex items-center justify-center gap-1.5 rounded-xl md:rounded-lg border border-orange-200/80 dark:border-orange-900/60 bg-orange-50/80 dark:bg-orange-950/40 hover:border-[#FF671F] text-xs font-bold text-slate-800 dark:text-slate-100 active:scale-95 transition whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <Wrench className="w-4 h-4 md:w-3.5 md:h-3.5 text-[#FF671F] shrink-0" />
+            <span className="hidden lg:inline">{lang === 'hi' ? 'टूल्स ट्रे' : 'Tools Tray'}</span>
+          </button>
+
+          {/* Voice Nav (Tablet & Desktop) */}
+          {onToggleVoice && (
             <button
               type="button"
-              onClick={() => {
-                trackInteraction('ui', 'tools_tray_open', 'header', currentRoute);
-                setTrayOpen(true);
-              }}
-              title="Open Digital Tools Tray (150+ PDF, CSC, QR, Tax & AI Utilities)"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-orange-200 dark:border-orange-900/60 bg-orange-50/80 dark:bg-orange-950/40 hover:border-[#FF671F] text-xs font-bold text-slate-800 dark:text-slate-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              onClick={onToggleVoice}
+              title={voiceListening ? 'Stop voice navigation' : 'Hands-free Voice Navigation'}
+              className={`hidden sm:flex w-9 h-9 md:w-8 md:h-8 items-center justify-center rounded-xl md:rounded-lg border text-xs transition cursor-pointer shrink-0 ${
+                voiceListening
+                  ? 'bg-[#FF671F] text-white border-[#FF671F] animate-pulse'
+                  : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#FF671F]'
+              }`}
+              aria-label="Hands-free voice navigation"
             >
-              <Wrench className="w-3.5 h-3.5 text-[#FF671F] shrink-0" />
-              <span className="hidden lg:inline">{lang === 'hi' ? 'टूल्स ट्रे' : 'Tools Tray'}</span>
+              {voiceListening ? <MicOff className="w-4 h-4 md:w-3.5 md:h-3.5" /> : <Mic className="w-4 h-4 md:w-3.5 md:h-3.5" />}
             </button>
+          )}
 
-            {onToggleVoice && (
-              <button
-                type="button"
-                onClick={onToggleVoice}
-                title={voiceListening ? 'Stop voice navigation' : 'Hands-free Voice Navigation'}
-                className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer shrink-0 ${
-                  voiceListening
-                    ? 'bg-[#FF671F] text-white border-[#FF671F] animate-pulse'
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#FF671F]'
-                }`}
-                aria-label="Hands-free voice navigation"
-              >
-                {voiceListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-              </button>
-            )}
-
+          <div className="hidden md:flex items-center">
             <PWAInstallButton />
-
-            <ToolNotificationBell onNavigate={onNavigate} />
-
-            {user ? (
-              <div className="relative" ref={userDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-800 dark:text-slate-200 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  {user.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.name}
-                      referrerPolicy="no-referrer"
-                      className="w-6 h-6 rounded-full object-cover shrink-0"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-[#FF671F] text-white flex items-center justify-center font-bold text-[11px] shrink-0">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <span className="font-semibold text-slate-900 dark:text-white max-w-[110px] truncate hidden 2xl:inline">
-                    {user.name}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase text-[#FF671F] hidden sm:inline">
-                    {normalizedRole.replace('_', ' ')}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                </button>
-
-                {userDropdownOpen && (
-                  <div className="absolute right-0 top-11 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-2 z-50 text-xs">
-                    <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
-                      <div className="font-bold text-slate-900 dark:text-white truncate">{user.name}</div>
-                      <div className="text-slate-500 truncate text-[11px]">{user.email}</div>
-                      <div className="text-[10px] font-semibold text-[#FF671F] mt-0.5 capitalize">
-                        {normalizedRole.replace('_', ' ')} Account
-                      </div>
-                    </div>
-
-                    <div className="py-1">
-                      {roleMenuItems.map((item) => {
-                        const Icon = DROPDOWN_ICON_MAP[item.iconKey] || FileCheck2;
-                        return (
-                          <button
-                            key={`${item.route}-${item.param || 'main'}`}
-                            type="button"
-                            onClick={() => handleNav(item.route, item.param)}
-                            className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between gap-2 text-slate-700 dark:text-slate-200 font-medium cursor-pointer"
-                          >
-                            <span className="flex items-center gap-2.5 min-w-0">
-                              <Icon className={`w-4 h-4 shrink-0 ${item.color || 'text-slate-500'}`} />
-                              <span className="truncate">{item.label}</span>
-                            </span>
-                            {item.badge && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
-                                {item.badge}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await logout();
-                          handleNav('home');
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 flex items-center gap-2.5 font-medium cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4 shrink-0" />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <a
-                href={buildUrlForRoute('register')}
-                onClick={(e) => handleLinkClick(e, 'register')}
-                className={`hidden lg:flex px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer items-center gap-1 ${
-                  currentRoute === 'register'
-                    ? 'border-[#FF671F] text-[#FF671F] bg-orange-50 dark:bg-orange-950/20'
-                    : 'border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
-              >
-                <UserPlus className="w-3.5 h-3.5 shrink-0" />
-                <span>{t('nav.register')}</span>
-              </a>
-            )}
-
-            <a
-              href={buildUrlForRoute(headerCtaTarget.route, headerCtaTarget.param)}
-              onClick={(e) => handleLinkClick(e, headerCtaTarget.route, headerCtaTarget.param)}
-              className="flex items-center gap-1 bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <span>{headerCtaTarget.label}</span>
-              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-            </a>
           </div>
 
-          {/* Compact Mobile & Small-Tablet Theme Control */}
+          <ToolNotificationBell onNavigate={onNavigate} />
+
+          {/* Mobile & Small-Tablet Theme Control */}
           <button
             type="button"
             onClick={() => {
               toggleTheme();
               trackInteraction('ui', 'theme_toggle', theme === 'dark' ? 'light' : 'dark', currentRoute);
             }}
-            className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 hover:border-[#FF671F] active:scale-95 transition cursor-pointer shrink-0"
+            className="lg:hidden w-9 h-9 flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 hover:border-[#FF671F] active:scale-95 transition cursor-pointer shrink-0"
             aria-label="Toggle dark mode"
           >
-            {theme === 'dark' ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          {/* User Account / Role Menu (All screens — compact avatar on mobile, rich pill on tablet/desktop) */}
+          {user ? (
+            <div className="relative" ref={userDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                aria-label="Open account menu"
+                className="flex items-center gap-1.5 sm:gap-2 p-1 md:px-2.5 md:py-1.5 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full md:rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 active:scale-95 transition cursor-pointer whitespace-nowrap shrink-0"
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    referrerPolicy="no-referrer"
+                    className="w-7 h-7 md:w-6 md:h-6 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-7 h-7 md:w-6 md:h-6 rounded-full bg-[#FF671F] text-white flex items-center justify-center font-bold text-[11px] shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="font-semibold text-slate-900 dark:text-white max-w-[110px] truncate hidden 2xl:inline">
+                  {user.name}
+                </span>
+                <span className="text-[10px] font-bold uppercase text-[#FF671F] hidden md:inline">
+                  {normalizedRole.replace('_', ' ')}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0 hidden md:inline" />
+              </button>
+
+              {userDropdownOpen && (
+                <div className="absolute right-0 top-12 w-64 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl py-2 z-50 text-xs animate-fadeIn">
+                  <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
+                    <div className="font-bold text-slate-900 dark:text-white truncate">{user.name}</div>
+                    <div className="text-slate-500 truncate text-[11px]">{user.email}</div>
+                    <div className="text-[10px] font-semibold text-[#FF671F] mt-0.5 capitalize">
+                      {normalizedRole.replace('_', ' ')} Account
+                    </div>
+                  </div>
+
+                  <div className="py-1 max-h-[60dvh] overflow-y-auto">
+                    {roleMenuItems.map((item) => {
+                      const Icon = DROPDOWN_ICON_MAP[item.iconKey] || FileCheck2;
+                      return (
+                        <button
+                          key={`${item.route}-${item.param || 'main'}`}
+                          type="button"
+                          onClick={() => handleNav(item.route, item.param)}
+                          className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between gap-2 text-slate-700 dark:text-slate-200 font-medium cursor-pointer"
+                        >
+                          <span className="flex items-center gap-2.5 min-w-0">
+                            <Icon className={`w-4 h-4 shrink-0 ${item.color || 'text-slate-500'}`} />
+                            <span className="truncate">{item.label}</span>
+                          </span>
+                          {item.badge && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                              {item.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await logout();
+                        handleNav('home');
+                      }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 flex items-center gap-2.5 font-medium cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 shrink-0" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <a
+              href={buildUrlForRoute('register')}
+              onClick={(e) => handleLinkClick(e, 'register')}
+              className={`hidden lg:flex px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer items-center gap-1 ${
+                currentRoute === 'register'
+                  ? 'border-[#FF671F] text-[#FF671F] bg-orange-50 dark:bg-orange-950/20'
+                  : 'border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <UserPlus className="w-3.5 h-3.5 shrink-0" />
+              <span>{t('nav.register')}</span>
+            </a>
+          )}
+
+          {/* Primary CTA (Tablet & Desktop; on < md signed-out users use BottomNav Account or compact icon) */}
+          <a
+            href={buildUrlForRoute(headerCtaTarget.route, headerCtaTarget.param)}
+            onClick={(e) => handleLinkClick(e, headerCtaTarget.route, headerCtaTarget.param)}
+            className="hidden md:flex items-center gap-1 bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs active:scale-95 transition whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <span>{headerCtaTarget.label}</span>
+            <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+          </a>
         </div>
       </div>
     </header>

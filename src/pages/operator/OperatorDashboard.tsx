@@ -306,10 +306,10 @@ export const OperatorDashboard: React.FC<{
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#202124] to-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="bg-gradient-to-r from-[#202124] to-[#1E293B] text-white p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-lg flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FFC928] uppercase tracking-wider">
-            <Shield className="w-4 h-4 text-[#138808]" />
+            <Shield className="w-4 h-4 text-[#138808] shrink-0" />
             <span>Digital India Project — Operations & Assisted Intake Desk</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black mt-1">
@@ -320,11 +320,11 @@ export const OperatorDashboard: React.FC<{
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap max-w-full">
           <button
             type="button"
             onClick={() => setIntakeOpen(true)}
-            className="bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs"
+            className="bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Collect Walk-In Application</span>
@@ -333,7 +333,7 @@ export const OperatorDashboard: React.FC<{
           <button
             type="button"
             onClick={() => setSandboxTestOpen(true)}
-            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer transition"
+            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer transition whitespace-nowrap"
           >
             <FlaskConical className="w-4 h-4" />
             <span>Test Payment</span>
@@ -343,7 +343,7 @@ export const OperatorDashboard: React.FC<{
             <button
               type="button"
               onClick={() => onNavigate('admin')}
-              className="text-xs font-bold text-blue-300 hover:text-white bg-blue-950 px-3 py-2 rounded-xl border border-blue-800 cursor-pointer"
+              className="text-xs font-bold text-blue-300 hover:text-white bg-blue-950 px-3 py-2 rounded-xl border border-blue-800 cursor-pointer whitespace-nowrap"
             >
               Admin Panel →
             </button>
@@ -353,10 +353,10 @@ export const OperatorDashboard: React.FC<{
 
       {/* CSC Operator Digital Tools Desk */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
-              <Wrench className="w-3.5 h-3.5" />
+        <div className="flex flex-wrap items-start sm:items-center justify-between gap-3">
+          <div className="flex-[1_1_280px] min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
+              <Wrench className="w-3.5 h-3.5 shrink-0" />
               <span>CSC Operator Tool Studio · {planDefinition.name}</span>
               {activeSingleUsePassList.length > 0 && (
                 <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/50 text-[#138808] dark:text-emerald-300">
@@ -368,11 +368,11 @@ export const OperatorDashboard: React.FC<{
               Fast walk-in utilities for passport photos, KB resizing, PDF KYC packs, OCR, and customer receipts.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 max-w-full">
             <button
               type="button"
               onClick={() => setTrayOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer hover:bg-[#FF671F] transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer hover:bg-[#FF671F] transition-colors whitespace-nowrap"
             >
               <Wrench className="w-3.5 h-3.5" />
               <span>Quick Tray</span>
@@ -380,7 +380,7 @@ export const OperatorDashboard: React.FC<{
             <button
               type="button"
               onClick={() => onNavigate('tool-plans')}
-              className="px-3 py-1.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <Crown className="w-3.5 h-3.5" />
               <span>Plans &amp; ₹10 Pass</span>

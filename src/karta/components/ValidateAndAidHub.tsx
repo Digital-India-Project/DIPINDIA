@@ -78,12 +78,12 @@ export function ValidateAndAidHub() {
   return (
     <div className="max-w-[1440px] mx-auto px-6 py-8 space-y-6">
       {/* Header */}
-      <div className="border-b border-slate-200 pb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div className="space-y-2">
+      <div className="border-b border-slate-200 pb-6 flex flex-wrap items-start lg:items-end justify-between gap-4">
+        <div className="space-y-2 flex-[1_1_320px] min-w-0">
           <p className="text-xs tracking-widest uppercase text-[#138808] font-semibold">
             Document Scrutiny &amp; Clause Guidance
           </p>
-          <h1 className="text-3xl font-bold text-[#202124] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight">
             Validate Legal Documents &amp; Consult Legal Assistance
           </h1>
           <p className="text-sm text-slate-600 max-w-3xl">
@@ -92,7 +92,7 @@ export function ValidateAndAidHub() {
           </p>
         </div>
 
-        <div className="text-xs text-[#138808] bg-[#ECFDF5] border border-[#BBF7D0] rounded-xl px-3.5 py-2.5 flex items-center gap-2 shrink-0">
+        <div className="text-xs text-[#138808] bg-[#ECFDF5] border border-[#BBF7D0] rounded-xl px-3.5 py-2.5 flex items-center gap-2 max-w-full">
           <ShieldCheck className="w-4 h-4 text-[#138808] shrink-0" />
           <span>In-memory scrutiny only · Uploaded files are not stored on server</span>
         </div>

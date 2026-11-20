@@ -28,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   };
 
   return (
-    <footer className="bg-white dark:bg-slate-950 border-t border-[#E5E7EB] dark:border-slate-800 text-[#202124] dark:text-slate-200 pb-20 lg:pb-0">
+    <footer className="bg-white dark:bg-slate-950 border-t border-[#E5E7EB] dark:border-slate-800 text-[#202124] dark:text-slate-200 pb-4 lg:pb-0 px-safe">
       {/* Subtle tricolour top border */}
       <div className="w-full h-1.5 flex">
         <div className="flex-1 bg-[#FF671F]"></div>

@@ -360,9 +360,9 @@ export function LibraryBrowser({
 
         {/* Filter Toolbar */}
         <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3.5 shadow-2xs">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex items-center p-1 bg-slate-100 border border-slate-200 rounded-lg">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
+              <div className="inline-flex flex-wrap items-center p-1 bg-slate-100 border border-slate-200 rounded-lg max-w-full">
                 {REVIEW_FILTERS.map((rf) => (
                   <button
                     key={rf.value}
@@ -389,7 +389,7 @@ export function LibraryBrowser({
                   setPage(1);
                 }}
                 aria-label="Filter by source format"
-                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] w-full sm:w-auto min-w-[140px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               >
                 {FORMAT_FILTERS.map((ff) => (
                   <option key={ff.value} value={ff.value}>
@@ -405,7 +405,7 @@ export function LibraryBrowser({
                   setPage(1);
                 }}
                 aria-label="Filter by repository folder category"
-                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] max-w-[240px] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] w-full sm:w-auto min-w-[180px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               >
                 <option value="all">All Source Folders ({rawCategoriesForGroup.length})</option>
                 {rawCategoriesForGroup.map((rc) => (

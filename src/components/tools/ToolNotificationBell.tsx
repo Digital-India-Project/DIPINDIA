@@ -63,13 +63,13 @@ export const ToolNotificationBell: React.FC<ToolNotificationBellProps> = ({ onNa
         }
         aria-expanded={open}
         title="Tool Updates & New Releases"
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-[#FF671F] hover:text-[#FF671F] transition-colors cursor-pointer"
+        className="relative w-9 h-9 md:w-8 md:h-8 flex items-center justify-center rounded-xl md:rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-[#FF671F] hover:text-[#FF671F] flutter-press transition-colors cursor-pointer"
       >
         <Bell className="w-4 h-4" aria-hidden="true" />
         {unreadNotificationCount > 0 && (
           <span
             aria-hidden="true"
-            className="absolute -top-1.5 -right-1.5 min-w-[17px] h-[17px] px-1 rounded-full bg-[#FF671F] text-white text-[10px] font-bold tabular-nums flex items-center justify-center leading-none border-2 border-white dark:border-slate-950"
+            className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#FF671F] text-white text-[10px] font-bold tabular-nums flex items-center justify-center leading-none border-2 border-white dark:border-slate-950"
           >
             {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
           </span>
@@ -80,7 +80,7 @@ export const ToolNotificationBell: React.FC<ToolNotificationBellProps> = ({ onNa
         <div
           role="dialog"
           aria-label="Digital Tools notifications"
-          className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-[68px] sm:top-auto sm:mt-2 sm:w-[380px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl z-50 overflow-hidden"
+          className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[calc(3.75rem+env(safe-area-inset-top))] sm:top-auto sm:mt-2 sm:w-[380px] max-h-[75dvh] flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl z-50 overflow-hidden animate-fadeIn"
         >
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">

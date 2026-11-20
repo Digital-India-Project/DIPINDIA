@@ -144,7 +144,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, childre
           onClick={handleGoToTop}
           title="Go to top"
           aria-label="Go to top"
-          className="fixed bottom-[7.5rem] right-3.5 lg:bottom-[4.25rem] lg:right-6 z-30 w-10 h-10 p-0 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-lg hover:border-[#FF671F] text-[#FF671F] hover:bg-[#FFF5EE] dark:hover:bg-slate-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+          className="fixed bottom-[calc(8.25rem+env(safe-area-inset-bottom))] right-3.5 lg:bottom-[4.25rem] lg:right-6 z-30 w-11 h-11 lg:w-10 lg:h-10 p-0 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-lg hover:border-[#FF671F] text-[#FF671F] hover:bg-[#FFF5EE] dark:hover:bg-slate-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 flutter-press cursor-pointer"
         >
           <ArrowUp className="w-4 h-4 stroke-[2.5]" />
         </button>

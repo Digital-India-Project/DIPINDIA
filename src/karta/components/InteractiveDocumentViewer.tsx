@@ -888,12 +888,12 @@ export const InteractiveDocumentViewer: React.FC<Props> = ({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
       {/* Viewer Top Control Bar */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
+        <div className="flex flex-wrap items-start xl:items-center justify-between gap-4">
+          <div className="flex items-start gap-3 flex-[1_1_320px] min-w-0">
             <div className="w-10 h-10 rounded-xl bg-[#FF671F]/10 text-[#FF671F] flex items-center justify-center shrink-0">
               <Eye className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-white">
                 Document Viewer, Tesseract OCR &amp; Government of India Stamp Library
               </h2>
@@ -916,7 +916,7 @@ export const InteractiveDocumentViewer: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 max-w-full">
             <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FF671F] text-white text-xs font-semibold hover:bg-[#E55A16] cursor-pointer shadow-xs whitespace-nowrap shrink-0">
               <Upload className="w-3.5 h-3.5" />
               Open Scan / PDF / DOCX
@@ -976,8 +976,8 @@ export const InteractiveDocumentViewer: React.FC<Props> = ({
         </div>
 
         {/* Tesseract.js OCR Extraction Bar (for Scanned Images & Scanned PDFs) */}
-        <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+        <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-start lg:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs flex-[1_1_280px] min-w-0">
             <ScanText className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
             <span className="font-bold text-[#202124] dark:text-white">
               Tesseract.js Document OCR
@@ -988,7 +988,7 @@ export const InteractiveDocumentViewer: React.FC<Props> = ({
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 max-w-full">
             <select
               value={ocrLanguage}
               onChange={(e) => setOcrLanguage(e.target.value as OcrLanguageCode)}

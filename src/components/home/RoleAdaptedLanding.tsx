@@ -408,8 +408,8 @@ export const RoleAdaptedLanding: React.FC<RoleAdaptedLandingProps> = ({
 
           {/* Centered Active Account Context & Role Checklist Card */}
           <div className="max-w-5xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5 text-center sm:text-left">
-              <div className="min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5 text-center sm:text-left">
+              <div className="flex-[1_1_260px] min-w-0">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   {lang === 'hi' ? 'सक्रिय खाता प्रोफ़ाइल' : 'Active Account Context'}
                 </div>
@@ -421,7 +421,7 @@ export const RoleAdaptedLanding: React.FC<RoleAdaptedLandingProps> = ({
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 max-w-full">
                 {profile.roleKey === 'partner' && referralCode && (
                   <div className="inline-flex items-center gap-2 bg-[#F7F8FA] dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -492,8 +492,8 @@ export const RoleAdaptedLanding: React.FC<RoleAdaptedLandingProps> = ({
 
       {/* SECTION 2: ROLE TOOLKIT BENTO GRID ("ALL THEY NEED") */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
-          <div>
+        <div className="flex flex-wrap items-end justify-between mb-6 gap-3">
+          <div className="flex-[1_1_280px] min-w-0">
             <div className="text-xs font-bold uppercase tracking-wider text-[#FF671F]">
               {lang === 'hi' ? 'भूमिका के अनुसार त्वरित उपकरण' : 'Tailored Role Workspace'}
             </div>

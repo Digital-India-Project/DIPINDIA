@@ -123,7 +123,7 @@ export const AuthActionPage: React.FC<AuthActionPageProps> = ({ onNavigate }) =>
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F7F8FA] dark:bg-[#0B1120]">
+    <div className="min-h-[calc(100dvh-140px)] flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-[#F7F8FA] dark:bg-[#0B1120]">
       <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 space-y-6 shadow-xs">
         <div className="space-y-2">
           <Logo size="sm" showSubtitle={false} />

@@ -486,8 +486,8 @@ Official Domain: https://digitalindiaproject.com`;
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       {/* Top Banner with Google Workspace & Firebase Badges */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-wrap items-start lg:items-center justify-between gap-6">
+        <div className="space-y-2 flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-orange-50 border border-orange-200 text-[#FF671F] font-bold text-xs">
               <Database className="w-3.5 h-3.5" />
@@ -511,7 +511,7 @@ Official Domain: https://digitalindiaproject.com`;
         </div>
 
         {/* User Account / Auth Status */}
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-start md:items-end gap-3 text-xs shrink-0">
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-start lg:items-end gap-3 text-xs w-full lg:w-auto">
           {currentUser ? (
             <div className="space-y-1.5 text-left md:text-right">
               <div className="font-bold text-slate-900">{currentUser.displayName || 'Authorized User'}</div>

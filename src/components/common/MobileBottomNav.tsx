@@ -83,9 +83,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Mobile and Tablet App Navigation"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800/90 shadow-[0_-4px_20px_rgba(15,23,42,0.06)] pb-[env(safe-area-inset-bottom)]"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-6px_24px_rgba(15,23,42,0.06)] pb-safe"
     >
-      <div className="max-w-2xl mx-auto grid grid-cols-5 items-center h-16 px-1.5">
+      <div className="max-w-2xl mx-auto grid grid-cols-5 items-center h-16 px-1 sm:px-3">
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -94,19 +94,19 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               type="button"
               onClick={() => handleTap(item)}
               aria-current={item.isActive ? 'page' : undefined}
-              className="min-h-[46px] flex flex-col items-center justify-center gap-0.5 rounded-xl transition-transform duration-150 active:scale-95 cursor-pointer select-none group"
+              className="min-h-[48px] min-w-0 px-0.5 flex flex-col items-center justify-center gap-1 rounded-2xl flutter-press cursor-pointer select-none group"
             >
               <span
-                className={`px-3.5 py-1 rounded-full transition-all duration-200 flex items-center justify-center ${
+                className={`h-7 flex items-center justify-center rounded-full transition-all duration-200 ease-[cubic-bezier(0.2,0,0,1)] ${
                   item.isActive
-                    ? 'bg-[#FF671F]/15 text-[#FF671F] scale-105'
-                    : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white group-hover:bg-slate-100 dark:group-hover:bg-slate-800/70'
+                    ? 'w-14 bg-[#FF671F]/16 dark:bg-[#FF671F]/24 text-[#FF671F] shadow-2xs'
+                    : 'w-10 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white group-hover:bg-slate-100/80 dark:group-hover:bg-slate-800/60'
                 }`}
               >
-                <Icon className="w-[19px] h-[19px]" strokeWidth={item.isActive ? 2.4 : 1.9} />
+                <Icon className="w-[19px] h-[19px]" strokeWidth={item.isActive ? 2.4 : 1.85} />
               </span>
               <span
-                className={`text-[10px] leading-none tracking-tight whitespace-nowrap ${
+                className={`text-[10px] sm:text-[11px] leading-none tracking-tight whitespace-nowrap truncate max-w-full px-1 ${
                   item.isActive
                     ? 'font-bold text-[#FF671F]'
                     : 'font-medium text-slate-600 dark:text-slate-400'

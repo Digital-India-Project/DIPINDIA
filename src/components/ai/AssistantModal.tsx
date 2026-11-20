@@ -174,19 +174,19 @@ export const AssistantModal: React.FC<{ onNavigateToService?: (slug: string) => 
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-[4.5rem] right-3.5 lg:bottom-4 lg:right-6 z-40 bg-[#FF671F] hover:bg-[#E55B1B] text-white w-10 h-10 sm:w-auto sm:h-9 sm:px-3 p-0 rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+        className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-3.5 lg:bottom-4 lg:right-6 z-40 bg-[#FF671F] hover:bg-[#E55B1B] text-white w-11 h-11 sm:w-auto sm:h-10 sm:px-3.5 p-0 rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-105 flutter-press flex items-center justify-center gap-1.5 cursor-pointer"
         aria-label="Open Digital India AI Assistant"
       >
         <div className="relative flex items-center justify-center">
-          <Bot className="w-4 h-4 sm:w-4 sm:h-4" />
+          <Bot className="w-4 h-4" />
           <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#138808] ring-2 ring-white" />
         </div>
         <span className="text-[11px] font-bold hidden sm:inline">AI Help</span>
       </button>
 
-      {/* Smaller Compact Chat Popup */}
+      {/* Flutter Adaptive Chat Popup / Sheet */}
       {isOpen && (
-        <div className="fixed bottom-[7.5rem] lg:bottom-15 left-3 right-3 sm:left-auto sm:right-6 z-50 sm:w-[328px] h-[370px] max-h-[56vh] lg:max-h-[62vh] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+        <div className="fixed bottom-[calc(8.25rem+env(safe-area-inset-bottom))] lg:bottom-16 left-2.5 right-2.5 sm:left-auto sm:right-6 z-50 sm:w-[348px] h-[min(65dvh,420px)] bg-white dark:bg-slate-900 rounded-3xl sm:rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col overflow-hidden animate-sheet-up sm:animate-scaleUp">
           {/* Compact Header */}
           <div className="bg-[#202124] text-white px-3 py-2 flex items-center justify-between gap-2 shrink-0">
             <div className="flex items-center gap-2 min-w-0">

@@ -270,18 +270,18 @@ export const GuestAudienceShowcase: React.FC<GuestAudienceShowcaseProps> = ({ on
               <a
                 href={buildUrlForRoute(profile.primaryCta.route, profile.primaryCta.param)}
                 onClick={(e) => handleLink(e, profile.primaryCta.route, profile.primaryCta.param)}
-                className="w-full sm:w-auto min-w-[180px] sm:min-w-[210px] bg-[#FF671F] hover:bg-[#E55B1B] text-white font-bold text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                className="w-full sm:w-auto min-w-0 sm:min-w-[200px] bg-[#FF671F] hover:bg-[#E55B1B] text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl shadow-xs flutter-press transition flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
               >
-                <span>{lang === 'hi' ? profile.primaryCta.labelHi : profile.primaryCta.label}</span>
-                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="truncate">{lang === 'hi' ? profile.primaryCta.labelHi : profile.primaryCta.label}</span>
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
               </a>
 
               <a
                 href={buildUrlForRoute(profile.secondaryCta.route, profile.secondaryCta.param)}
                 onClick={(e) => handleLink(e, profile.secondaryCta.route, profile.secondaryCta.param)}
-                className="w-full sm:w-auto min-w-[170px] sm:min-w-[190px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl transition flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                className="w-full sm:w-auto min-w-0 sm:min-w-[180px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl flutter-press transition flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
               >
-                <span>{lang === 'hi' ? profile.secondaryCta.labelHi : profile.secondaryCta.label}</span>
+                <span className="truncate">{lang === 'hi' ? profile.secondaryCta.labelHi : profile.secondaryCta.label}</span>
               </a>
             </div>
           </div>

@@ -670,10 +670,10 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Admin Top Header */}
-      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="bg-[#1E293B] text-white p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-wrap items-start xl:items-center justify-between gap-4">
+        <div className="flex-[1_1_300px] min-w-0">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FFC928] uppercase tracking-wider">
-            <ShieldAlert className="w-4 h-4 text-[#FF671F]" />
+            <ShieldAlert className="w-4 h-4 text-[#FF671F] shrink-0" />
             <span>Digital India Project — Master Administration Panel</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black mt-1">
@@ -684,24 +684,24 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap max-w-full">
           <button
             onClick={() => onNavigate('workspace')}
-            className="text-xs font-bold text-blue-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+            className="text-xs font-bold text-blue-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <Database className="w-3.5 h-3.5" />
             <span>Workspace Hub</span>
           </button>
           <button
             onClick={() => onNavigate('b2b')}
-            className="text-xs font-bold text-amber-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+            className="text-xs font-bold text-amber-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>B2B Portal</span>
           </button>
           <button
             onClick={() => onNavigate('operator')}
-            className="text-xs font-bold text-emerald-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer"
+            className="text-xs font-bold text-emerald-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer whitespace-nowrap"
           >
             Operator Desk
           </button>

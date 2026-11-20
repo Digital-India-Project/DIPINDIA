@@ -310,8 +310,8 @@ export const IndiaDirectoryPage: React.FC<IndiaDirectoryPageProps> = ({
 
       {/* Hero Section with Language Switcher & Verified LGD/Census Metadata */}
       <section className="relative overflow-hidden rounded-3xl bg-[#0F172A] text-white border border-slate-800 p-6 sm:p-8 lg:p-10 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="space-y-3 flex-[1_1_300px] min-w-0 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-300">
               <Globe2 className="w-4 h-4 text-[#FF671F] shrink-0" />
               <span>{langMeta.copy.directoryLabel}</span>
@@ -359,7 +359,7 @@ export const IndiaDirectoryPage: React.FC<IndiaDirectoryPageProps> = ({
           </div>
 
           {/* 23-Language Selector Card */}
-          <div className="w-full lg:w-72 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 space-y-2.5 shrink-0">
+          <div className="w-full xl:w-72 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 space-y-2.5">
             <label
               htmlFor="dir-lang-select"
               className="block text-[11px] font-bold uppercase tracking-wider text-slate-300"

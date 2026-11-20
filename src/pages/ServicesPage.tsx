@@ -253,12 +253,12 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-orange-50/85 via-white to-sky-50/75 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/35 p-6 sm:p-8 rounded-2xl border border-orange-200/70 dark:border-slate-800 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="max-w-3xl space-y-2">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF671F] uppercase tracking-wider">
+      <div className="bg-gradient-to-r from-orange-50/85 via-white to-sky-50/75 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/35 p-5 sm:p-8 rounded-2xl border border-orange-200/70 dark:border-slate-800 shadow-xs">
+        <div className="flex flex-wrap items-start xl:items-center justify-between gap-4">
+          <div className="flex-[1_1_300px] min-w-0 max-w-3xl space-y-2">
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs font-bold text-[#FF671F] uppercase tracking-wider">
               <span>Official Catalogue</span>
-              <span>·</span>
+              <span aria-hidden="true">·</span>
               <span>{activeServices.length} Services, Instant Checks, Products &amp; Packages</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -268,13 +268,13 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
               {pageDescription}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => onNavigate('verifications')}
-              className="px-4 py-2.5 rounded-xl bg-[#138808] hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap shadow-xs cursor-pointer transition"
+              className="px-4 py-2.5 rounded-xl bg-[#138808] hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap shadow-xs flutter-press cursor-pointer transition"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
               <span>Instant Verifications Hub (13)</span>
             </button>
           </div>
@@ -425,9 +425,9 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
       })()}
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+      <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3">
         {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 xl:max-w-md min-w-0">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
@@ -439,11 +439,11 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
         </div>
 
         {/* Filters Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={productTypeFilter}
             onChange={(e) => setProductTypeFilter(e.target.value)}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
+            className="flex-1 sm:flex-none min-w-[140px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
           >
             <option value="all">All Types</option>
             <option value="instant_verification">Instant API Verifications (13)</option>
@@ -456,7 +456,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
           <select
             value={deliveryTypeFilter}
             onChange={(e) => setDeliveryTypeFilter(e.target.value)}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
+            className="flex-1 sm:flex-none min-w-[155px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
           >
             <option value="all">All Delivery Modes</option>
             <option value="online">Online Self / Guided</option>
@@ -469,7 +469,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
           <select
             value={priceRange}
             onChange={(e) => setPriceRange(e.target.value)}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
+            className="flex-1 sm:flex-none min-w-[125px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
           >
             <option value="all">All Prices</option>
             <option value="under-500">Under ₹500</option>
@@ -482,7 +482,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
+            className="flex-1 sm:flex-none min-w-[155px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg sm:rounded-xl px-2.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#FF671F]"
           >
             <option value="popular">Most Popular First</option>
             <option value="price-asc">Price: Low to High</option>
@@ -494,7 +494,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
           <button
             type="button"
             onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="lg:hidden flex items-center gap-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer"
+            className="lg:hidden flex items-center gap-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg text-[11px] font-semibold cursor-pointer"
           >
             <SlidersHorizontal className="w-3 h-3" />
             <span>Portfolios</span>
@@ -503,7 +503,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
       </div>
 
       {/* Android / Tablet Horizontal Category Selection Cards */}
-      <div className="lg:hidden flex items-stretch gap-2 overflow-x-auto scrollbar-none pb-1.5 -mx-1 px-1">
+      <div className="lg:hidden flex items-stretch gap-2 overflow-x-auto scrollbar-none scroll-touch pb-1.5 -mx-1 px-1">
         <button
           type="button"
           onClick={() => {

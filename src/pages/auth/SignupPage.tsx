@@ -148,7 +148,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, initialType 
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F7F8FA] dark:bg-[#0B1120]">
+    <div className="min-h-[calc(100dvh-140px)] flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-[#F7F8FA] dark:bg-[#0B1120]">
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         <div className="lg:col-span-5 bg-[#1E293B] text-white rounded-2xl p-8 flex flex-col justify-between space-y-8 border border-slate-800">
           <div className="space-y-4">

@@ -159,8 +159,8 @@ export const ToolsCatalogPage: React.FC<ToolsCatalogPageProps> = ({
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       {/* Top Hero Banner & Plan Context */}
       <section className="rounded-2xl border border-orange-200/80 dark:border-orange-900/50 bg-gradient-to-br from-orange-50/90 via-white to-sky-50/75 dark:from-slate-900 dark:via-slate-900 dark:to-sky-950/30 p-4 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-1.5">
+        <div className="flex flex-wrap items-start xl:items-center justify-between gap-4">
+          <div className="space-y-1.5 flex-[1_1_320px] min-w-0">
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FF671F]">
               <Wrench className="w-3.5 h-3.5" />
               <span>
@@ -184,7 +184,7 @@ export const ToolsCatalogPage: React.FC<ToolsCatalogPageProps> = ({
           </div>
 
           {/* Active Plan Card */}
-          <div className="p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end justify-between gap-2.5 shrink-0">
+          <div className="w-full xl:w-auto p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 flex flex-col sm:flex-row xl:flex-col items-start sm:items-center xl:items-end justify-between gap-2.5">
             <div className="space-y-0.5 tabular-nums lg:text-right">
               <div className="flex items-center lg:justify-end gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
                 <Crown className="w-3.5 h-3.5 text-[#FF671F]" />

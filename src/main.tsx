@@ -29,7 +29,7 @@ class AppErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-[#F7F8FA] dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <div className="min-h-dvh flex items-center justify-center p-6 bg-[#F7F8FA] dark:bg-slate-950 text-slate-900 dark:text-slate-100">
           <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center space-y-3 shadow-sm">
             <div className="text-sm font-extrabold text-[#FF671F]">Digital India Project</div>
             <h1 className="text-lg font-black">View Refresh Needed</h1>

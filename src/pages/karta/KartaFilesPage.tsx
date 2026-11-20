@@ -956,24 +956,24 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
   const pendingSyncCount = syncStatus?.pendingCount || 0;
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] dark:bg-slate-950 text-[#202124] dark:text-slate-100 pb-16">
+    <div className="min-h-dvh bg-[#FAF9F5] dark:bg-slate-950 text-[#202124] dark:text-slate-100 pb-12">
       {/* Top Integrated DIP-Desk × Karta Files Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
+          <div className="flex flex-wrap items-start xl:items-center justify-between gap-4">
+            <div className="flex items-start gap-3 flex-[1_1_320px] min-w-0">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF671F] to-[#138808] text-white flex items-center justify-center shrink-0 shadow-sm">
                 <Scale className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-widest text-[#FF671F]">
                     Digital-India-Project / Karta-Files
                   </span>
-                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                  <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">•</span>
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#138808] dark:text-emerald-400">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    SHCIL e-Stamp + Interactive Viewer + Offline Background Sync
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                    <span>SHCIL e-Stamp + Interactive Viewer + Offline Background Sync</span>
                   </span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-white tracking-tight">
@@ -985,7 +985,7 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 max-w-full">
               {/* Live Background Sync Pill */}
               <div
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold ${
@@ -1054,10 +1054,10 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
             </div>
           </div>
 
-          {/* 6-Tab Workbench Bar */}
+          {/* 6-Tab Workbench Bar (Horizontal touch-scroll on mobile, wrapped on tablet/desktop) */}
           <nav
             aria-label="Karta Files Workbench Views"
-            className="flex flex-wrap items-center gap-1.5 pt-1"
+            className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 pt-1 overflow-x-auto scrollbar-none scroll-touch -mx-1 px-1"
           >
             {navTabs.map((tab) => {
               const Icon = tab.icon;
@@ -1067,7 +1067,7 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
                   key={tab.id}
                   type="button"
                   onClick={() => setView(tab.id)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full sm:rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 flutter-press transition-colors cursor-pointer ${
                     active
                       ? 'bg-[#FF671F] text-white shadow-xs'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -1154,11 +1154,11 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
           {/* Firestore AES-256-GCM Zero-Knowledge Cloud Vault + Background Sync Engine */}
           <section className="max-w-5xl mx-auto px-6">
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-5 shadow-xs">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-                <div>
+              <div className="flex flex-wrap items-start lg:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                <div className="flex-[1_1_280px] min-w-0">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                    <FolderLock className="w-4 h-4" />
-                    DIP-Desk E2EE Cloud Vault &amp; Background Sync Engine
+                    <FolderLock className="w-4 h-4 shrink-0" />
+                    <span>DIP-Desk E2EE Cloud Vault &amp; Background Sync Engine</span>
                   </div>
                   <h2 className="text-xl font-bold text-[#202124] dark:text-white mt-1">
                     Encrypted Legal Drafts &amp; Deeds ({vaultDocs.length})
@@ -1168,7 +1168,7 @@ export const KartaFilesPage: React.FC<KartaFilesPageProps> = ({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 max-w-full">
                   <button
                     type="button"
                     onClick={() => setView('qr')}

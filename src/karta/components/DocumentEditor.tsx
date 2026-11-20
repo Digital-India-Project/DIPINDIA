@@ -802,8 +802,8 @@ export function DocumentEditor({
       {/* Header Banner */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs print:hidden">
         <div className="h-1.5 w-full" style={{ backgroundColor: theme.accentHex }} />
-        <div className="p-5 flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-          <div className="space-y-2">
+        <div className="p-5 flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2 flex-[1_1_320px] min-w-0">
             <button
               type="button"
               onClick={onBackToLibrary}
@@ -837,12 +837,12 @@ export function DocumentEditor({
               {template.title}
             </h1>
             <p className="text-sm text-slate-600 max-w-3xl">{template.description}</p>
-            <p className="text-xs text-slate-500 font-mono-tabular">
+            <p className="text-xs text-slate-500 font-mono-tabular break-all sm:break-normal">
               Source: {template.sourcePath} · Scope: {template.jurisdictionScope}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 max-w-full">
             <button
               type="button"
               disabled={exporting !== null}

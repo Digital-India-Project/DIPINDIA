@@ -11,12 +11,25 @@
     --brand-charcoal: #202124;
     --brand-light: #F7F8FA;
     --brand-offwhite: #FFFDF8;
+
+    /* Flutter Material 3 Motion & Safe-Area Tokens */
+    --m3-easing: cubic-bezier(0.2, 0, 0, 1);
+    --m3-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   body {
@@ -28,8 +41,18 @@
       radial-gradient(at 100% 10%, rgba(56, 189, 248, 0.09) 0px, transparent 45%),
       radial-gradient(at 85% 85%, rgba(19, 136, 8, 0.07) 0px, transparent 50%),
       linear-gradient(180deg, #FFFBF5 0%, #F4F7FB 45%, #F2F9F6 100%);
-    background-attachment: fixed;
+    background-attachment: scroll;
+    min-height: 100dvh;
+    max-width: 100%;
     overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fixed backdrop gradient only on capable desktop pointers to prevent iOS/Android scroll jank */
+  @media (min-width: 1024px) and (hover: hover) {
+    body {
+      background-attachment: fixed;
+    }
   }
 
   html.dark body {
@@ -40,7 +63,6 @@
       radial-gradient(at 100% 15%, rgba(59, 130, 246, 0.11) 0px, transparent 48%),
       radial-gradient(at 80% 90%, rgba(16, 185, 129, 0.09) 0px, transparent 50%),
       linear-gradient(180deg, #0B1120 0%, #0D1528 50%, #091320 100%);
-    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, .font-display {
@@ -51,6 +73,32 @@
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-variant-numeric: tabular-nums;
   }
+
+  /* Responsive media & touch ergonomics across all screen types */
+  img, svg, video, canvas {
+    max-width: 100%;
+  }
+
+  button, a, select, input, textarea, summary, [role="button"], [role="tab"] {
+    touch-action: manipulation;
+  }
+
+  /* Prevent horizontal blowout on narrow mobile screens inside flex/grid containers */
+  main, section, article, aside, header, footer {
+    min-width: 0;
+  }
+}
+
+/* Safe-Area Helpers for Edge-to-Edge Mobile / PWA / Flutter Shell */
+.pt-safe {
+  padding-top: var(--safe-top);
+}
+.pb-safe {
+  padding-bottom: var(--safe-bottom);
+}
+.px-safe {
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 
 .tabular-nums {
@@ -68,10 +116,16 @@
   display: none;
 }
 
+/* Smooth momentum touch scrolling for horizontal strips & sheets */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -80,13 +134,28 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 190ms var(--m3-easing) forwards;
+}
+
+@keyframes sheetSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-sheet-up {
+  animation: sheetSlideUp 240ms var(--m3-easing) forwards;
 }
 
 @keyframes scaleUp {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.94);
   }
   to {
     opacity: 1;
@@ -95,7 +164,7 @@
 }
 
 .animate-scaleUp {
-  animation: scaleUp 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleUp 200ms var(--m3-easing) forwards;
 }
 
 @keyframes skeletonShimmer {
@@ -127,36 +196,87 @@ html.dark .skeleton-shimmer {
   );
 }
 
-/* Figma / Android E-Commerce Modular Card & Block Micro-interactions */
+/* Flutter Material 3 Adaptive Card & InkWell Press Micro-interactions */
 .app-card {
   transition:
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 180ms var(--m3-easing),
+    box-shadow 180ms var(--m3-easing),
+    border-color 180ms var(--m3-easing),
+    background-color 180ms var(--m3-easing);
   will-change: transform;
 }
 
-.app-card:hover {
-  transform: translateY(-2px);
-}
-
 .app-card:active {
-  transform: scale(0.985);
+  transform: scale(0.978);
 }
 
 .app-block {
   transition:
-    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 160ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.app-block:hover {
-  transform: translateY(-1px);
+    transform 160ms var(--m3-easing),
+    background-color 160ms var(--m3-easing),
+    border-color 160ms var(--m3-easing),
+    box-shadow 160ms var(--m3-easing);
 }
 
 .app-block:active {
-  transform: scale(0.975);
+  transform: scale(0.972);
+}
+
+/* Apply hover lift only on mouse/trackpad devices to prevent sticky hover on touch */
+@media (hover: hover) and (pointer: fine) {
+  .app-card:hover {
+    transform: translateY(-2px);
+  }
+  .app-block:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Flutter Surface Card & Bottom Sheet Styling */
+.flutter-surface {
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 6px 20px -6px rgba(15, 23, 42, 0.06);
+  transition: transform 180ms var(--m3-easing), box-shadow 180ms var(--m3-easing);
+}
+
+html.dark .flutter-surface {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px -8px rgba(0, 0, 0, 0.45);
+}
+
+.flutter-press {
+  transition: transform 140ms var(--m3-easing), opacity 140ms var(--m3-easing);
+}
+.flutter-press:active {
+  transform: scale(0.96);
+}
+
+/* Responsive table, flex-action-bar & wide-content containment across narrow screens */
+.flex-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.flex-action-bar > .flex-action-copy {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.flex-action-bar > .flex-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .responsive-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
