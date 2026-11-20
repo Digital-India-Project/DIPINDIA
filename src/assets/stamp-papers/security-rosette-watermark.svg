@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <pattern id="rosetteMesh" width="120" height="120" patternUnits="userSpaceOnUse">
+      <circle cx="60" cy="60" r="46" fill="none" stroke="#78716C" stroke-width="0.65" stroke-opacity="0.14" stroke-dasharray="3 2"/>
+      <circle cx="60" cy="60" r="34" fill="none" stroke="#78716C" stroke-width="0.5" stroke-opacity="0.12"/>
+      <circle cx="60" cy="60" r="14" fill="none" stroke="#57534E" stroke-width="0.5" stroke-opacity="0.12"/>
+      <path d="M14 60 L106 60 M60 14 L60 106 M27 27 L93 93 M93 27 L27 93" stroke="#78716C" stroke-width="0.4" stroke-opacity="0.10"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="480" fill="#FDFCF8"/>
+  <rect width="480" height="480" fill="url(#rosetteMesh)"/>
+  <g transform="translate(240,240) rotate(-24)">
+    <text x="0" y="0" text-anchor="middle" font-family="Georgia, serif" font-size="18" font-weight="bold" letter-spacing="6" fill="#78716C" fill-opacity="0.10">
+      DRAFT LAYOUT SIMULATION
+    </text>
+  </g>
+</svg>

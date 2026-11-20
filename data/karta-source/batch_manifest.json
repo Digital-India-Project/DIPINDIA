@@ -1,0 +1,614 @@
+[
+  {
+    "category": "Acknowledgement",
+    "file": "upload_batches/Acknowledgement_batch_01.txt",
+    "source_documents": 67,
+    "size_bytes": 273452
+  },
+  {
+    "category": "Adoption",
+    "file": "upload_batches/Adoption_batch_01.txt",
+    "source_documents": 14,
+    "size_bytes": 277563
+  },
+  {
+    "category": "Affidavit",
+    "file": "upload_batches/Affidavit_batch_01.txt",
+    "source_documents": 13,
+    "size_bytes": 239880
+  },
+  {
+    "category": "Agreement",
+    "file": "upload_batches/Agreement_batch_01.txt",
+    "source_documents": 34,
+    "size_bytes": 859345
+  },
+  {
+    "category": "Agreement",
+    "file": "upload_batches/Agreement_batch_02.txt",
+    "source_documents": 36,
+    "size_bytes": 866613
+  },
+  {
+    "category": "Agreement",
+    "file": "upload_batches/Agreement_batch_03.txt",
+    "source_documents": 36,
+    "size_bytes": 897685
+  },
+  {
+    "category": "Agreement",
+    "file": "upload_batches/Agreement_batch_04.txt",
+    "source_documents": 39,
+    "size_bytes": 884384
+  },
+  {
+    "category": "Agreement",
+    "file": "upload_batches/Agreement_batch_05.txt",
+    "source_documents": 8,
+    "size_bytes": 201099
+  },
+  {
+    "category": "Application",
+    "file": "upload_batches/Application_batch_01.txt",
+    "source_documents": 9,
+    "size_bytes": 173174
+  },
+  {
+    "category": "Appointment",
+    "file": "upload_batches/Appointment_batch_01.txt",
+    "source_documents": 26,
+    "size_bytes": 560731
+  },
+  {
+    "category": "Appranticeship",
+    "file": "upload_batches/Appranticeship_batch_01.txt",
+    "source_documents": 5,
+    "size_bytes": 108735
+  },
+  {
+    "category": "Arbitration",
+    "file": "upload_batches/Arbitration_batch_01.txt",
+    "source_documents": 60,
+    "size_bytes": 836530
+  },
+  {
+    "category": "Assignment",
+    "file": "upload_batches/Assignment_batch_01.txt",
+    "source_documents": 19,
+    "size_bytes": 386696
+  },
+  {
+    "category": "Banking",
+    "file": "upload_batches/Banking_batch_01.txt",
+    "source_documents": 39,
+    "size_bytes": 689618
+  },
+  {
+    "category": "Bond",
+    "file": "upload_batches/Bond_batch_01.txt",
+    "source_documents": 52,
+    "size_bytes": 893882
+  },
+  {
+    "category": "Bond",
+    "file": "upload_batches/Bond_batch_02.txt",
+    "source_documents": 12,
+    "size_bytes": 217123
+  },
+  {
+    "category": "Child Custody",
+    "file": "upload_batches/Child_Custody_batch_01.txt",
+    "source_documents": 3,
+    "size_bytes": 27196
+  },
+  {
+    "category": "Civil Pleadings",
+    "file": "upload_batches/Civil_Pleadings_batch_01.txt",
+    "source_documents": 52,
+    "size_bytes": 897120
+  },
+  {
+    "category": "Civil Pleadings",
+    "file": "upload_batches/Civil_Pleadings_batch_02.txt",
+    "source_documents": 47,
+    "size_bytes": 894124
+  },
+  {
+    "category": "Civil Pleadings",
+    "file": "upload_batches/Civil_Pleadings_batch_03.txt",
+    "source_documents": 47,
+    "size_bytes": 883429
+  },
+  {
+    "category": "Civil Pleadings",
+    "file": "upload_batches/Civil_Pleadings_batch_04.txt",
+    "source_documents": 49,
+    "size_bytes": 894718
+  },
+  {
+    "category": "Civil Pleadings",
+    "file": "upload_batches/Civil_Pleadings_batch_05.txt",
+    "source_documents": 37,
+    "size_bytes": 674386
+  },
+  {
+    "category": "Classification Of Offences",
+    "file": "upload_batches/Classification_Of_Offences_batch_01.txt",
+    "source_documents": 1,
+    "size_bytes": 19465
+  },
+  {
+    "category": "Company",
+    "file": "upload_batches/Company_batch_01.txt",
+    "source_documents": 44,
+    "size_bytes": 895371
+  },
+  {
+    "category": "Company",
+    "file": "upload_batches/Company_batch_02.txt",
+    "source_documents": 43,
+    "size_bytes": 897570
+  },
+  {
+    "category": "Company",
+    "file": "upload_batches/Company_batch_03.txt",
+    "source_documents": 36,
+    "size_bytes": 729511
+  },
+  {
+    "category": "Composition deed",
+    "file": "upload_batches/Composition_deed_batch_01.txt",
+    "source_documents": 19,
+    "size_bytes": 362088
+  },
+  {
+    "category": "Consumer protection act",
+    "file": "upload_batches/Consumer_protection_act_batch_01.txt",
+    "source_documents": 16,
+    "size_bytes": 315680
+  },
+  {
+    "category": "Conveyancing",
+    "file": "upload_batches/Conveyancing_batch_01.txt",
+    "source_documents": 41,
+    "size_bytes": 894644
+  },
+  {
+    "category": "Conveyancing",
+    "file": "upload_batches/Conveyancing_batch_02.txt",
+    "source_documents": 3,
+    "size_bytes": 54439
+  },
+  {
+    "category": "Copyright",
+    "file": "upload_batches/Copyright_batch_01.txt",
+    "source_documents": 10,
+    "size_bytes": 210381
+  },
+  {
+    "category": "Criminal Pleading",
+    "file": "upload_batches/Criminal_Pleading_batch_01.txt",
+    "source_documents": 51,
+    "size_bytes": 892016
+  },
+  {
+    "category": "Criminal Pleading",
+    "file": "upload_batches/Criminal_Pleading_batch_02.txt",
+    "source_documents": 50,
+    "size_bytes": 888541
+  },
+  {
+    "category": "Criminal Pleading",
+    "file": "upload_batches/Criminal_Pleading_batch_03.txt",
+    "source_documents": 26,
+    "size_bytes": 467792
+  },
+  {
+    "category": "Easements",
+    "file": "upload_batches/Easements_batch_01.txt",
+    "source_documents": 10,
+    "size_bytes": 181007
+  },
+  {
+    "category": "Exchange",
+    "file": "upload_batches/Exchange_batch_01.txt",
+    "source_documents": 7,
+    "size_bytes": 142244
+  },
+  {
+    "category": "Franchisee",
+    "file": "upload_batches/Franchisee_batch_01.txt",
+    "source_documents": 3,
+    "size_bytes": 117022
+  },
+  {
+    "category": "Gift",
+    "file": "upload_batches/Gift_batch_01.txt",
+    "source_documents": 86,
+    "size_bytes": 753912
+  },
+  {
+    "category": "Guarantee",
+    "file": "upload_batches/Guarantee_batch_01.txt",
+    "source_documents": 10,
+    "size_bytes": 225425
+  },
+  {
+    "category": "Hindu Marriage Act, Divorce, Maintenance, Restitution of Conjugal Rights",
+    "file": "upload_batches/Hindu_Marriage_Act_Divorce_Maintenance_Restitution_of_Conjugal_Rights_batch_01.txt",
+    "source_documents": 17,
+    "size_bytes": 89061
+  },
+  {
+    "category": "Hire-Purchase",
+    "file": "upload_batches/Hire-Purchase_batch_01.txt",
+    "source_documents": 18,
+    "size_bytes": 407359
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_01.txt",
+    "source_documents": 46,
+    "size_bytes": 890112
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_02.txt",
+    "source_documents": 24,
+    "size_bytes": 786349
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_03.txt",
+    "source_documents": 13,
+    "size_bytes": 597289
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_04.txt",
+    "source_documents": 8,
+    "size_bytes": 825704
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_05.txt",
+    "source_documents": 14,
+    "size_bytes": 718024
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_06.txt",
+    "source_documents": 6,
+    "size_bytes": 614389
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_07.txt",
+    "source_documents": 3,
+    "size_bytes": 462741
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_08.txt",
+    "source_documents": 20,
+    "size_bytes": 884117
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_09.txt",
+    "source_documents": 28,
+    "size_bytes": 890875
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_10.txt",
+    "source_documents": 14,
+    "size_bytes": 821507
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_11.txt",
+    "source_documents": 2,
+    "size_bytes": 541357
+  },
+  {
+    "category": "Income Tax",
+    "file": "upload_batches/Income_Tax_batch_12.txt",
+    "source_documents": 9,
+    "size_bytes": 857261
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_01.txt",
+    "source_documents": 36,
+    "size_bytes": 889669
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_02.txt",
+    "source_documents": 26,
+    "size_bytes": 891163
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_03.txt",
+    "source_documents": 10,
+    "size_bytes": 242570
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_04.txt",
+    "source_documents": 2,
+    "size_bytes": 691115
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_05.txt",
+    "source_documents": 10,
+    "size_bytes": 615300
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_06.txt",
+    "source_documents": 15,
+    "size_bytes": 760744
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_07.txt",
+    "source_documents": 15,
+    "size_bytes": 615865
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_08.txt",
+    "source_documents": 15,
+    "size_bytes": 647508
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_09.txt",
+    "source_documents": 16,
+    "size_bytes": 812633
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_10.txt",
+    "source_documents": 12,
+    "size_bytes": 713883
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_11.txt",
+    "source_documents": 11,
+    "size_bytes": 599906
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_12.txt",
+    "source_documents": 12,
+    "size_bytes": 748007
+  },
+  {
+    "category": "Income Tax & GST Drafts",
+    "file": "upload_batches/Income_Tax_GST_Drafts_batch_13.txt",
+    "source_documents": 7,
+    "size_bytes": 666153
+  },
+  {
+    "category": "Indemnity",
+    "file": "upload_batches/Indemnity_batch_01.txt",
+    "source_documents": 18,
+    "size_bytes": 319737
+  },
+  {
+    "category": "Information Technology",
+    "file": "upload_batches/Information_Technology_batch_01.txt",
+    "source_documents": 5,
+    "size_bytes": 124687
+  },
+  {
+    "category": "Infrastructure, development and financing",
+    "file": "upload_batches/Infrastructure_development_and_financing_batch_01.txt",
+    "source_documents": 15,
+    "size_bytes": 673640
+  },
+  {
+    "category": "Labour",
+    "file": "upload_batches/Labour_batch_01.txt",
+    "source_documents": 7,
+    "size_bytes": 141823
+  },
+  {
+    "category": "Lease Financing",
+    "file": "upload_batches/Lease_Financing_batch_01.txt",
+    "source_documents": 37,
+    "size_bytes": 893044
+  },
+  {
+    "category": "Lease Financing",
+    "file": "upload_batches/Lease_Financing_batch_02.txt",
+    "source_documents": 1,
+    "size_bytes": 19108
+  },
+  {
+    "category": "Matrimonial",
+    "file": "upload_batches/Matrimonial_batch_01.txt",
+    "source_documents": 36,
+    "size_bytes": 685890
+  },
+  {
+    "category": "Medical Form",
+    "file": "upload_batches/Medical_Form_batch_01.txt",
+    "source_documents": 1,
+    "size_bytes": 22413
+  },
+  {
+    "category": "Memorandum of Understanding",
+    "file": "upload_batches/Memorandum_of_Understanding_batch_01.txt",
+    "source_documents": 2,
+    "size_bytes": 44479
+  },
+  {
+    "category": "Miscellaneous deeds",
+    "file": "upload_batches/Miscellaneous_deeds_batch_01.txt",
+    "source_documents": 41,
+    "size_bytes": 894421
+  },
+  {
+    "category": "Miscellaneous deeds",
+    "file": "upload_batches/Miscellaneous_deeds_batch_02.txt",
+    "source_documents": 40,
+    "size_bytes": 890278
+  },
+  {
+    "category": "Miscellaneous deeds",
+    "file": "upload_batches/Miscellaneous_deeds_batch_03.txt",
+    "source_documents": 40,
+    "size_bytes": 879178
+  },
+  {
+    "category": "Miscellaneous deeds",
+    "file": "upload_batches/Miscellaneous_deeds_batch_04.txt",
+    "source_documents": 2,
+    "size_bytes": 38528
+  },
+  {
+    "category": "Mortgage, Pledge , Hypothecation and Security Document",
+    "file": "upload_batches/Mortgage_Pledge_Hypothecation_and_Security_Document_batch_01.txt",
+    "source_documents": 34,
+    "size_bytes": 887647
+  },
+  {
+    "category": "Mortgage, Pledge , Hypothecation and Security Document",
+    "file": "upload_batches/Mortgage_Pledge_Hypothecation_and_Security_Document_batch_02.txt",
+    "source_documents": 1,
+    "size_bytes": 39573
+  },
+  {
+    "category": "Motor Vehicle Act",
+    "file": "upload_batches/Motor_Vehicle_Act_batch_01.txt",
+    "source_documents": 15,
+    "size_bytes": 292678
+  },
+  {
+    "category": "Negotiable Instrument",
+    "file": "upload_batches/Negotiable_Instrument_batch_01.txt",
+    "source_documents": 15,
+    "size_bytes": 294671
+  },
+  {
+    "category": "Notice",
+    "file": "upload_batches/Notice_batch_01.txt",
+    "source_documents": 51,
+    "size_bytes": 883311
+  },
+  {
+    "category": "Notice",
+    "file": "upload_batches/Notice_batch_02.txt",
+    "source_documents": 14,
+    "size_bytes": 262952
+  },
+  {
+    "category": "Partition",
+    "file": "upload_batches/Partition_batch_01.txt",
+    "source_documents": 14,
+    "size_bytes": 277246
+  },
+  {
+    "category": "Partnership",
+    "file": "upload_batches/Partnership_batch_01.txt",
+    "source_documents": 9,
+    "size_bytes": 226189
+  },
+  {
+    "category": "Petition",
+    "file": "upload_batches/Petition_batch_01.txt",
+    "source_documents": 25,
+    "size_bytes": 499008
+  },
+  {
+    "category": "Plaint and Written statement",
+    "file": "upload_batches/Plaint_and_Written_statement_batch_01.txt",
+    "source_documents": 10,
+    "size_bytes": 180203
+  },
+  {
+    "category": "Pleadings",
+    "file": "upload_batches/Pleadings_batch_01.txt",
+    "source_documents": 47,
+    "size_bytes": 854661
+  },
+  {
+    "category": "Power of Attorney",
+    "file": "upload_batches/Power_of_Attorney_batch_01.txt",
+    "source_documents": 45,
+    "size_bytes": 898959
+  },
+  {
+    "category": "Power of Attorney",
+    "file": "upload_batches/Power_of_Attorney_batch_02.txt",
+    "source_documents": 24,
+    "size_bytes": 527226
+  },
+  {
+    "category": "Principle",
+    "file": "upload_batches/Principle_batch_01.txt",
+    "source_documents": 3,
+    "size_bytes": 57214
+  },
+  {
+    "category": "Release",
+    "file": "upload_batches/Release_batch_01.txt",
+    "source_documents": 10,
+    "size_bytes": 174560
+  },
+  {
+    "category": "Rent",
+    "file": "upload_batches/Rent_batch_01.txt",
+    "source_documents": 13,
+    "size_bytes": 248625
+  },
+  {
+    "category": "Sale",
+    "file": "upload_batches/Sale_batch_01.txt",
+    "source_documents": 23,
+    "size_bytes": 647076
+  },
+  {
+    "category": "Special Leave Petition",
+    "file": "upload_batches/Special_Leave_Petition_batch_01.txt",
+    "source_documents": 8,
+    "size_bytes": 42631
+  },
+  {
+    "category": "Specific Relief Act",
+    "file": "upload_batches/Specific_Relief_Act_batch_01.txt",
+    "source_documents": 6,
+    "size_bytes": 126835
+  },
+  {
+    "category": "Trust, Wakf society",
+    "file": "upload_batches/Trust_Wakf_society_batch_01.txt",
+    "source_documents": 14,
+    "size_bytes": 286326
+  },
+  {
+    "category": "Vakalatnama",
+    "file": "upload_batches/Vakalatnama_batch_01.txt",
+    "source_documents": 1,
+    "size_bytes": 21636
+  },
+  {
+    "category": "Will",
+    "file": "upload_batches/Will_batch_01.txt",
+    "source_documents": 28,
+    "size_bytes": 496499
+  },
+  {
+    "category": "Writ",
+    "file": "upload_batches/Writ_batch_01.txt",
+    "source_documents": 13,
+    "size_bytes": 86040
+  }
+]

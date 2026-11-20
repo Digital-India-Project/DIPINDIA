@@ -1,0 +1,6 @@
+{
+  "name": "DIP-Desk",
+  "description": "Unified proprietary Digital India Project command desk merging DIP-Official, Karta Files encrypted vault, and Tools-Tray utilities with legacy R1/R2 and D1/D2 schema migration, RBAC, audit compliance, and offline PWA sync.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

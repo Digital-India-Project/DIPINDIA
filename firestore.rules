@@ -1,0 +1,921 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny all unmapped collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Hardened Global Helpers
+    // -------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'cyber.sundial@gmail.com' ||
+        request.auth.token.email == 'allindiadigitalseva@gmail.com'
+      );
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (
+        isVerifiedUser() && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isManagerOrAdmin() {
+      return isAdmin() || (
+        isVerifiedUser() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'manager'
+      );
+    }
+
+    function isApprovedOperator() {
+      return isVerifiedUser() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'operator';
+    }
+
+    // -------------------------------------------------------------------------
+    // Entity Validation Blueprints (Anti-Update-Gap)
+    // -------------------------------------------------------------------------
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role'])
+        && data.keys().hasOnly([
+          'uid', 'displayName', 'email', 'mobile', 'role', 'accountType',
+          'companyName', 'businessId', 'partnerId', 'referralCode', 'referredByCode',
+          'kycStatus', 'operatorEnrollmentId', 'managerScope',
+          'preferredLang', 'theme', 'hapticsEnabled', 'twoFactorEnabled', 'biometricEnabled',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100))
+        && (!('mobile' in data) || (data.mobile is string && data.mobile.size() <= 25))
+        && data.role in ['customer', 'operator', 'manager', 'partner', 'admin', 'super_admin', 'business', 'auditor', 'viewer']
+        && (!('accountType' in data) || data.accountType in ['customer', 'business', 'operator', 'partner', 'manager', 'admin'])
+        && (!('companyName' in data) || (data.companyName is string && data.companyName.size() <= 140))
+        && (!('businessId' in data) || (data.businessId is string && data.businessId.size() <= 64))
+        && (!('partnerId' in data) || (data.partnerId is string && data.partnerId.size() <= 64))
+        && (!('referralCode' in data) || (data.referralCode is string && data.referralCode.size() <= 40))
+        && (!('referredByCode' in data) || (data.referredByCode is string && data.referredByCode.size() <= 40))
+        && (!('kycStatus' in data) || data.kycStatus in ['Not Submitted', 'KYC Submitted', 'Under Verification', 'Resubmission Required', 'Approved', 'Rejected'])
+        && (!('operatorEnrollmentId' in data) || (data.operatorEnrollmentId is string && data.operatorEnrollmentId.size() <= 64))
+        && (!('managerScope' in data) || (data.managerScope is string && data.managerScope.size() <= 100))
+        && (!('preferredLang' in data) || (data.preferredLang is string && data.preferredLang.size() >= 2 && data.preferredLang.size() <= 10))
+        && (!('theme' in data) || data.theme in ['light', 'dark'])
+        && (!('hapticsEnabled' in data) || data.hapticsEnabled is bool)
+        && (!('twoFactorEnabled' in data) || data.twoFactorEnabled is bool)
+        && (!('biometricEnabled' in data) || data.biometricEnabled is bool)
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50) || data.createdAt is timestamp)
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50) || data.updatedAt is timestamp);
+    }
+
+    function isValidUserPrivateSecurity(data) {
+      return data.keys().hasAll(['uid', 'email', 'updatedAt'])
+        && data.keys().hasOnly([
+          'uid', 'email', 'totpSecretEncrypted', 'biometricCredentialId',
+          'keyFingerprint', 'recoveryHash', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && (!('totpSecretEncrypted' in data) || (data.totpSecretEncrypted is string && data.totpSecretEncrypted.size() <= 256))
+        && (!('biometricCredentialId' in data) || (data.biometricCredentialId is string && data.biometricCredentialId.size() <= 256))
+        && (!('keyFingerprint' in data) || (data.keyFingerprint is string && data.keyFingerprint.size() <= 128))
+        && (!('recoveryHash' in data) || (data.recoveryHash is string && data.recoveryHash.size() <= 256))
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAdminGrant(data) {
+      return data.keys().hasAll(['uid', 'grantedBy', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'grantedBy', 'createdAt'])
+        && isValidId(data.uid)
+        && data.grantedBy is string && data.grantedBy.size() >= 1 && data.grantedBy.size() <= 128
+        && data.createdAt is timestamp;
+    }
+
+    function isValidServiceProduct(data) {
+      return data.keys().hasAll(['id', 'slug', 'name', 'category', 'serviceCharge', 'govtFees'])
+        && data.keys().hasOnly([
+          'id', 'slug', 'name', 'nameHi', 'category', 'subcategory', 'productType',
+          'shortDesc', 'shortDescHi', 'fullDesc', 'fullDescHi', 'iconName',
+          'coverImageUrl', 'serviceCharge', 'govtFees', 'thirdPartyFees',
+          'additionalCharge', 'urgentFee', 'discountInr', 'taxRateBps',
+          'taxInclusive', 'partnerPriceInr', 'billingUnit', 'pricingType',
+          'govtFeeNote', 'commissionNote', 'deliveryType', 'formVersion',
+          'slaHours', 'published', 'supportedFilingModes', 'autoAssignRule',
+          'serviceDisclaimer', 'regulatedNotice', 'instructions', 'conditions',
+          'estimatedTime', 'integrationType', 'availability', 'apiSetuRef',
+          'providerApprovalStatus', 'customerConsentRequired', 'b2bSupported',
+          'popular', 'featured', 'isCustomQuote', 'includedServiceIds',
+          'exclusions', 'packageSavingsInr', 'digitalAsset', 'seoTitle',
+          'seoDescription', 'focusKeyword', 'canonicalUrl', 'eligibility', 'requiredDocs',
+          'processSteps', 'formFields', 'faqs', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 80
+        && data.slug is string && data.slug.size() > 0 && data.slug.size() <= 120
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 160
+        && (!('nameHi' in data) || (data.nameHi is string && data.nameHi.size() <= 180))
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 64
+        && data.serviceCharge is number && data.serviceCharge >= 0
+        && data.govtFees is number && data.govtFees >= 0
+        && (!('shortDesc' in data) || (data.shortDesc is string && data.shortDesc.size() <= 500))
+        && (!('shortDescHi' in data) || (data.shortDescHi is string && data.shortDescHi.size() <= 500))
+        && (!('fullDesc' in data) || (data.fullDesc is string && data.fullDesc.size() <= 4000))
+        && (!('estimatedTime' in data) || (data.estimatedTime is string && data.estimatedTime.size() <= 100))
+        && (!('seoTitle' in data) || (data.seoTitle is string && data.seoTitle.size() <= 120))
+        && (!('seoDescription' in data) || (data.seoDescription is string && data.seoDescription.size() <= 240))
+        && (!('focusKeyword' in data) || (data.focusKeyword is string && data.focusKeyword.size() <= 100))
+        && (!('canonicalUrl' in data) || (data.canonicalUrl is string && data.canonicalUrl.size() <= 250))
+        && (!('eligibility' in data) || (data.eligibility is list && data.eligibility.size() <= 20))
+        && (!('requiredDocs' in data) || (data.requiredDocs is list && data.requiredDocs.size() <= 20))
+        && (!('processSteps' in data) || (data.processSteps is list && data.processSteps.size() <= 12))
+        && (!('formFields' in data) || (data.formFields is list && data.formFields.size() <= 40))
+        && (!('faqs' in data) || (data.faqs is list && data.faqs.size() <= 20));
+    }
+
+    function isValidApplication(data) {
+      return data.keys().hasAll(['id', 'userId', 'serviceId', 'status'])
+        && data.keys().hasOnly([
+          'id', 'userId', 'collectedByUid', 'partnerId', 'partnerName', 'filingMode',
+          'referralCodeUsed', 'assistedConsentRecorded', 'assignedOperatorId',
+          'assignedOperatorName', 'sourceChannel', 'businessId', 'userName',
+          'userEmail', 'userMobile', 'serviceId', 'serviceName', 'serviceSlug',
+          'formVersion', 'status', 'totalAmount', 'urgentProcessing',
+          'includedServiceIds', 'payment', 'formData', 'documents',
+          'statusHistory', 'customerRemarks', 'internalNotes', 'completionFileName',
+          'completionFileUrl', 'slaTargetAt', 'submissionDate', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128
+        && data.serviceId is string && data.serviceId.size() > 0 && data.serviceId.size() <= 80
+        && (!('serviceName' in data) || (data.serviceName is string && data.serviceName.size() <= 160))
+        && (!('serviceSlug' in data) || (data.serviceSlug is string && data.serviceSlug.size() <= 120))
+        && (!('userName' in data) || (data.userName is string && data.userName.size() <= 120))
+        && (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 150))
+        && (!('userMobile' in data) || (data.userMobile is string && data.userMobile.size() <= 30))
+        && (!('assignedOperatorId' in data) || (data.assignedOperatorId is string && data.assignedOperatorId.size() <= 128))
+        && (!('assignedOperatorName' in data) || (data.assignedOperatorName is string && data.assignedOperatorName.size() <= 120))
+        && (!('collectedByUid' in data) || (data.collectedByUid is string && data.collectedByUid.size() <= 128))
+        && (!('partnerId' in data) || (data.partnerId is string && data.partnerId.size() <= 64))
+        && (!('sourceChannel' in data) || data.sourceChannel in ['web_b2c', 'b2b_portal', 'operator_assisted', 'partner_assisted', 'google_forms', 'admin_manual'])
+        && data.status is string && data.status.size() > 0 && data.status.size() <= 60
+        && (!('totalAmount' in data) || (data.totalAmount is number && data.totalAmount >= 0))
+        && (!('customerRemarks' in data) || (data.customerRemarks is string && data.customerRemarks.size() <= 1000))
+        && (!('internalNotes' in data) || (data.internalNotes is string && data.internalNotes.size() <= 1000))
+        && (!('completionFileName' in data) || (data.completionFileName is string && data.completionFileName.size() <= 160))
+        && (!('completionFileUrl' in data) || (data.completionFileUrl is string && data.completionFileUrl.size() <= 300))
+        && (!('documents' in data) || (data.documents is list && data.documents.size() <= 20))
+        && (!('statusHistory' in data) || (data.statusHistory is list && data.statusHistory.size() <= 50));
+    }
+
+    function isValidTrackingRecord(data) {
+      return data.keys().hasAll(['id', 'ownerUid', 'serviceName', 'status'])
+        && data.keys().hasOnly([
+          'id', 'ownerUid', 'collectedByUid', 'assignedOperatorId',
+          'serviceName', 'applicantMaskedName', 'contactMobileDigits',
+          'contactEmailLower', 'sourceChannel', 'status', 'customerRemarks',
+          'completionFileName', 'totalAmount', 'statusHistory',
+          'submissionDate', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.ownerUid is string && data.ownerUid.size() > 0 && data.ownerUid.size() <= 128
+        && data.serviceName is string && data.serviceName.size() <= 140
+        && data.status is string && data.status.size() <= 60
+        && (!('customerRemarks' in data) || (data.customerRemarks is string && data.customerRemarks.size() <= 1000))
+        && (!('completionFileName' in data) || (data.completionFileName is string && data.completionFileName.size() <= 160))
+        && (!('statusHistory' in data) || (data.statusHistory is list && data.statusHistory.size() <= 50));
+    }
+
+    function isValidOperatorEnrollment(data) {
+      return data.keys().hasAll(['id', 'userId', 'fullName', 'email', 'mobile', 'panNumber', 'kycStatus'])
+        && data.keys().hasOnly([
+          'id', 'userId', 'fullName', 'email', 'mobile', 'centerName',
+          'operatingState', 'operatingDistrict', 'centerAddress', 'pincode',
+          'panNumber', 'maskedAadhaar', 'bankAccountHolder', 'bankIfsc',
+          'maskedBankAccount', 'experienceYears', 'kycDocuments',
+          'kycStatus', 'adminRemarks', 'reviewedBy', 'reviewedAt',
+          'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128
+        && data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 120
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.mobile is string && data.mobile.size() >= 10 && data.mobile.size() <= 25
+        && data.panNumber is string && data.panNumber.size() == 10
+        && (!('centerName' in data) || (data.centerName is string && data.centerName.size() <= 140))
+        && (!('centerAddress' in data) || (data.centerAddress is string && data.centerAddress.size() <= 300))
+        && (!('kycDocuments' in data) || (data.kycDocuments is list && data.kycDocuments.size() <= 8))
+        && data.kycStatus in ['KYC Submitted', 'Under Verification', 'Resubmission Required', 'Approved', 'Rejected']
+        && (!('adminRemarks' in data) || (data.adminRemarks is string && data.adminRemarks.size() <= 600));
+    }
+
+    function isValidPartner(data) {
+      return data.keys().hasAll(['id', 'userId', 'partnerCode', 'referralCode', 'businessName', 'approvalStatus'])
+        && data.keys().hasOnly([
+          'id', 'userId', 'partnerCode', 'referralCode', 'partnerType',
+          'fullName', 'businessName', 'ownerName', 'email', 'mobile',
+          'city', 'state', 'district', 'pincode', 'gstin', 'panNumber', 'panMasked',
+          'bankIfsc', 'bankAccountMasked', 'approvalStatus', 'commissionTier',
+          'minSettlementInr', 'totalReferrals', 'walletBalancePaise', 'totalEarnedPaise',
+          'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128
+        && data.partnerCode is string && data.partnerCode.size() > 0 && data.partnerCode.size() <= 40
+        && data.referralCode is string && data.referralCode.size() > 0 && data.referralCode.size() <= 40
+        && data.businessName is string && data.businessName.size() > 0 && data.businessName.size() <= 140
+        && (!('fullName' in data) || (data.fullName is string && data.fullName.size() <= 120))
+        && (!('email' in data) || (data.email is string && data.email.size() <= 150))
+        && (!('mobile' in data) || (data.mobile is string && data.mobile.size() <= 25))
+        && (!('state' in data) || (data.state is string && data.state.size() <= 80))
+        && (!('district' in data) || (data.district is string && data.district.size() <= 80))
+        && (!('pincode' in data) || (data.pincode is string && data.pincode.size() <= 12))
+        && data.approvalStatus in ['Pending Approval', 'Approved', 'Suspended', 'Rejected'];
+    }
+
+    function isValidCommissionEntry(data) {
+      return data.keys().hasAll(['id', 'partnerId', 'applicationId', 'netPaise', 'status'])
+        && data.keys().hasOnly([
+          'id', 'partnerId', 'partnerUid', 'applicationId', 'serviceName',
+          'entryType', 'grossServiceFeePaise', 'commissionPaise', 'tdsPaise',
+          'netPaise', 'status', 'notes', 'createdAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.partnerId is string && data.partnerId.size() > 0 && data.partnerId.size() <= 64
+        && (!('partnerUid' in data) || (data.partnerUid is string && data.partnerUid.size() <= 128))
+        && data.applicationId is string && data.applicationId.size() > 0 && data.applicationId.size() <= 64
+        && data.netPaise is number
+        && (!('entryType' in data) || data.entryType in ['EARNED', 'REVERSAL', 'SETTLED'])
+        && data.status in ['Pending', 'Approved', 'Settled', 'Reversed']
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500));
+    }
+
+    function isValidSettlementRequest(data) {
+      return data.keys().hasAll(['id', 'partnerId', 'requestedPaise', 'status'])
+        && data.keys().hasOnly([
+          'id', 'partnerId', 'partnerUid', 'partnerName', 'requestedPaise',
+          'bankDetails', 'status', 'payoutReference', 'adminRemarks', 'remarks',
+          'utrNumber', 'requestedAt', 'processedAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.partnerId is string && data.partnerId.size() > 0 && data.partnerId.size() <= 64
+        && (!('partnerUid' in data) || (data.partnerUid is string && data.partnerUid.size() <= 128))
+        && (!('partnerName' in data) || (data.partnerName is string && data.partnerName.size() <= 140))
+        && data.requestedPaise is number && data.requestedPaise > 0
+        && data.status in ['Requested', 'Under Review', 'Approved', 'Paid', 'Rejected']
+        && (!('payoutReference' in data) || (data.payoutReference is string && data.payoutReference.size() <= 120))
+        && (!('adminRemarks' in data) || (data.adminRemarks is string && data.adminRemarks.size() <= 500));
+    }
+
+    function isValidWorkspaceAudit(data) {
+      return data.keys().hasAll(['id', 'userId', 'actionType', 'targetService', 'timestamp'])
+        && data.keys().hasOnly(['id', 'userId', 'actionType', 'targetService', 'details', 'timestamp'])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.userId == request.auth.uid
+        && data.actionType is string && data.actionType.size() <= 50
+        && data.targetService in ['drive', 'gmail', 'forms', 'tasks']
+        && (!('details' in data) || (data.details is string && data.details.size() <= 500));
+    }
+
+    function isValidBlogPost(data) {
+      return data.keys().hasAll(['id', 'slug', 'title', 'excerpt', 'content', 'category', 'status', 'authorName', 'publishedAt', 'updatedAt', 'readingTimeMinutes'])
+        && data.keys().hasOnly([
+          'id', 'slug', 'title', 'titleHi', 'excerpt', 'excerptHi',
+          'content', 'contentHi', 'category', 'tags', 'status', 'featured',
+          'authorName', 'authorRole', 'publishedAt', 'updatedAt',
+          'readingTimeMinutes', 'relatedServiceSlug', 'seoTitle',
+          'seoDescription', 'focusKeyword', 'canonicalUrl',
+          'featuredImageUrl', 'featuredImageKey', 'faqItems'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 64
+        && data.slug is string && data.slug.size() > 0 && data.slug.size() <= 110
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 180
+        && (!('titleHi' in data) || (data.titleHi is string && data.titleHi.size() <= 200))
+        && data.excerpt is string && data.excerpt.size() > 0 && data.excerpt.size() <= 400
+        && (!('excerptHi' in data) || (data.excerptHi is string && data.excerptHi.size() <= 420))
+        && data.content is string && data.content.size() > 0 && data.content.size() <= 20000
+        && (!('contentHi' in data) || (data.contentHi is string && data.contentHi.size() <= 20000))
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 64
+        && data.status in ['published', 'draft', 'archived']
+        && (!('featured' in data) || data.featured is bool)
+        && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100
+        && (!('authorRole' in data) || (data.authorRole is string && data.authorRole.size() <= 100))
+        && data.publishedAt is string && data.publishedAt.size() <= 50
+        && data.updatedAt is string && data.updatedAt.size() <= 50
+        && data.readingTimeMinutes is number && data.readingTimeMinutes >= 1 && data.readingTimeMinutes <= 120
+        && (!('relatedServiceSlug' in data) || (data.relatedServiceSlug is string && data.relatedServiceSlug.size() <= 100))
+        && (!('seoTitle' in data) || (data.seoTitle is string && data.seoTitle.size() <= 110))
+        && (!('seoDescription' in data) || (data.seoDescription is string && data.seoDescription.size() <= 200))
+        && (!('focusKeyword' in data) || (data.focusKeyword is string && data.focusKeyword.size() <= 100))
+        && (!('canonicalUrl' in data) || (data.canonicalUrl is string && data.canonicalUrl.size() <= 250))
+        && (!('featuredImageUrl' in data) || (data.featuredImageUrl is string && data.featuredImageUrl.size() <= 500))
+        && (!('featuredImageKey' in data) || (data.featuredImageKey is string && data.featuredImageKey.size() <= 250))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 10 && (data.tags.size() == 0 || data.tags[0] is string)))
+        && (!('faqItems' in data) || (data.faqItems is list && data.faqItems.size() <= 8));
+    }
+
+    function isValidApiSathiVerification(data) {
+      return data.keys().hasAll([
+          'id', 'userId', 'intent', 'productSlug', 'idempotencyKey',
+          'environment', 'verified', 'outcome', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'userId', 'intent', 'productSlug', 'callId', 'idempotencyKey',
+          'environment', 'isSandboxTest', 'httpStatus', 'verified', 'outcome',
+          'errorCode', 'errorMessage', 'maskedRequestJson', 'maskedResponseJson',
+          'latencyMs', 'createdAt'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 80
+        && data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128
+        && data.intent is string && data.intent.size() > 0 && data.intent.size() <= 80
+        && data.productSlug is string && data.productSlug.size() > 0 && data.productSlug.size() <= 80
+        && data.idempotencyKey is string && data.idempotencyKey.size() > 0 && data.idempotencyKey.size() <= 80
+        && data.environment in ['SANDBOX', 'PRODUCTION']
+        && data.verified is bool
+        && data.outcome in ['VERIFIED', 'NOT_VERIFIED', 'WALLET_EMPTY', 'RATE_LIMITED', 'UPSTREAM_ERROR', 'ERROR', 'STEP1_INITIATED']
+        && data.createdAt is string && data.createdAt.size() > 0 && data.createdAt.size() <= 50
+        && (!('callId' in data) || (data.callId is string && data.callId.size() <= 128))
+        && (!('isSandboxTest' in data) || data.isSandboxTest is bool)
+        && (!('httpStatus' in data) || (data.httpStatus is number && data.httpStatus >= 0 && data.httpStatus <= 599))
+        && (!('errorCode' in data) || (data.errorCode is string && data.errorCode.size() <= 80))
+        && (!('errorMessage' in data) || (data.errorMessage is string && data.errorMessage.size() <= 500))
+        && (!('maskedRequestJson' in data) || (data.maskedRequestJson is string && data.maskedRequestJson.size() <= 1500))
+        && (!('maskedResponseJson' in data) || (data.maskedResponseJson is string && data.maskedResponseJson.size() <= 2000))
+        && (!('latencyMs' in data) || (data.latencyMs is number && data.latencyMs >= 0));
+    }
+
+    function isValidInfraBinding(data) {
+      return data.keys().hasAll([
+          'ownerId', 'bindingKey', 'bindingType', 'sourceRepo', 'legacyNamespace',
+          'migrationStatus', 'conflictPolicy', 'recordCount', 'checksum',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'bindingKey', 'bindingType', 'sourceRepo', 'legacyNamespace',
+          'migrationStatus', 'conflictPolicy', 'recordCount', 'checksum',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && isValidId(data.bindingKey)
+        && data.bindingType in ['r1', 'r2', 'd1', 'd2', 'firebase']
+        && data.sourceRepo in ['karta-files', 'DIP-Official', 'Tools-Tray']
+        && data.legacyNamespace is string && data.legacyNamespace.size() >= 1 && data.legacyNamespace.size() <= 64
+        && data.migrationStatus in ['legacy-active', 'migrating', 'migrated', 'conflict-resolved']
+        && data.conflictPolicy in ['keep-latest', 'merge-persistent-state', 'legacy-d1-priority']
+        && data.recordCount is int && data.recordCount >= 0 && data.recordCount <= 100000000
+        && data.checksum is string && data.checksum.size() >= 8 && data.checksum.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidKartaFile(data) {
+      return data.keys().hasAll([
+          'ownerId', 'title', 'bucketSlot', 'd1Shard', 'mimeType', 'sizeBytes',
+          'encryptedPayload', 'iv', 'salt', 'keyFingerprint', 'integrityHash',
+          'status', 'version', 'tags', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'title', 'bucketSlot', 'd1Shard', 'mimeType', 'sizeBytes',
+          'encryptedPayload', 'iv', 'salt', 'keyFingerprint', 'integrityHash',
+          'status', 'version', 'tags', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.bucketSlot is string && data.bucketSlot.size() >= 4 && data.bucketSlot.size() <= 16 && data.bucketSlot.matches('^(r1|r2)-(0[1-9]|10)$')
+        && data.d1Shard is string && data.d1Shard.size() >= 4 && data.d1Shard.size() <= 16 && data.d1Shard.matches('^(d1|d2)-(0[1-9]|10)$')
+        && data.mimeType is string && data.mimeType.size() >= 3 && data.mimeType.size() <= 80
+        && data.sizeBytes is int && data.sizeBytes >= 0 && data.sizeBytes <= 50000000
+        && data.encryptedPayload is string && data.encryptedPayload.size() >= 1 && data.encryptedPayload.size() <= 200000
+        && data.iv is string && data.iv.size() >= 8 && data.iv.size() <= 64
+        && data.salt is string && data.salt.size() >= 8 && data.salt.size() <= 64
+        && data.keyFingerprint is string && data.keyFingerprint.size() >= 8 && data.keyFingerprint.size() <= 128
+        && data.integrityHash is string && data.integrityHash.size() >= 16 && data.integrityHash.size() <= 128
+        && data.status in ['encrypted', 'synced', 'archived']
+        && data.version is int && data.version >= 1 && data.version <= 100000
+        && data.tags is list && data.tags.size() <= 10
+        && (data.tags.size() == 0 || (data.tags[0] is string && data.tags[0].size() <= 32))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidToolConfig(data) {
+      return data.keys().hasAll([
+          'ownerId', 'toolKey', 'displayName', 'enabled',
+          'legacyD1Binding', 'legacyR2Binding', 'configSummary',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'toolKey', 'displayName', 'enabled',
+          'legacyD1Binding', 'legacyR2Binding', 'configSummary',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.toolKey in [
+          'schema-migrator', 'payload-encryptor', 'totp-vault',
+          'locale-inspector', 'backup-utility', 'voice-console'
+        ]
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
+        && data.enabled is bool
+        && data.legacyD1Binding is string && data.legacyD1Binding.size() >= 2 && data.legacyD1Binding.size() <= 64
+        && data.legacyR2Binding is string && data.legacyR2Binding.size() >= 2 && data.legacyR2Binding.size() <= 64
+        && data.configSummary is string && data.configSummary.size() <= 500
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll([
+          'actorId', 'actorRole', 'module', 'action',
+          'resourcePath', 'severity', 'details', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'actorId', 'actorRole', 'module', 'action',
+          'resourcePath', 'severity', 'details', 'createdAt'
+        ])
+        && isValidId(data.actorId)
+        && data.actorRole in ['admin', 'super_admin', 'manager', 'operator', 'partner', 'auditor', 'viewer', 'customer', 'business']
+        && data.module in ['DIP-Desk', 'karta-files', 'Tools-Tray', 'Security', 'Migration']
+        && data.action is string && data.action.size() >= 2 && data.action.size() <= 100
+        && data.resourcePath is string && data.resourcePath.size() >= 1 && data.resourcePath.size() <= 160
+        && data.severity in ['info', 'warning', 'critical']
+        && data.details is string && data.details.size() >= 1 && data.details.size() <= 500
+        && data.createdAt is timestamp;
+    }
+
+    function isValidCloudBackup(data) {
+      return data.keys().hasAll([
+          'ownerId', 'label', 'scope', 'encryptedSnapshot', 'iv', 'salt',
+          'checksum', 'itemCount', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'label', 'scope', 'encryptedSnapshot', 'iv', 'salt',
+          'checksum', 'itemCount', 'status', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.label is string && data.label.size() >= 1 && data.label.size() <= 120
+        && data.scope in ['full', 'karta-files', 'infra-configs']
+        && data.encryptedSnapshot is string && data.encryptedSnapshot.size() >= 1 && data.encryptedSnapshot.size() <= 400000
+        && data.iv is string && data.iv.size() >= 8 && data.iv.size() <= 64
+        && data.salt is string && data.salt.size() >= 8 && data.salt.size() <= 64
+        && data.checksum is string && data.checksum.size() >= 8 && data.checksum.size() <= 128
+        && data.itemCount is int && data.itemCount >= 0 && data.itemCount <= 100000
+        && data.status in ['verified', 'restored']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // -------------------------------------------------------------------------
+    // Collection Match Blocks
+    // -------------------------------------------------------------------------
+
+    match /test/connection {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isManagerOrAdmin());
+      allow list: if isSignedIn() && (existing().uid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().uid == request.auth.uid
+        && (incoming().role in ['customer', 'business', 'viewer'] || isAdmin());
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().uid == existing().uid
+        && (
+          isAdmin() ||
+          (
+            isOwner(userId)
+            && incoming().role == existing().role
+            && (!('kycStatus' in incoming()) || incoming().kycStatus == 'KYC Submitted' || ('kycStatus' in existing() && incoming().kycStatus == existing().kycStatus))
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'displayName', 'mobile', 'accountType', 'companyName', 'businessId',
+              'kycStatus', 'operatorEnrollmentId', 'preferredLang', 'theme',
+              'hapticsEnabled', 'twoFactorEnabled', 'biometricEnabled', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isValidId(userId) && isAdmin();
+
+      match /private/{docId} {
+        allow get: if isValidId(userId) && docId == 'security' && (isOwner(userId) || isAdmin());
+        allow create: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'security'
+          && (isOwner(userId) || isAdmin())
+          && isValidUserPrivateSecurity(incoming())
+          && incoming().uid == userId
+          && incoming().updatedAt == request.time;
+        allow update: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'security'
+          && (isOwner(userId) || isAdmin())
+          && isValidUserPrivateSecurity(incoming())
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'email', 'totpSecretEncrypted', 'biometricCredentialId',
+            'keyFingerprint', 'recoveryHash', 'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && docId == 'security' && isAdmin();
+      }
+    }
+
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && (isOwner(adminId) || isAdmin());
+      allow list: if isBootstrappedAdmin();
+      allow create: if isAdmin()
+        && isValidId(adminId)
+        && isValidAdminGrant(incoming())
+        && incoming().uid == adminId
+        && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isValidId(adminId) && isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow get: if isValidId(serviceId);
+      allow list: if existing().published == true || isBootstrappedAdmin();
+      allow create, update: if isAdmin() && isValidId(serviceId) && isValidServiceProduct(incoming());
+      allow delete: if isAdmin() && isValidId(serviceId);
+    }
+
+    match /applications/{applicationId} {
+      allow get: if isSignedIn() && isValidId(applicationId) && (
+        existing().userId == request.auth.uid ||
+        existing().collectedByUid == request.auth.uid ||
+        existing().assignedOperatorId == request.auth.uid ||
+        isApprovedOperator() ||
+        isManagerOrAdmin()
+      );
+      allow list: if isSignedIn() && (
+        existing().userId == request.auth.uid ||
+        existing().collectedByUid == request.auth.uid ||
+        existing().assignedOperatorId == request.auth.uid ||
+        isBootstrappedAdmin()
+      );
+      allow create: if isSignedIn() && isValidId(applicationId) && isValidApplication(incoming()) && (
+        isManagerOrAdmin() ||
+        (
+          (incoming().userId == request.auth.uid || incoming().collectedByUid == request.auth.uid)
+          && incoming().status in ['Draft', 'Submitted', 'Payment Pending', 'Awaiting Payment', 'Payment Confirmed']
+          && !('internalNotes' in incoming())
+        )
+      );
+      allow update: if isSignedIn() && isValidId(applicationId) && isValidApplication(incoming()) && (
+        (isManagerOrAdmin() && incoming().userId == existing().userId) ||
+        (
+          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid || isApprovedOperator())
+          && incoming().userId == existing().userId
+          && incoming().totalAmount == existing().totalAmount
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'status', 'statusHistory', 'customerRemarks', 'internalNotes',
+            'documents', 'completionFileName', 'completionFileUrl', 'updatedAt'
+          ])
+        ) ||
+        (
+          existing().userId == request.auth.uid
+          && incoming().userId == existing().userId
+          && incoming().totalAmount == existing().totalAmount
+          && incoming().status in ['Submitted', 'Resubmitted', 'Cancelled']
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'documents', 'formData', 'customerRemarks', 'status', 'statusHistory', 'payment', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(applicationId);
+    }
+
+    match /tracking_records/{applicationId} {
+      allow get: if isSignedIn() && isValidId(applicationId) && (
+        existing().ownerUid == request.auth.uid ||
+        existing().collectedByUid == request.auth.uid ||
+        existing().assignedOperatorId == request.auth.uid ||
+        isManagerOrAdmin()
+      );
+      allow list: if false;
+      allow create: if isSignedIn() && isValidId(applicationId) && isValidTrackingRecord(incoming()) && (
+        incoming().ownerUid == request.auth.uid ||
+        incoming().collectedByUid == request.auth.uid ||
+        isManagerOrAdmin()
+      );
+      allow update: if isSignedIn() && isValidId(applicationId) && isValidTrackingRecord(incoming()) && (
+        (isManagerOrAdmin() && incoming().ownerUid == existing().ownerUid) ||
+        (
+          (existing().assignedOperatorId == request.auth.uid || existing().collectedByUid == request.auth.uid || isApprovedOperator())
+          && incoming().ownerUid == existing().ownerUid
+          && incoming().totalAmount == existing().totalAmount
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'status', 'customerRemarks', 'completionFileName', 'statusHistory', 'updatedAt'
+          ])
+        ) ||
+        (
+          existing().ownerUid == request.auth.uid
+          && incoming().ownerUid == existing().ownerUid
+          && incoming().totalAmount == existing().totalAmount
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'status', 'customerRemarks', 'statusHistory', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(applicationId);
+    }
+
+    match /operator_enrollments/{enrollmentId} {
+      allow get: if isSignedIn() && isValidId(enrollmentId) && (
+        existing().userId == request.auth.uid || isManagerOrAdmin()
+      );
+      allow list: if isSignedIn() && (
+        existing().userId == request.auth.uid || isBootstrappedAdmin()
+      );
+      allow create: if isSignedIn()
+        && isValidId(enrollmentId)
+        && isValidOperatorEnrollment(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().kycStatus == 'KYC Submitted';
+      allow update: if isSignedIn()
+        && isValidId(enrollmentId)
+        && isValidOperatorEnrollment(incoming())
+        && (
+          isAdmin() ||
+          (
+            existing().userId == request.auth.uid
+            && incoming().userId == existing().userId
+            && existing().kycStatus in ['KYC Submitted', 'Resubmission Required']
+            && incoming().kycStatus == 'KYC Submitted'
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'fullName', 'mobile', 'centerName', 'operatingState', 'operatingDistrict',
+              'centerAddress', 'pincode', 'kycDocuments', 'kycStatus', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isAdmin() && isValidId(enrollmentId);
+    }
+
+    match /partners/{partnerId} {
+      allow get: if isSignedIn() && isValidId(partnerId) && (
+        existing().userId == request.auth.uid || isManagerOrAdmin()
+      );
+      allow list: if isSignedIn() && (
+        existing().userId == request.auth.uid || isBootstrappedAdmin()
+      );
+      allow create: if isSignedIn()
+        && isValidId(partnerId)
+        && isValidPartner(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().approvalStatus == 'Pending Approval';
+      allow update: if isSignedIn()
+        && isValidId(partnerId)
+        && isValidPartner(incoming())
+        && (
+          isAdmin() ||
+          (
+            existing().userId == request.auth.uid
+            && incoming().userId == existing().userId
+            && incoming().approvalStatus == existing().approvalStatus
+            && incoming().partnerCode == existing().partnerCode
+            && incoming().referralCode == existing().referralCode
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'businessName', 'fullName', 'ownerName', 'mobile', 'city',
+              'state', 'district', 'pincode', 'gstin', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isAdmin() && isValidId(partnerId);
+    }
+
+    match /commission_ledger/{entryId} {
+      allow get: if isSignedIn() && isValidId(entryId) && (
+        existing().partnerId == request.auth.uid ||
+        existing().partnerUid == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isSignedIn() && (
+        existing().partnerId == request.auth.uid ||
+        existing().partnerUid == request.auth.uid ||
+        isBootstrappedAdmin()
+      );
+      allow create, update: if isAdmin() && isValidId(entryId) && isValidCommissionEntry(incoming());
+      allow delete: if isAdmin() && isValidId(entryId);
+    }
+
+    match /settlement_requests/{requestId} {
+      allow get: if isSignedIn() && isValidId(requestId) && (
+        isAdmin() ||
+        existing().partnerId == request.auth.uid ||
+        existing().partnerUid == request.auth.uid
+      );
+      allow list: if isSignedIn() && (
+        existing().partnerId == request.auth.uid ||
+        existing().partnerUid == request.auth.uid ||
+        isBootstrappedAdmin()
+      );
+      allow create: if isSignedIn()
+        && isValidId(requestId)
+        && isValidSettlementRequest(incoming())
+        && incoming().status == 'Requested'
+        && (incoming().partnerId == request.auth.uid || incoming().partnerUid == request.auth.uid);
+      allow update: if isAdmin() && isValidId(requestId) && isValidSettlementRequest(incoming());
+      allow delete: if isAdmin() && isValidId(requestId);
+    }
+
+    match /workspace_audits/{auditId} {
+      allow get: if isSignedIn() && isValidId(auditId) && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().userId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isSignedIn()
+        && isValidId(auditId)
+        && incoming().userId == request.auth.uid
+        && isValidWorkspaceAudit(incoming());
+      allow update, delete: if false;
+    }
+
+    match /business_settings/{settingId} {
+      allow get: if isValidId(settingId) && isSignedIn() && settingId in ['default', 'rbac_matrix'];
+      allow list: if isBootstrappedAdmin();
+      allow create, update: if isValidId(settingId) && isAdmin();
+      allow delete: if isValidId(settingId) && isAdmin();
+    }
+
+    match /blog_posts/{postId} {
+      allow get: if isValidId(postId) && (existing().status == 'published' || isManagerOrAdmin());
+      allow list: if existing().status == 'published' || isBootstrappedAdmin();
+      allow create: if isManagerOrAdmin() && isValidId(postId) && isValidBlogPost(incoming());
+      allow update: if isManagerOrAdmin() && isValidId(postId) && isValidBlogPost(incoming());
+      allow delete: if isAdmin() && isValidId(postId);
+    }
+
+    match /api_sathi_verifications/{verificationId} {
+      allow get: if isSignedIn() && isValidId(verificationId) && (
+        existing().userId == request.auth.uid || isAdmin()
+      );
+      allow list: if isSignedIn() && (
+        existing().userId == request.auth.uid || isBootstrappedAdmin()
+      );
+      allow create: if isSignedIn()
+        && isValidId(verificationId)
+        && isValidApiSathiVerification(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().id == verificationId;
+      allow update, delete: if false;
+    }
+
+    match /infra_bindings/{bindingId} {
+      allow get: if isValidId(bindingId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().ownerId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isVerifiedUser()
+        && isValidId(bindingId)
+        && isValidInfraBinding(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(bindingId)
+        && isValidInfraBinding(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().bindingKey == existing().bindingKey
+        && incoming().bindingType == existing().bindingType
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().ownerId == request.auth.uid
+            && existing().migrationStatus != 'conflict-resolved'
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'migrationStatus', 'conflictPolicy', 'recordCount', 'checksum', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isValidId(bindingId) && isVerifiedUser() && (existing().ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /karta_files/{fileId} {
+      allow get: if isValidId(fileId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().ownerId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isVerifiedUser()
+        && isValidId(fileId)
+        && isValidKartaFile(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(fileId)
+        && isValidKartaFile(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().ownerId == request.auth.uid
+            && existing().status != 'archived'
+            && (
+              incoming().diff(existing()).affectedKeys().hasOnly([
+                'title', 'encryptedPayload', 'iv', 'salt', 'keyFingerprint',
+                'integrityHash', 'sizeBytes', 'version', 'tags', 'status', 'updatedAt'
+              ]) ||
+              incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+            )
+          )
+        );
+      allow delete: if isValidId(fileId) && isVerifiedUser() && (existing().ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /tools_configs/{toolId} {
+      allow get: if isValidId(toolId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().ownerId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isVerifiedUser()
+        && isValidId(toolId)
+        && isValidToolConfig(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(toolId)
+        && isValidToolConfig(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().toolKey == existing().toolKey
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().ownerId == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'displayName', 'enabled', 'legacyD1Binding', 'legacyR2Binding',
+              'configSummary', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isValidId(toolId) && isVerifiedUser() && (existing().ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /audit_logs/{logId} {
+      allow get: if isValidId(logId) && isSignedIn() && (existing().actorId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().actorId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isVerifiedUser()
+        && isValidId(logId)
+        && isValidAuditLog(incoming())
+        && incoming().actorId == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /backups/{backupId} {
+      allow get: if isValidId(backupId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().ownerId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isVerifiedUser()
+        && isValidId(backupId)
+        && isValidCloudBackup(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(backupId)
+        && isValidCloudBackup(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().ownerId == request.auth.uid
+            && existing().status != 'restored'
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(backupId) && isVerifiedUser() && (existing().ownerId == request.auth.uid || isAdmin());
+    }
+  }
+}

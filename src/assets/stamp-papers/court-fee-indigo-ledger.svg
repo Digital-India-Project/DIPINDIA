@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <pattern id="judicialGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="none" stroke="#1E3A8A" stroke-width="0.45" stroke-opacity="0.10"/>
+      <path d="M0 24 Q12 12 24 24 T48 24" fill="none" stroke="#1B365D" stroke-width="0.55" stroke-opacity="0.13"/>
+      <path d="M24 0 Q36 12 24 24 T24 48" fill="none" stroke="#1B365D" stroke-width="0.55" stroke-opacity="0.13"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="480" fill="#FAFCFF"/>
+  <rect width="480" height="480" fill="url(#judicialGrid)"/>
+  <g transform="translate(240,240)" stroke="#1B365D" fill="none" stroke-opacity="0.13">
+    <circle r="128" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <circle r="112" stroke-width="0.7"/>
+    <rect x="-80" y="-80" width="160" height="160" rx="8" stroke-width="0.7" transform="rotate(45)"/>
+    <rect x="-80" y="-80" width="160" height="160" rx="8" stroke-width="0.7"/>
+  </g>
+</svg>

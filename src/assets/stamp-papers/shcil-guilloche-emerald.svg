@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <pattern id="guillocheWave" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M0 20 Q20 0 40 20 T80 20" fill="none" stroke="#047857" stroke-width="0.65" stroke-opacity="0.16"/>
+      <path d="M0 40 Q20 20 40 40 T80 40" fill="none" stroke="#0F766E" stroke-width="0.65" stroke-opacity="0.14"/>
+      <path d="M0 60 Q20 40 40 60 T80 60" fill="none" stroke="#047857" stroke-width="0.65" stroke-opacity="0.16"/>
+      <path d="M0 20 Q20 40 40 20 T80 20" fill="none" stroke="#065F46" stroke-width="0.5" stroke-opacity="0.12"/>
+      <path d="M0 60 Q20 80 40 60 T80 60" fill="none" stroke="#065F46" stroke-width="0.5" stroke-opacity="0.12"/>
+      <circle cx="40" cy="40" r="18" fill="none" stroke="#047857" stroke-width="0.55" stroke-opacity="0.12" stroke-dasharray="2 2"/>
+    </pattern>
+    <pattern id="microDiamond" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M12 0 L24 12 L12 24 L0 12 Z" fill="none" stroke="#059669" stroke-width="0.4" stroke-opacity="0.09"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="480" fill="#FAFEFC"/>
+  <rect width="480" height="480" fill="url(#microDiamond)"/>
+  <rect width="480" height="480" fill="url(#guillocheWave)"/>
+  <g transform="translate(240,240)" stroke="#047857" fill="none" stroke-opacity="0.14">
+    <circle r="135" stroke-width="1.2" stroke-dasharray="6 3"/>
+    <circle r="118" stroke-width="0.8"/>
+    <circle r="92" stroke-width="0.7" stroke-dasharray="3 3"/>
+    <polygon points="0,-112 28,-28 112,0 28,28 0,112 -28,28 -112,0 -28,-28" stroke-width="0.8"/>
+    <polygon points="79,-79 38,0 79,79 0,38 -79,79 -38,0 -79,-79 0,-38" stroke-width="0.65"/>
+  </g>
+</svg>
