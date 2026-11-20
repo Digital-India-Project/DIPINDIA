@@ -175,6 +175,9 @@ export function mapFirebaseAuthError(err: any): string {
       return 'This verification or reset link is invalid or has already been used.';
     case 'auth/too-many-requests':
       return 'Too many failed sign-in attempts. Please wait a few minutes and try again.';
+    case 'auth/api-key-not-valid':
+    case 'auth/invalid-api-key':
+      return 'Cached Firebase configuration is out of date. Please hard-refresh the page (Ctrl+Shift+R / Cmd+Shift+R) or clear site data to load the updated digitalindiaproject-portal config.';
     default:
       return err?.message || 'Authentication failed. Please try again.';
   }

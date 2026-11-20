@@ -11,6 +11,27 @@ if (typeof window !== 'undefined') {
       window.location.reload();
     }
   });
+
+  if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      const hadDevSw = regs.some((r) =>
+        (r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || '').includes('dev-sw')
+      );
+      if (hadDevSw) {
+        Promise.all(regs.map((r) => r.unregister())).then(() => {
+          if ('caches' in window) {
+            caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).finally(() => {
+              const reloadKey = 'dip_dev_sw_cleaned';
+              if (!window.sessionStorage.getItem(reloadKey)) {
+                window.sessionStorage.setItem(reloadKey, '1');
+                window.location.reload();
+              }
+            });
+          }
+        });
+      }
+    }).catch(() => {});
+  }
 }
 
 class AppErrorBoundary extends React.Component<
