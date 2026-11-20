@@ -106,7 +106,7 @@ if (apiKey) {
 
 // Reverse-proxy Firebase Auth handler/iframe paths so authDomain works on digitalindiaproject.com
 const FIREBASE_AUTH_HOST =
-  process.env.FIREBASE_AUTH_HOST || 'gen-lang-client-0594646237.firebaseapp.com';
+  process.env.FIREBASE_AUTH_HOST || 'gen-lang-client-0294214396.firebaseapp.com';
 app.use(['/__/auth', '/__/firebase'], async (req, res) => {
   try {
     const targetUrl = `https://${FIREBASE_AUTH_HOST}${req.originalUrl}`;
@@ -2502,9 +2502,8 @@ app.get('/api/admin/infrastructure', requireExpressAdmin, async (_req, res) => {
           preservedR1Bucket: 'r1-01 (karta-legacy-r1)',
           preservedD2Database: 'd2-01 (digital-tools-tray-db)',
           firebaseProjects: [
-            { projectId: 'gen-lang-client-0294214396', projectNumber: '520982792771', sourceRepo: 'DIP-Official (DIP-Desk)' },
+            { projectId: 'gen-lang-client-0294214396', projectNumber: '520982792771', databaseId: 'ai-studio-dipindia-8df12812-95d2-4c97-aafb-7ee0d14a643f', sourceRepo: 'DIP-Official (DIP-Desk) — Active Runtime DB' },
             { projectId: 'gen-lang-client-0226759782', sourceRepo: 'Tools-Tray' },
-            { projectId: 'gen-lang-client-0594646237', databaseId: 'ai-studio-9b536d90-36f8-404e-991c-6452405c2473', sourceRepo: 'Active Runtime DB' },
           ],
         },
       },

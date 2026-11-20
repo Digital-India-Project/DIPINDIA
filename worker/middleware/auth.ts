@@ -12,7 +12,6 @@ import { DatabaseRegistry } from '../config/database';
 
 const FIREBASE_PROJECT_ID = 'gen-lang-client-0294214396';
 const ACTIVE_FIREBASE_PROJECT_IDS = [
-  'gen-lang-client-0594646237',
   FIREBASE_PROJECT_ID,
 ];
 const BOOTSTRAP_ADMIN_EMAIL = 'allindiadigitalseva@gmail.com';

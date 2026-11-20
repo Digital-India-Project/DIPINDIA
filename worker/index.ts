@@ -63,7 +63,7 @@ import { generateDigitalProductPayload } from '../src/data/catalogue/digitalGene
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
-const FIREBASE_AUTH_HOST = 'gen-lang-client-0594646237.firebaseapp.com';
+const FIREBASE_AUTH_HOST = 'gen-lang-client-0294214396.firebaseapp.com';
 
 async function proxyFirebaseAuthRequest(rawRequest: Request): Promise<Response> {
   const url = new URL(rawRequest.url);
