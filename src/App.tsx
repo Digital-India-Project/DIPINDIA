@@ -15,7 +15,8 @@ import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useVoiceCommands } from './hooks/useVoiceCommands';
 import { flushOfflineQueue } from './lib/offlineQueue';
 import { initializeWorkspaceIfEmpty } from './lib/legacySeeds';
-import { db } from './services/firebase';
+import { ensureActiveDatabasePopulatedIfEmpty } from './lib/firestoreRecreate';
+import { auth, db } from './services/firebase';
 import {
   captureInitialNavigationTiming,
   recordRouteLoad,
@@ -124,7 +125,7 @@ const ToolPlansPage = React.lazy(() =>
 const KartaFilesPage = React.lazy(() =>
   import('./pages/karta/KartaFilesPage').then((m) => ({ default: m.KartaFilesPage }))
 );
-import { getHomeRouteForRole } from './lib/rbac';
+import { getHomeRouteForRole, isSuperAdminRole } from './lib/rbac';
 import {
   isRouteAccessible,
   resolveDynamicNavigation,
@@ -146,11 +147,11 @@ function parseLocation(): { route: string; param: string } {
 }
 
 function MainApp() {
-  const { user, role, permissions, isAuthenticated } = useAuth();
+  const { user, role, permissions, isAuthenticated, authLoading } = useAuth();
   const { lang, setLang } = useLanguage();
   const { setTheme } = useTheme();
   const { plan } = useToolTray();
-  const { services, blogPosts, syncApplicationPaymentStatus } = useData();
+  const { services, blogPosts, businessSettings, rolePermissions, syncApplicationPaymentStatus } = useData();
   const isOnline = useOnlineStatus();
 
   const initial = parseLocation();
@@ -316,9 +317,17 @@ function MainApp() {
   }, [isOnline, user?.id]);
 
   useEffect(() => {
-    if (!user?.id) return;
-    void initializeWorkspaceIfEmpty(user.id).catch(() => {});
-  }, [user?.id]);
+    if (authLoading || !user?.id || !auth.currentUser?.uid) return;
+    if (isSuperAdminRole(user.role) && auth.currentUser.emailVerified) {
+      void ensureActiveDatabasePopulatedIfEmpty({
+        user,
+        businessSettings,
+        rolePermissions,
+      }).catch(() => {});
+      return;
+    }
+    void initializeWorkspaceIfEmpty(auth.currentUser.uid).catch(() => {});
+  }, [authLoading, user?.id, user?.role]);
 
   const voice = useVoiceCommands({
     onNavigate: (module) => {

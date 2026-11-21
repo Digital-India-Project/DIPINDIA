@@ -228,9 +228,10 @@ export async function initializeWorkspaceIfEmpty(uid: string): Promise<boolean> 
     query(collection(db, 'tools_configs'), where('ownerId', '==', uid))
   );
   if (existingTools.empty) {
+    const toolsBatch = writeBatch(db);
     for (const tool of DEFAULT_TOOLS) {
       const docId = `${uid}_${tool.toolKey}`;
-      await setDoc(doc(db, 'tools_configs', docId), {
+      toolsBatch.set(doc(db, 'tools_configs', docId), {
         ownerId: uid,
         toolKey: tool.toolKey,
         displayName: tool.displayName,
@@ -242,6 +243,7 @@ export async function initializeWorkspaceIfEmpty(uid: string): Promise<boolean> 
         updatedAt: serverTimestamp(),
       });
     }
+    await toolsBatch.commit();
     seeded = true;
   }
 

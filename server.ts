@@ -71,6 +71,17 @@ import {
   type ApiSathiCallAnalyticsInputRow,
 } from './src/lib/apiSathiAnalytics';
 import { defaultApiSathiRetryQueue } from './src/services/apiSathiQueue';
+import {
+  probeJustPostgresStatus,
+  resolveJustPostgresConfig,
+  runSqlSchemaMigrationDirect,
+} from './server/postgres/justPostgresClient';
+import {
+  exportAllJustPostgresData,
+  importBackupJsonToJustPostgres,
+  readPostgresSchemaSql,
+  seedCanonicalDataToJustPostgres,
+} from './server/postgres/justPostgresSync';
 
 dotenv.config();
 
@@ -218,6 +229,7 @@ const requireExpressAdmin: express.RequestHandler = async (req, res, next) => {
 
 // 1. Health check
 app.get('/api/health', (req, res) => {
+  const pgCfg = resolveJustPostgresConfig(process.env);
   res.json({
     status: 'healthy',
     platform: 'Digital India Project',
@@ -228,6 +240,7 @@ app.get('/api/health', (req, res) => {
     groqConfigured: !!process.env.GROQ_API_KEY,
     openaiConfigured: !!process.env.OPENAI_API_KEY,
     anthropicConfigured: !!process.env.ANTHROPIC_API_KEY,
+    justPostgresConfigured: pgCfg.configured,
     timestamp: new Date().toISOString(),
   });
 });
@@ -2502,7 +2515,7 @@ app.get('/api/admin/infrastructure', requireExpressAdmin, async (_req, res) => {
           preservedR1Bucket: 'r1-01 (karta-legacy-r1)',
           preservedD2Database: 'd2-01 (digital-tools-tray-db)',
           firebaseProjects: [
-            { projectId: 'digitalindiaproject-portal', projectNumber: '49386507162', databaseId: 'ai-studio-dipindia-8df12812-95d2-4c97-aafb-7ee0d14a643f', sourceRepo: 'Digital India Project (DIP-Desk) — Active Runtime DB' },
+            { projectId: 'digitalindiaproject-portal', projectNumber: '49386507162', databaseId: 'digitalindiaproject-database', sourceRepo: 'Digital India Project (DIP-Desk) — Active Runtime DB' },
             { projectId: 'gen-lang-client-0294214396', projectNumber: '520982792771', sourceRepo: 'DIP-Official (Previous Source DB)' },
             { projectId: 'gen-lang-client-0226759782', sourceRepo: 'Tools-Tray' },
           ],
@@ -2514,6 +2527,7 @@ app.get('/api/admin/infrastructure', requireExpressAdmin, async (_req, res) => {
 
 app.get('/api/integrations/status', (_req, res) => {
   const cfConfig = resolveCashfreeConfig(process.env);
+  const pgCfg = resolveJustPostgresConfig(process.env);
   return res.json(
     buildStandardResponse({
       success: true,
@@ -2552,10 +2566,237 @@ app.get('/api/integrations/status', (_req, res) => {
                 : 'gateway_ready'
               : 'sandbox_adapter',
           },
+          justPostgres: {
+            configured: pgCfg.configured,
+            endpointHost: pgCfg.endpointHost || null,
+            mode: pgCfg.configured ? 'remote_rest_ready' : 'env_secrets_pending',
+          },
         },
       },
     })
   );
+});
+
+// Remote PostgreSQL (JustPostgres REST Proxy Routes — Strictly Admin Authenticated & Server-Side Key Only)
+app.get('/api/admin/postgres/status', requireExpressAdmin, async (_req, res) => {
+  try {
+    const status = await probeJustPostgresStatus(process.env);
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: status.message,
+        referenceId: `pg_stat_${Date.now()}`,
+        data: status,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Unable to check JustPostgres status.',
+        referenceId: `pg_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_STATUS_ERROR',
+      })
+    );
+  }
+});
+
+app.get('/api/admin/postgres/schema-sql', requireExpressAdmin, (_req, res) => {
+  try {
+    const sql = readPostgresSchemaSql();
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: 'PostgreSQL schema & core initialization migrations loaded (0001 + 0002).',
+        referenceId: `pg_sql_${Date.now()}`,
+        data: {
+          filename: 'justpostgres_0001_0002_init.sql',
+          sql,
+        },
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Unable to read Postgres schema SQL.',
+        referenceId: `pg_sql_err_${Date.now()}`,
+        data: null,
+        errorCode: 'SCHEMA_READ_ERROR',
+      })
+    );
+  }
+});
+
+app.post('/api/admin/postgres/run-migration', requireExpressAdmin, async (_req, res) => {
+  try {
+    const sql = readPostgresSchemaSql();
+    const result = await runSqlSchemaMigrationDirect(sql, process.env);
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: result.message,
+        referenceId: `pg_mig_${Date.now()}`,
+        data: result,
+      })
+    );
+  } catch (err: any) {
+    return res.status(400).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Unable to run PostgreSQL schema migration.',
+        referenceId: `pg_mig_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_MIGRATION_ERROR',
+      })
+    );
+  }
+});
+
+app.post('/api/admin/postgres/sync-catalogue', requireExpressAdmin, async (req, res) => {
+  try {
+    const actor = await resolveExpressAdminFromRequest(req);
+    if (!actor) {
+      return res.status(401).json(
+        buildStandardResponse({
+          success: false,
+          status: 'REJECTED',
+          message: 'Verified admin identity required.',
+          referenceId: `pg_auth_${Date.now()}`,
+          data: null,
+          errorCode: 'UNAUTHORIZED',
+        })
+      );
+    }
+    const status = await probeJustPostgresStatus(process.env);
+    if (status.healthState !== 'connected') {
+      return res.status(400).json(
+        buildStandardResponse({
+          success: false,
+          status: 'FAILED',
+          message: status.message,
+          referenceId: `pg_precheck_${Date.now()}`,
+          data: status,
+          errorCode: status.healthState.toUpperCase(),
+        })
+      );
+    }
+
+    const syncResults = await seedCanonicalDataToJustPostgres({
+      actorUid: actor.uid,
+      actorEmail: actor.email || 'allindiadigitalseva@gmail.com',
+      env: process.env,
+    });
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: 'Seeded services catalogue, bilingual blog posts, settings, RBAC & admin user into JustPostgres.',
+        referenceId: `pg_seed_${Date.now()}`,
+        data: syncResults,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Failed to sync canonical data to JustPostgres.',
+        referenceId: `pg_seed_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_SYNC_ERROR',
+      })
+    );
+  }
+});
+
+app.post('/api/admin/postgres/import-json', requireExpressAdmin, async (req, res) => {
+  try {
+    const actor = await resolveExpressAdminFromRequest(req);
+    if (!actor) {
+      return res.status(401).json(
+        buildStandardResponse({
+          success: false,
+          status: 'REJECTED',
+          message: 'Verified admin identity required.',
+          referenceId: `pg_imp_auth_${Date.now()}`,
+          data: null,
+          errorCode: 'UNAUTHORIZED',
+        })
+      );
+    }
+    const collections = req.body?.collections;
+    if (!collections || typeof collections !== 'object' || Array.isArray(collections)) {
+      return res.status(400).json(
+        buildStandardResponse({
+          success: false,
+          status: 'FAILED',
+          message: 'Invalid backup payload: expected { collections: { ... } }.',
+          referenceId: `pg_imp_bad_${Date.now()}`,
+          data: null,
+          errorCode: 'INVALID_BACKUP_PAYLOAD',
+        })
+      );
+    }
+    const summary = await importBackupJsonToJustPostgres({
+      collections,
+      actorUid: actor.uid,
+      env: process.env,
+    });
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: 'Imported backup JSON collections into JustPostgres.',
+        referenceId: `pg_imp_${Date.now()}`,
+        data: summary,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Failed to import JSON backup into JustPostgres.',
+        referenceId: `pg_imp_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_IMPORT_ERROR',
+      })
+    );
+  }
+});
+
+app.get('/api/admin/postgres/export-json', requireExpressAdmin, async (_req, res) => {
+  try {
+    const dump = await exportAllJustPostgresData(process.env);
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: 'Exported JustPostgres tables as JSON backup.',
+        referenceId: `pg_exp_${Date.now()}`,
+        data: dump,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Failed to export JustPostgres data.',
+        referenceId: `pg_exp_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_EXPORT_ERROR',
+      })
+    );
+  }
 });
 
 // Catalogue, Coupon, Quote & Digital Product Local Node Parity Routes

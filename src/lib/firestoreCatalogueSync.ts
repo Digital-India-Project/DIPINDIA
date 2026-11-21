@@ -80,7 +80,7 @@ export async function syncServicesCatalogueToFirestore(params?: {
 
   if (!params?.dryRun && pendingWrites.length > 0) {
     try {
-      const BATCH_CHUNK = 200;
+      const BATCH_CHUNK = 50;
       for (let i = 0; i < pendingWrites.length; i += BATCH_CHUNK) {
         const chunk = pendingWrites.slice(i, i + BATCH_CHUNK);
         const batch = writeBatch(db);

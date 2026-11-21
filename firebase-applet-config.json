@@ -3,7 +3,7 @@
   "appId": "1:49386507162:web:6129267750858cd8c2c823",
   "apiKey": "AIzaSyC64NTrEzqkgXztiPaIK1WJ8siCeXHmn80",
   "authDomain": "digitalindiaproject-portal.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-dipindia-8df12812-95d2-4c97-aafb-7ee0d14a643f",
+  "firestoreDatabaseId": "digitalindiaproject-database",
   "storageBucket": "digitalindiaproject-portal.firebasestorage.app",
   "messagingSenderId": "49386507162",
   "measurementId": "",

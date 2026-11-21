@@ -9,7 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "db:init:postgres": "tsx server/postgres/initJustPostgres.ts",
+    "db:init:postgres:dry": "tsx server/postgres/initJustPostgres.ts --dry-run"
   },
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",
@@ -19,6 +21,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@types/canvas-confetti": "^1.9.0",
     "@types/pdfkit": "^0.17.7",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
     "@vitejs/plugin-react": "^6.1.1",
     "canvas-confetti": "^1.9.4",
@@ -36,6 +39,7 @@
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.5.438",
     "pdfkit": "^0.20.2",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",

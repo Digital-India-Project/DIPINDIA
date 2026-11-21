@@ -67,6 +67,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Globe,
+  Sparkles,
 } from 'lucide-react';
 import { AdminPaymentsConsole } from '../../components/admin/AdminPaymentsConsole';
 import { InlineSkeletonPulse } from '../../components/common/SkeletonLoaders';
@@ -78,6 +79,12 @@ import {
   type ApiSathiCallLogRow,
   type ApiSathiStatusInfo,
 } from '../../services/apiSathiService';
+import {
+  ensureActiveDatabasePopulatedIfEmpty,
+  inspectActiveDatabaseState,
+  recreateAllFirestoreDatabaseFiles,
+} from '../../lib/firestoreRecreate';
+import { auth, firebaseMetadata } from '../../services/firebase';
 
 const BlogManagerTab = React.lazy(() =>
   import('../../components/admin/BlogManagerTab').then((m) => ({ default: m.BlogManagerTab }))
@@ -151,7 +158,7 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
   initialTab = 'overview',
   onNavigate,
 }) => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const {
     services,
     applications,
@@ -397,11 +404,91 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
     }
   };
 
+  const [dbNeedsInit, setDbNeedsInit] = useState(false);
+  const [fbSessionMissing, setFbSessionMissing] = useState(false);
+  const [recreatingDb, setRecreatingDb] = useState(false);
+  const [dbRebuildResultMsg, setDbRebuildResultMsg] = useState<string | null>(null);
+  const [dbRebuildErrorMsg, setDbRebuildErrorMsg] = useState<string | null>(null);
+
   useEffect(() => {
+    if (authLoading) return;
     if (user?.role === 'admin' || user?.role === 'super_admin') {
       void refreshApiSathiTelemetry();
+      const fbUser = auth.currentUser;
+      if (!fbUser || !fbUser.emailVerified) {
+        setFbSessionMissing(true);
+        return;
+      }
+      setFbSessionMissing(false);
+      void (async () => {
+        try {
+          const state = await inspectActiveDatabaseState();
+          if (state.initialized) {
+            setDbNeedsInit(false);
+            return;
+          }
+          if (state.error) {
+            setDbNeedsInit(true);
+            setDbRebuildErrorMsg(state.error);
+            return;
+          }
+          setDbNeedsInit(true);
+          setRecreatingDb(true);
+          const autoRes = await ensureActiveDatabasePopulatedIfEmpty({
+            user,
+            businessSettings,
+            rolePermissions,
+          });
+          setDbNeedsInit(false);
+          if (autoRes.ranRebuild && autoRes.result) {
+            setDbRebuildResultMsg(
+              `Auto-created ${autoRes.result.totalWritten} record(s) in "${autoRes.result.targetDbId}" across admins, users, services, blog_posts, business_settings, infra_bindings, tools_configs & audit_logs.`
+            );
+          }
+        } catch (err: any) {
+          setDbRebuildErrorMsg(
+            String(err?.message || `Unable to initialize "${firebaseMetadata.firestoreDatabaseId}".`)
+          );
+        } finally {
+          setRecreatingDb(false);
+        }
+      })();
     }
-  }, [user?.role]);
+  }, [authLoading, user?.id, user?.role, user?.email]);
+
+  const handleQuickRecreateDb = async () => {
+    setRecreatingDb(true);
+    setDbRebuildErrorMsg(null);
+    setDbRebuildResultMsg(null);
+    try {
+      const res = await recreateAllFirestoreDatabaseFiles({
+        user,
+        businessSettings,
+        rolePermissions,
+      });
+      setDbNeedsInit(false);
+      setDbRebuildResultMsg(
+        `Recreated ${res.totalWritten} record(s) in "${res.targetDbId}" across admins, users, services, blog_posts, business_settings, infra_bindings, tools_configs & audit_logs.`
+      );
+    } catch (err: any) {
+      const raw = String(err?.message || 'Unable to recreate Firestore collections.');
+      const lower = raw.toLowerCase();
+      if (
+        lower.includes('quota exceeded') ||
+        lower.includes('resource-exhausted') ||
+        lower.includes('resource_exhausted') ||
+        lower.includes('free daily read units')
+      ) {
+        setDbRebuildErrorMsg(
+          `Firestore Spark free-tier quota or limit reached on "${firebaseMetadata.firestoreDatabaseId}": ${raw}`
+        );
+      } else {
+        setDbRebuildErrorMsg(raw);
+      }
+    } finally {
+      setRecreatingDb(false);
+    }
+  };
 
   // Strict Admin Authorization Gate
   const isAuthorizedAdmin = user && (user.role === 'admin' || user.role === 'super_admin');
@@ -686,6 +773,14 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
 
         <div className="flex items-center gap-2 flex-wrap max-w-full">
           <button
+            type="button"
+            onClick={() => setActiveTab('infrastructure')}
+            className="text-xs font-bold text-white bg-[#FF671F] hover:bg-[#E55B1B] px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap shadow-xs"
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>DB Recreate &amp; Migration</span>
+          </button>
+          <button
             onClick={() => onNavigate('workspace')}
             className="text-xs font-bold text-blue-300 hover:text-white bg-slate-800 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
@@ -707,6 +802,112 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
           </button>
         </div>
       </div>
+
+      {/* Firebase Auth Re-verify Notice if Cached Session Lacks Active Auth Token */}
+      {fbSessionMissing && (
+        <div className="p-4 sm:p-5 bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400/70 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1 text-xs">
+            <div className="font-extrabold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+              Google Sign-In Session Required for {firebaseMetadata.firestoreDatabaseId}
+            </div>
+            <p className="text-amber-900 dark:text-amber-100">
+              Firestore Console stays empty until you sign in with Google (<span className="font-mono font-bold">allindiadigitalseva@gmail.com</span>) inside this app so your browser can automatically create and sync all collections into <span className="font-mono">{firebaseMetadata.firestoreDatabaseId}</span>.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('login')}
+            className="px-4 py-2 bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold rounded-xl shrink-0 cursor-pointer"
+          >
+            Sign In With Google Now
+          </button>
+        </div>
+      )}
+
+      {/* Empty Database Auto-Detect & One-Click Recreate Banner */}
+      {dbNeedsInit && (
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-50 via-amber-50 to-emerald-50 dark:from-orange-950/40 dark:via-slate-900 dark:to-emerald-950/30 border-2 border-[#FF671F]/50 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#FF671F]">
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>Fresh Firestore Database Detected</span>
+            </div>
+            <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+              Active database{' '}
+              <span className="font-mono text-[#138808] dark:text-emerald-400">
+                {firebaseMetadata.firestoreDatabaseId}
+              </span>{' '}
+              is empty
+            </h2>
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              Recreate all core database collections (admins, users, 149+ services, 106+ bilingual blogs, corporate GSTIN settings, RBAC matrix, 25 infra bindings &amp; 6 tool configs) with one click.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleQuickRecreateDb}
+              disabled={recreatingDb}
+              className="px-4 py-2.5 bg-[#FF671F] hover:bg-[#E55B1B] text-white text-xs font-bold rounded-xl inline-flex items-center gap-2 cursor-pointer disabled:opacity-60 shadow-sm"
+            >
+              <Sparkles className={`w-4 h-4 ${recreatingDb ? 'animate-spin' : ''}`} />
+              <span>
+                {recreatingDb
+                  ? `Recreating in ${firebaseMetadata.firestoreDatabaseId}...`
+                  : `Recreate All Collections in ${firebaseMetadata.firestoreDatabaseId}`}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('infrastructure')}
+              className="px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl cursor-pointer hover:border-[#FF671F]"
+            >
+              Open DB Console
+            </button>
+          </div>
+        </div>
+      )}
+
+      {dbRebuildResultMsg && (
+        <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-xl text-xs text-emerald-800 dark:text-emerald-200 font-semibold flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#138808] shrink-0" />
+            <span>{dbRebuildResultMsg}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab('infrastructure')}
+              className="text-xs font-bold underline cursor-pointer"
+            >
+              View Collection Counts
+            </button>
+            <button
+              type="button"
+              onClick={() => setDbRebuildResultMsg(null)}
+              className="text-xs font-bold underline cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      {dbRebuildErrorMsg && (
+        <div className="p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-xs text-red-700 dark:text-red-300 font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{dbRebuildErrorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDbRebuildErrorMsg(null)}
+            className="text-xs font-bold underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {appActionMsg && (
         <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-xl text-xs text-emerald-800 dark:text-emerald-200 font-semibold flex items-center gap-2">
@@ -793,7 +994,7 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
                 { id: 'blog', label: 'Blog & SEO', count: String(blogPosts.length), icon: BookOpen, accent: 'text-orange-600 dark:text-orange-400' },
                 { id: 'catalog-seo', label: 'Catalog SEO', count: String(services.length), icon: Globe, accent: 'text-emerald-600 dark:text-emerald-400' },
                 { id: 'directory', label: 'India Directory', count: '36', icon: Globe2, accent: 'text-emerald-600 dark:text-emerald-400' },
-                { id: 'infrastructure', label: 'Cloud & R2', icon: Cloud, accent: 'text-sky-600 dark:text-sky-400' },
+                { id: 'infrastructure', label: 'DB Migration & Cloud', icon: Cloud, accent: 'text-sky-600 dark:text-sky-400' },
                 { id: 'performance', label: 'Performance', icon: Gauge, accent: 'text-amber-600 dark:text-amber-400' },
                 { id: 'apilogs', label: 'Audit Logs', icon: Activity, accent: 'text-slate-600 dark:text-slate-300' },
                 { id: 'settings', label: 'Settings', icon: Settings, accent: 'text-slate-600 dark:text-slate-300' },

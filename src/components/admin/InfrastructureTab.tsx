@@ -27,6 +27,8 @@ import {
   Upload,
 } from 'lucide-react';
 import { SchemaMigrationPanel } from '../workspace/SchemaMigrationPanel';
+import { FirestoreDbMigrator } from './FirestoreDbMigrator';
+import { PostgresDbConsole } from './PostgresDbConsole';
 import { openExternalSafeUrl } from '../../lib/navigationController';
 
 function formatBytes(bytes: number): string {
@@ -178,6 +180,12 @@ export const InfrastructureTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Client-Side Super-Admin Firestore Recreate, Migration & JSON Export */}
+      <FirestoreDbMigrator />
+
+      {/* Server-Side Remote PostgreSQL (JustPostgres) Migration, Seeding & Backup Console */}
+      <PostgresDbConsole />
+
       {/* Top Action Bar */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-wrap items-start xl:items-center justify-between gap-4">
         <div className="space-y-1 flex-[1_1_280px] min-w-0">

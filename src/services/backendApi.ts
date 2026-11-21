@@ -1389,3 +1389,62 @@ export async function runAdminPaymentCutoverCheck() {
     body: '{}',
   });
 }
+
+export interface JustPostgresStatusResponse {
+  configured: boolean;
+  directPgConfigured?: boolean;
+  restConfigured?: boolean;
+  hasServiceRoleKey: boolean;
+  hasAnonKey: boolean;
+  endpointHost: string;
+  restUrl: string;
+  transportMode?: 'direct_pg' | 'rest_api' | 'unconfigured';
+  healthState: 'connected' | 'api_not_enabled' | 'tables_missing' | 'unconfigured' | 'unreachable';
+  message: string;
+  tableStats: Array<{
+    table: string;
+    rowCount: number;
+    exists: boolean;
+    error?: string;
+  }>;
+  checkedAt: string;
+}
+
+export async function fetchJustPostgresStatus() {
+  return apiRequest<JustPostgresStatusResponse>('/api/admin/postgres/status', { method: 'GET' });
+}
+
+export async function fetchJustPostgresSchemaSql() {
+  return apiRequest<{ filename: string; sql: string }>('/api/admin/postgres/schema-sql', { method: 'GET' });
+}
+
+export async function runJustPostgresMigration() {
+  return apiRequest<{ executedStatements: number; message: string }>('/api/admin/postgres/run-migration', {
+    method: 'POST',
+    body: '{}',
+  });
+}
+
+export async function syncCatalogueToJustPostgres() {
+  return apiRequest<Record<string, { upserted: number; failed: number; errors: string[] }>>(
+    '/api/admin/postgres/sync-catalogue',
+    { method: 'POST', body: '{}' }
+  );
+}
+
+export async function importJsonToJustPostgres(collections: Record<string, any[]>) {
+  return apiRequest<Record<string, { upserted: number; failed: number; errors: string[] }>>(
+    '/api/admin/postgres/import-json',
+    { method: 'POST', body: JSON.stringify({ collections }) }
+  );
+}
+
+export async function exportJustPostgresBackup() {
+  return apiRequest<{
+    exportedAt: string;
+    provider: string;
+    endpointHost: string;
+    collections: Record<string, any[]>;
+  }>('/api/admin/postgres/export-json', { method: 'GET' });
+}
+

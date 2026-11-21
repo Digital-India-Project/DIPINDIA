@@ -64,6 +64,8 @@ import {
 } from 'lucide-react';
 import { SchemaMigrationPanel } from '../../components/workspace/SchemaMigrationPanel';
 import { SecurityAndBackupsPanel } from '../../components/workspace/SecurityAndBackupsPanel';
+import { FirestoreDbMigrator } from '../../components/admin/FirestoreDbMigrator';
+import { isSuperAdminRole } from '../../lib/rbac';
 
 interface WorkspaceHubProps {
   onNavigate?: (route: string) => void;
@@ -1225,7 +1227,12 @@ Official Domain: https://digitalindiaproject.com`;
       )}
 
       {/* TAB 6: 3-REPO R1/R2 & D1/D2 MIGRATION */}
-      {activeTab === 'migration' && <SchemaMigrationPanel />}
+      {activeTab === 'migration' && (
+        <div className="space-y-6">
+          {isSuperAdminRole(authUser?.role) && <FirestoreDbMigrator />}
+          <SchemaMigrationPanel />
+        </div>
+      )}
 
       {/* TAB 7: RBAC, 2FA, BIOMETRICS & BACKUPS */}
       {activeTab === 'security' && <SecurityAndBackupsPanel />}
