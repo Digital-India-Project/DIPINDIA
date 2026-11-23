@@ -127,9 +127,9 @@ export function LegalTermTooltipOverlay({ tooltip, onKeepOpen, onClose }: Popove
         width: `${cardWidth}px`,
         zIndex: 60,
       }}
-      className="bg-[#FFFEFA] border border-[#1B365D]/35 rounded-lg shadow-[0_12px_30px_rgba(27,54,93,0.2)] overflow-hidden text-left print:hidden"
+      className="bg-[#FFFEFA] dark:bg-slate-900 border border-[#1B365D]/35 dark:border-slate-700 rounded-lg shadow-[0_12px_30px_rgba(27,54,93,0.2)] dark:shadow-[0_16px_36px_rgba(0,0,0,0.65)] overflow-hidden text-left print:hidden"
     >
-      <div className="bg-[#1B365D] text-white px-3.5 py-2 flex items-center justify-between gap-2">
+      <div className="bg-[#1B365D] dark:bg-slate-950 text-white px-3.5 py-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
           <Scale className="w-3.5 h-3.5 text-[#FCD34D] shrink-0" />
           <span className="text-xs font-semibold truncate">{tooltip.entry.term}</span>
@@ -145,17 +145,17 @@ export function LegalTermTooltipOverlay({ tooltip, onKeepOpen, onClose }: Popove
       </div>
 
       <div className="p-3.5 space-y-2 text-xs">
-        <div className="flex items-center justify-between gap-2 text-[10.5px] font-mono-tabular text-[#0F766E] font-medium">
+        <div className="flex items-center justify-between gap-2 text-[10.5px] font-mono-tabular text-[#0F766E] dark:text-teal-400 font-medium">
           <span>{tooltip.entry.category}</span>
-          <span className="text-[#78716C]">Matched: &ldquo;{tooltip.matchedText}&rdquo;</span>
+          <span className="text-[#78716C] dark:text-slate-400">Matched: &ldquo;{tooltip.matchedText}&rdquo;</span>
         </div>
 
-        <p className="text-[#1C1917] leading-relaxed">{tooltip.entry.plainEnglish}</p>
+        <p className="text-[#1C1917] dark:text-slate-100 leading-relaxed">{tooltip.entry.plainEnglish}</p>
 
-        <div className="pt-2 border-t border-[#E5DFD3] flex items-start gap-1.5 text-[11px] text-[#57534E]">
-          <BookOpen className="w-3.5 h-3.5 text-[#B45309] shrink-0 mt-0.5" />
+        <div className="pt-2 border-t border-[#E5DFD3] dark:border-slate-800 flex items-start gap-1.5 text-[11px] text-[#57534E] dark:text-slate-300">
+          <BookOpen className="w-3.5 h-3.5 text-[#B45309] dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="leading-snug">
-            <strong className="text-[#1C1917] font-semibold">Indian Legal Context: </strong>
+            <strong className="text-[#1C1917] dark:text-white font-semibold">Indian Legal Context: </strong>
             {tooltip.entry.indianContext}
           </p>
         </div>

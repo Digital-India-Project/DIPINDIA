@@ -384,25 +384,25 @@ export function DigitalSignatureGeneratorControls({
   };
 
   return (
-    <div className="p-4 bg-[#F7F8FA] border border-slate-200 rounded-xl space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+    <div className="p-4 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF671F] flex items-center gap-1.5">
             <PenLine className="w-3.5 h-3.5" />
             Digital Signature Area Generator
           </h4>
-          <p className="text-[11px] text-slate-600">
+          <p className="text-[11px] text-slate-600 dark:text-slate-400">
             {schemaSummary ||
               'Automatically detects schema parties & witnesses and injects guided signature blocks, date lines, and witness fields.'}
           </p>
         </div>
 
-        <label className="inline-flex items-center gap-2 text-xs font-medium text-[#202124] cursor-pointer shrink-0">
+        <label className="inline-flex items-center gap-2 text-xs font-medium text-[#202124] dark:text-slate-100 cursor-pointer shrink-0">
           <input
             type="checkbox"
             checked={isEnabled}
             onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
-            className="rounded border-slate-300 text-[#FF671F]"
+            className="rounded border-slate-300 dark:border-slate-600 text-[#FF671F]"
           />
           <span>Inject Signature Area</span>
         </label>
@@ -411,7 +411,7 @@ export function DigitalSignatureGeneratorControls({
       {/* Preset Picker */}
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[11px] font-semibold text-slate-700">Execution Layout</span>
+          <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">Execution Layout</span>
           <button
             type="button"
             onClick={onSyncFromSchema}
@@ -430,11 +430,11 @@ export function DigitalSignatureGeneratorControls({
               onClick={() => selectPreset(p)}
               className={`text-left p-2.5 rounded-lg border text-xs transition-colors cursor-pointer ${
                 preset === p.id
-                  ? 'bg-[#FFF5F0] border-[#FF671F] text-[#202124]'
-                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                  ? 'bg-[#FFF5F0] dark:bg-orange-950/35 border-[#FF671F] text-[#202124] dark:text-white'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
               }`}
             >
-              <strong className="block text-[#202124]">{p.title}</strong>
+              <strong className="block text-[#202124] dark:text-white">{p.title}</strong>
               <span className="text-[11px]">{p.desc}</span>
             </button>
           ))}
@@ -446,7 +446,7 @@ export function DigitalSignatureGeneratorControls({
         {showSecondParty && (
           <>
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Second Party / Advocate Name
               </label>
               <input
@@ -456,11 +456,11 @@ export function DigitalSignatureGeneratorControls({
                   onChange({ ...value, enabled: true, secondPartyName: e.target.value })
                 }
                 placeholder="Second party or Advocate name"
-                className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Second Signatory Role
               </label>
               <input
@@ -470,30 +470,30 @@ export function DigitalSignatureGeneratorControls({
                   onChange({ ...value, enabled: true, secondPartyRole: e.target.value })
                 }
                 placeholder="e.g., Licensee / Second Party / Advocate"
-                className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
           </>
         )}
 
         <div>
-          <label className="block font-medium text-[#202124] mb-1">Signature Date Line</label>
+          <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Signature Date Line</label>
           <input
             type="date"
             value={value.signatureDate || ''}
             onChange={(e) => onChange({ ...value, enabled: true, signatureDate: e.target.value })}
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100"
           />
         </div>
 
         <div>
-          <label className="block font-medium text-[#202124] mb-1">Witness Fields</label>
+          <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Witness Fields</label>
           <select
             value={String(wCount)}
             onChange={(e) =>
               onChange({ ...value, enabled: true, witnessCount: Number(e.target.value) })
             }
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100"
           >
             <option value="0">No Witness Fields (0)</option>
             <option value="1">1 Witness Field</option>
@@ -506,7 +506,7 @@ export function DigitalSignatureGeneratorControls({
       {/* Additional Signatories (3rd+ Party) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-semibold text-slate-700">
+          <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">
             Additional Party Blocks ({additionalList.length})
           </span>
           <button
@@ -539,7 +539,7 @@ export function DigitalSignatureGeneratorControls({
                 onChange({ ...value, enabled: true, additionalSignatories: next });
               }}
               placeholder="Party full name"
-              className="sm:col-span-6 h-8 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+              className="sm:col-span-6 h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
             <input
               type="text"
@@ -550,7 +550,7 @@ export function DigitalSignatureGeneratorControls({
                 onChange({ ...value, enabled: true, additionalSignatories: next });
               }}
               placeholder="Role (e.g., Guarantor)"
-              className="sm:col-span-5 h-8 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+              className="sm:col-span-5 h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
             <button
               type="button"
@@ -561,7 +561,7 @@ export function DigitalSignatureGeneratorControls({
                 })
               }
               title="Remove party block"
-              className="sm:col-span-1 text-[#991B1B] inline-flex justify-center cursor-pointer"
+              className="sm:col-span-1 text-[#991B1B] dark:text-rose-400 inline-flex justify-center cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -573,7 +573,7 @@ export function DigitalSignatureGeneratorControls({
       {wCount > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div>
-            <label className="block font-medium text-slate-600 mb-1">
+            <label className="block font-medium text-slate-600 dark:text-slate-300 mb-1">
               Witness 1 Address (Optional)
             </label>
             <input
@@ -583,12 +583,12 @@ export function DigitalSignatureGeneratorControls({
                 onChange({ ...value, enabled: true, witness1Address: e.target.value })
               }
               placeholder="City / Residential address"
-              className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+              className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
           {wCount >= 2 && (
             <div>
-              <label className="block font-medium text-slate-600 mb-1">
+              <label className="block font-medium text-slate-600 dark:text-slate-300 mb-1">
                 Witness 2 Address (Optional)
               </label>
               <input
@@ -598,7 +598,7 @@ export function DigitalSignatureGeneratorControls({
                   onChange({ ...value, enabled: true, witness2Address: e.target.value })
                 }
                 placeholder="City / Residential address"
-                className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
           )}
@@ -606,23 +606,23 @@ export function DigitalSignatureGeneratorControls({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-        <label className="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+        <label className="inline-flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 cursor-pointer">
           <input
             type="checkbox"
             checked={value.includeDateLines !== false}
             onChange={(e) =>
               onChange({ ...value, enabled: true, includeDateLines: e.target.checked })
             }
-            className="rounded border-slate-300 text-[#FF671F]"
+            className="rounded border-slate-300 dark:border-slate-600 text-[#FF671F]"
           />
-          <CheckSquare className="w-3.5 h-3.5 text-[#138808]" />
+          <CheckSquare className="w-3.5 h-3.5 text-[#138808] dark:text-emerald-400" />
           <span>Include Date &amp; Place lines under each signatory</span>
         </label>
 
         <button
           type="button"
           onClick={() => onInjectIntoText(buildPlainTextSignatureBlock(value))}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#202124] bg-white border border-slate-300 rounded-lg hover:border-[#FF671F] hover:text-[#FF671F] cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg hover:border-[#FF671F] hover:text-[#FF671F] dark:hover:border-orange-500 dark:hover:text-orange-300 cursor-pointer"
         >
           <FilePlus2 className="w-3.5 h-3.5" />
           Append Text Block to Editor

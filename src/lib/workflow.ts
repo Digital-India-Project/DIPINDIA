@@ -585,3 +585,78 @@ export function getApplicationProgress(status: ApplicationStatus): ApplicationPr
       };
   }
 }
+
+export type ApplicationVisualBucket = 'Pending' | 'Processing' | 'Completed' | 'Halted';
+
+export interface ApplicationVisualState {
+  bucket: ApplicationVisualBucket;
+  label: string;
+  stageLabel: string;
+  pdfAccentRgb: [number, number, number];
+  pdfBgRgb: [number, number, number];
+  pdfTextRgb: [number, number, number];
+}
+
+const PROCESSING_STATUSES = new Set<ApplicationStatus>([
+  'Processing',
+  'Application Processing',
+  'Payment Confirmed',
+  'Payment Successful',
+  'Resubmitted',
+  'Submitted to Provider',
+  'Submitted to External Authority',
+  'Refund Initiated',
+]);
+
+const HALTED_STATUSES = new Set<ApplicationStatus>([
+  'Rejected',
+  'Cancelled',
+  'Refunded',
+]);
+
+export function resolveApplicationVisualState(
+  status: ApplicationStatus
+): ApplicationVisualState {
+  if (status === 'Completed') {
+    return {
+      bucket: 'Completed',
+      label: 'Completed',
+      stageLabel: 'Completed',
+      pdfAccentRgb: [0.075, 0.533, 0.031],
+      pdfBgRgb: [0.925, 0.992, 0.961],
+      pdfTextRgb: [0.024, 0.373, 0.275],
+    };
+  }
+
+  if (PROCESSING_STATUSES.has(status)) {
+    return {
+      bucket: 'Processing',
+      label: 'Processing',
+      stageLabel: status,
+      pdfAccentRgb: [0.008, 0.518, 0.78],
+      pdfBgRgb: [0.941, 0.976, 1],
+      pdfTextRgb: [0.027, 0.349, 0.522],
+    };
+  }
+
+  if (HALTED_STATUSES.has(status)) {
+    return {
+      bucket: 'Halted',
+      label: status,
+      stageLabel: status,
+      pdfAccentRgb: [0.882, 0.114, 0.282],
+      pdfBgRgb: [1, 0.945, 0.949],
+      pdfTextRgb: [0.745, 0.071, 0.235],
+    };
+  }
+
+  return {
+    bucket: 'Pending',
+    label: 'Pending',
+    stageLabel: status,
+    pdfAccentRgb: [0.851, 0.467, 0.024],
+    pdfBgRgb: [1, 0.984, 0.922],
+    pdfTextRgb: [0.573, 0.251, 0.055],
+  };
+}
+

@@ -5,11 +5,14 @@ import { ApplicationStatus } from '../../types';
 import {
   CANONICAL_WORKFLOW_STATUSES,
   computeSlaHoursRemaining,
+  resolveApplicationVisualState,
   validateStatusTransition,
 } from '../../lib/workflow';
 import { SwipeableActionItem } from '../../components/common/SwipeableActionItem';
 import { issueSignedFileDownloadUrl, uploadFileToR2 } from '../../services/backendApi';
 import { openExternalSafeUrl } from '../../lib/navigationController';
+import { ApplicationStatusBadge } from '../../components/dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../../components/dashboard/DownloadReceiptButton';
 import {
   Shield,
   FileCheck,
@@ -48,6 +51,7 @@ export const OperatorDashboard: React.FC<{
   const {
     services,
     applications,
+    businessSettings,
     createApplication,
     updateApplicationStatus,
     verifyDocument,
@@ -504,24 +508,30 @@ export const OperatorDashboard: React.FC<{
                   <div className="p-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition cursor-pointer text-xs space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-mono font-bold text-[#FF671F]">{app.id}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        {app.status}
-                      </span>
+                      <ApplicationStatusBadge status={app.status} size="xs" />
                     </div>
 
                     <div>
                       <div className="font-bold text-slate-900 dark:text-white">{app.serviceName}</div>
                       <div className="text-[11px] text-slate-500">
-                        Applicant: {app.userName} ({app.userMobile})
+                        Applicant: {app.userName} ({app.userMobile}) · Stage: {resolveApplicationVisualState(app.status).stageLabel}
                       </div>
                     </div>
 
-                    <div className="text-[10px] text-slate-400 flex justify-between items-center pt-1 border-t border-slate-100/60 dark:border-slate-800">
-                      <span>{SOURCE_LABELS[app.sourceChannel || 'web_b2c'] || 'Web B2C'}</span>
-                      <span className={`inline-flex items-center gap-1 font-mono ${sla.isOverdue && app.status !== 'Completed' ? 'text-red-600 font-bold' : ''}`}>
-                        <Clock className="w-3 h-3" />
-                        {app.status === 'Completed' ? 'Done' : sla.label}
-                      </span>
+                    <div className="text-[10px] text-slate-400 flex justify-between items-center gap-2 pt-1.5 border-t border-slate-100/60 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <span>{SOURCE_LABELS[app.sourceChannel || 'web_b2c'] || 'Web B2C'}</span>
+                        <span aria-hidden="true">·</span>
+                        <span className={`inline-flex items-center gap-1 font-mono ${sla.isOverdue && app.status !== 'Completed' ? 'text-red-600 font-bold' : ''}`}>
+                          <Clock className="w-3 h-3" />
+                          {app.status === 'Completed' ? 'Done' : sla.label}
+                        </span>
+                      </div>
+                      <DownloadReceiptButton
+                        application={app}
+                        businessSettings={businessSettings}
+                        size="xs"
+                      />
                     </div>
                   </div>
                 </SwipeableActionItem>
@@ -532,23 +542,32 @@ export const OperatorDashboard: React.FC<{
 
         <div className="lg:col-span-7">
           {selectedApp ? (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-bold text-[#FF671F]">{selectedApp.id}</span>
-                    <span className="text-xs font-bold text-slate-800">· {selectedApp.serviceName}</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">· {selectedApp.serviceName}</span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-0.5">
-                    Applicant: <strong>{selectedApp.userName}</strong> | Mobile: {selectedApp.userMobile} |{' '}
-                    Channel: <strong>{SOURCE_LABELS[selectedApp.sourceChannel || 'web_b2c']}</strong>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+                    Applicant: <strong className="text-slate-700 dark:text-slate-200">{selectedApp.userName}</strong> · Mobile: {selectedApp.userMobile} ·{' '}
+                    Channel: <strong>{SOURCE_LABELS[selectedApp.sourceChannel || 'web_b2c']}</strong> · Stage:{' '}
+                    <strong>{resolveApplicationVisualState(selectedApp.status).stageLabel}</strong>
                   </div>
                 </div>
-                <div className="text-right text-xs">
-                  <span className="text-[10px] text-slate-400 block">Payment Received</span>
-                  <span className="font-bold text-[#138808] font-mono">
-                    ₹{selectedApp.payment.totalAmount} (Success)
-                  </span>
+                <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 text-xs">
+                  <div className="text-left sm:text-right mr-1">
+                    <span className="text-[10px] text-slate-400 block">Payment Received</span>
+                    <span className="font-bold text-[#138808] dark:text-emerald-400 font-mono">
+                      ₹{selectedApp.payment.totalAmount} ({selectedApp.payment.status})
+                    </span>
+                  </div>
+                  <ApplicationStatusBadge status={selectedApp.status} size="sm" />
+                  <DownloadReceiptButton
+                    application={selectedApp}
+                    businessSettings={businessSettings}
+                    size="xs"
+                  />
                 </div>
               </div>
 

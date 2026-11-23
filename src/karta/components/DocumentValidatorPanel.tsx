@@ -37,31 +37,31 @@ const STATUS_META: Record<
   ready_for_advocate_review: {
     label: 'Complete & Ready for Advocate Review',
     desc: 'All mapped placeholders, jurisdiction, date, and formal checks passed automated verification.',
-    containerClass: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-    titleClass: 'text-[#138808]',
+    containerClass: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200',
+    titleClass: 'text-[#138808] dark:text-emerald-300',
   },
   needs_attention: {
     label: 'Draft Validated with Advisory Warnings',
     desc: 'Body placeholders appear filled, but stamp, witness, date, or statutory checks need verification.',
-    containerClass: 'bg-amber-50 border-amber-200 text-amber-900',
-    titleClass: 'text-amber-800',
+    containerClass: 'bg-amber-50 dark:bg-amber-950/35 border-amber-200 dark:border-amber-800/70 text-amber-900 dark:text-amber-200',
+    titleClass: 'text-amber-800 dark:text-amber-300',
   },
   incomplete: {
     label: 'Incomplete — Unfilled Blanks or Errors Found',
     desc: 'Unfilled placeholders or structural errors remain in the draft. Complete them before exporting.',
-    containerClass: 'bg-red-50 border-red-200 text-red-900',
-    titleClass: 'text-red-700',
+    containerClass: 'bg-red-50 dark:bg-rose-950/40 border-red-200 dark:border-rose-800 text-red-900 dark:text-rose-200',
+    titleClass: 'text-red-700 dark:text-rose-300',
   },
 };
 
 function renderSeverityIcon(severity: ValidationCheckItem['severity']) {
   if (severity === 'pass') {
-    return <CheckCircle2 className="w-4 h-4 text-[#138808] shrink-0 mt-0.5" />;
+    return <CheckCircle2 className="w-4 h-4 text-[#138808] dark:text-emerald-400 shrink-0 mt-0.5" />;
   }
   if (severity === 'warning') {
-    return <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />;
+    return <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />;
   }
-  return <ShieldAlert className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />;
+  return <ShieldAlert className="w-4 h-4 text-red-600 dark:text-rose-400 shrink-0 mt-0.5" />;
 }
 
 export function DocumentValidatorPanel({
@@ -130,11 +130,11 @@ export function DocumentValidatorPanel({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="text-sm font-display font-bold text-[#202124] flex items-center gap-1.5">
+          <h3 className="text-sm font-display font-bold text-[#202124] dark:text-white flex items-center gap-1.5">
             <FileCheck2 className="w-4 h-4 text-[#FF671F]" />
             Indian Legal Document Validator
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Automated checks for unfilled blanks, jurisdiction, verification clauses, witnesses, Aadhaar masking, and configured API provider rules.
           </p>
         </div>
@@ -143,7 +143,7 @@ export function DocumentValidatorPanel({
             <button
               type="button"
               onClick={onJumpToForm}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#FF671F] bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#FF671F] dark:text-orange-300 bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-950/70 cursor-pointer whitespace-nowrap shrink-0"
             >
               <Wrench className="w-3.5 h-3.5" />
               Edit Fields
@@ -153,7 +153,7 @@ export function DocumentValidatorPanel({
             type="button"
             disabled={loading}
             onClick={runValidation}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#202124] bg-white border border-slate-200 rounded-lg hover:border-[#FF671F] hover:text-[#FF671F] disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-[#FF671F] hover:text-[#FF671F] dark:hover:border-orange-500 dark:hover:text-orange-300 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             {loading ? 'Checking...' : 'Re-Run Checks'}
@@ -162,7 +162,7 @@ export function DocumentValidatorPanel({
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800">
+        <div className="p-3 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800 rounded-lg text-xs text-red-800 dark:text-rose-300">
           {error}
         </div>
       )}
@@ -182,14 +182,14 @@ export function DocumentValidatorPanel({
 
           {/* Active Validation API Provider Strip */}
           {report.providerMeta && (
-            <div className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 text-[#202124]">
+            <div className="px-3.5 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 text-[#202124] dark:text-slate-100">
                 <Server className="w-3.5 h-3.5 text-[#FF671F] shrink-0" />
                 <span className="font-semibold">{report.providerMeta.providerName}</span>
-                <span className="text-slate-400">·</span>
-                <span className="text-slate-600">{report.providerMeta.note}</span>
+                <span className="text-slate-400 dark:text-slate-500">·</span>
+                <span className="text-slate-600 dark:text-slate-300">{report.providerMeta.note}</span>
               </div>
-              <div className="flex items-center gap-2 font-mono-tabular text-[11px] text-slate-500">
+              <div className="flex items-center gap-2 font-mono-tabular text-[11px] text-slate-500 dark:text-slate-400">
                 {report.providerMeta.latencyMs !== undefined && (
                   <span>{report.providerMeta.latencyMs}ms</span>
                 )}
@@ -201,34 +201,34 @@ export function DocumentValidatorPanel({
           )}
 
           {/* Numeric Summary Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-3.5 bg-[#F7F8FA] border border-slate-200 rounded-xl text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-3.5 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs">
             <div>
-              <span className="text-slate-500 block">Passed</span>
-              <strong className="text-base font-mono-tabular text-[#138808]">
+              <span className="text-slate-500 dark:text-slate-400 block">Passed</span>
+              <strong className="text-base font-mono-tabular text-[#138808] dark:text-emerald-400">
                 {report.passedCount}
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block">Warnings</span>
-              <strong className="text-base font-mono-tabular text-amber-700">
+              <span className="text-slate-500 dark:text-slate-400 block">Warnings</span>
+              <strong className="text-base font-mono-tabular text-amber-700 dark:text-amber-400">
                 {report.warningCount}
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block">Errors</span>
-              <strong className="text-base font-mono-tabular text-red-700">
+              <span className="text-slate-500 dark:text-slate-400 block">Errors</span>
+              <strong className="text-base font-mono-tabular text-red-700 dark:text-rose-400">
                 {report.errorCount}
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block">Unfilled Blanks</span>
-              <strong className="text-base font-mono-tabular text-[#202124]">
+              <span className="text-slate-500 dark:text-slate-400 block">Unfilled Blanks</span>
+              <strong className="text-base font-mono-tabular text-[#202124] dark:text-white">
                 {report.unfilledBlankCount}
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block">Word Count</span>
-              <strong className="text-base font-mono-tabular text-[#202124]">
+              <span className="text-slate-500 dark:text-slate-400 block">Word Count</span>
+              <strong className="text-base font-mono-tabular text-[#202124] dark:text-white">
                 {report.wordCount.toLocaleString('en-IN')}
               </strong>
             </div>
@@ -239,19 +239,19 @@ export function DocumentValidatorPanel({
             {report.checks.map((item) => (
               <div
                 key={item.id}
-                className="p-3.5 bg-white border border-slate-200 rounded-xl flex items-start gap-2.5 text-xs"
+                className="p-3.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-start gap-2.5 text-xs"
               >
                 {renderSeverityIcon(item.severity)}
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-semibold text-[#202124]">{item.title}</span>
-                    <span className="text-[11px] font-mono-tabular text-slate-500">
+                    <span className="font-semibold text-[#202124] dark:text-white">{item.title}</span>
+                    <span className="text-[11px] font-mono-tabular text-slate-500 dark:text-slate-400">
                       {item.category} · {item.severity.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-slate-600 leading-relaxed">{item.detail}</p>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{item.detail}</p>
                   {item.suggestion && (
-                    <p className="text-[11px] font-medium text-[#FF671F]">
+                    <p className="text-[11px] font-medium text-[#FF671F] dark:text-orange-400">
                       Next step: {item.suggestion}
                     </p>
                   )}
@@ -261,9 +261,9 @@ export function DocumentValidatorPanel({
           </div>
 
           {/* SHA-256 Digest */}
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1">
-            <span className="font-semibold block text-[#202124]">Draft Integrity Digest (SHA-256)</span>
-            <code className="font-mono-tabular break-all block text-slate-700">
+          <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
+            <span className="font-semibold block text-[#202124] dark:text-white">Draft Integrity Digest (SHA-256)</span>
+            <code className="font-mono-tabular break-all block text-slate-700 dark:text-slate-300">
               {report.sha256Digest}
             </code>
           </div>

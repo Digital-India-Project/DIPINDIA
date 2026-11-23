@@ -9,7 +9,7 @@ interface Props {
 export function LibraryAuditView({ report, providerStatus, onNavigateAdmin }: Props) {
   if (!report) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-12 text-sm text-slate-500">
+      <div className="max-w-6xl mx-auto px-6 py-12 text-sm text-slate-500 dark:text-slate-400">
         Loading repository audit report...
       </div>
     );
@@ -59,17 +59,17 @@ export function LibraryAuditView({ report, providerStatus, onNavigateAdmin }: Pr
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
-      <div className="border-b border-slate-200 pb-6">
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-6">
         <p className="text-xs tracking-widest uppercase font-semibold text-[#FF671F] mb-2">
           API Providers, Integration &amp; Archive Audit
         </p>
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-[#202124] tracking-tight text-balance">
+        <h1 className="text-3xl md:text-4xl font-display font-bold text-[#202124] dark:text-white tracking-tight text-balance">
           Digital India Project Legal Add-on Inventory
         </h1>
-        <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
-          Complete inventory of <span className="font-mono-tabular text-[#202124]">Digital-India-Project/karta-files</span>{' '}
+        <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
+          Complete inventory of <span className="font-mono-tabular text-[#202124] dark:text-white">Digital-India-Project/karta-files</span>{' '}
           and active API provider adapters for Document Validation, e-Stamping, and{' '}
-          <span className="font-mono-tabular text-[#202124]">digitalindiaproject.com</span>.
+          <span className="font-mono-tabular text-[#202124] dark:text-white">digitalindiaproject.com</span>.
         </p>
       </div>
 
@@ -86,10 +86,10 @@ export function LibraryAuditView({ report, providerStatus, onNavigateAdmin }: Pr
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between shadow-2xs"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-2xs"
             >
-              <span className="text-xs text-slate-500 leading-snug">{stat.label}</span>
-              <span className="mt-3 text-2xl font-semibold text-[#202124] font-mono-tabular">
+              <span className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{stat.label}</span>
+              <span className="mt-3 text-2xl font-semibold text-[#202124] dark:text-white font-mono-tabular">
                 {stat.value.toLocaleString('en-IN')}
               </span>
             </div>
@@ -99,90 +99,90 @@ export function LibraryAuditView({ report, providerStatus, onNavigateAdmin }: Pr
 
       {/* Format & Processing Status Breakdown */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
-          <h2 className="text-xl font-display font-bold text-[#202124] mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-2xs">
+          <h2 className="text-xl font-display font-bold text-[#202124] dark:text-white mb-4">
             Source Formats &amp; Directory Cross-Check
           </h2>
-          <dl className="divide-y divide-slate-100 text-sm">
+          <dl className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">catalogue.json / catalogue.csv entries</dt>
-              <dd className="font-mono-tabular text-[#202124]">
+              <dt className="text-slate-600 dark:text-slate-400">catalogue.json / catalogue.csv entries</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">
                 {report.catalogueJsonCount.toLocaleString()} / {report.catalogueCsvCount.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">upload_batches manifests (source docs linked)</dt>
-              <dd className="font-mono-tabular text-[#202124]">
+              <dt className="text-slate-600 dark:text-slate-400">upload_batches manifests (source docs linked)</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">
                 {report.batchManifestCount} batches ({report.uploadBatchSourceDocs.toLocaleString()} docs)
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">original_pdfs/ directory binaries</dt>
-              <dd className="font-mono-tabular text-[#202124]">{report.originalPdfsDirCount}</dd>
+              <dt className="text-slate-600 dark:text-slate-400">original_pdfs/ directory binaries</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">{report.originalPdfsDirCount}</dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">original_unconverted/ directory files</dt>
-              <dd className="font-mono-tabular text-[#202124]">{report.originalUnconvertedDirCount}</dd>
+              <dt className="text-slate-600 dark:text-slate-400">original_unconverted/ directory files</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">{report.originalUnconvertedDirCount}</dd>
             </div>
             {Object.entries(report.breakdownByFormat).map(([fmt, cnt]) => (
               <div key={fmt} className="py-2.5 flex justify-between gap-4">
-                <dt className="text-slate-600">Catalogue format {fmt}</dt>
-                <dd className="font-mono-tabular text-[#202124]">{cnt.toLocaleString()}</dd>
+                <dt className="text-slate-600 dark:text-slate-400">Catalogue format {fmt}</dt>
+                <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">{cnt.toLocaleString()}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
-          <h2 className="text-xl font-display font-bold text-[#202124] mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-2xs">
+          <h2 className="text-xl font-display font-bold text-[#202124] dark:text-white mb-4">
             Processing Status &amp; Review Governance
           </h2>
-          <dl className="divide-y divide-slate-100 text-sm">
+          <dl className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">Extracted RTF / DOCX ready</dt>
-              <dd className="font-mono-tabular text-[#202124]">
+              <dt className="text-slate-600 dark:text-slate-400">Extracted RTF / DOCX ready</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">
                 {report.breakdownByStatus.processed_ready.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">Text PDFs extracted (reconstructed editable templates)</dt>
-              <dd className="font-mono-tabular text-[#202124]">
+              <dt className="text-slate-600 dark:text-slate-400">Text PDFs extracted (reconstructed editable templates)</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">
                 {report.breakdownByStatus.processed_pdf_text.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-600">Fillable AcroForm PDFs</dt>
-              <dd className="font-mono-tabular text-[#202124]">
+              <dt className="text-slate-600 dark:text-slate-400">Fillable AcroForm PDFs</dt>
+              <dd className="font-mono-tabular text-[#202124] dark:text-slate-100">
                 {report.breakdownByStatus.processed_pdf_acroform.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-amber-700">Scanned / image-only PDFs (OCR required)</dt>
-              <dd className="font-mono-tabular text-amber-700">
+              <dt className="text-amber-700 dark:text-amber-400">Scanned / image-only PDFs (OCR required)</dt>
+              <dd className="font-mono-tabular text-amber-700 dark:text-amber-400">
                 {report.breakdownByStatus.needs_ocr_scanned_pdf.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-amber-700">Legacy binary .doc files (conversion required)</dt>
-              <dd className="font-mono-tabular text-amber-700">
+              <dt className="text-amber-700 dark:text-amber-400">Legacy binary .doc files (conversion required)</dt>
+              <dd className="font-mono-tabular text-amber-700 dark:text-amber-400">
                 {report.breakdownByStatus.unsupported_legacy_doc.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-slate-500">Word temporary ~$ lock artifacts flagged</dt>
-              <dd className="font-mono-tabular text-slate-500">
+              <dt className="text-slate-500 dark:text-slate-400">Word temporary ~$ lock artifacts flagged</dt>
+              <dd className="font-mono-tabular text-slate-500 dark:text-slate-400">
                 {report.breakdownByStatus.invalid_lock_artifact.toLocaleString()}
               </dd>
             </div>
             <div className="py-2.5 flex justify-between gap-4">
-              <dt className="text-[#138808] font-semibold">Admin-approved templates</dt>
-              <dd className="font-mono-tabular text-[#138808] font-semibold">
+              <dt className="text-[#138808] dark:text-emerald-400 font-semibold">Admin-approved templates</dt>
+              <dd className="font-mono-tabular text-[#138808] dark:text-emerald-400 font-semibold">
                 {report.approvedTemplatesCount.toLocaleString()}
               </dd>
             </div>
           </dl>
-          <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-slate-500">
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               Last ingested: {new Date(report.lastIngestedAt).toLocaleString('en-IN')}
             </span>
             <button
@@ -197,36 +197,36 @@ export function LibraryAuditView({ report, providerStatus, onNavigateAdmin }: Pr
       </section>
 
       {/* API Provider & External Integration Matrix */}
-      <section className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
-        <h2 className="text-xl font-display font-bold text-[#202124] mb-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-2xs">
+        <h2 className="text-xl font-display font-bold text-[#202124] dark:text-white mb-2">
           API Providers &amp; Main-Site Integration Status
         </h2>
-        <p className="text-sm text-slate-600 mb-4">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
           Live status of configured Document Validation, e-Stamp, and Digital India Project subdomain/embed adapters:
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 <th className="py-2.5 pr-4 font-semibold">Integration</th>
                 <th className="py-2.5 pr-4 font-semibold">Status</th>
                 <th className="py-2.5 font-semibold">Operational Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {integrations.map((row) => (
                 <tr key={row.name}>
-                  <td className="py-3 pr-4 font-semibold text-[#202124] whitespace-nowrap">
+                  <td className="py-3 pr-4 font-semibold text-[#202124] dark:text-slate-100 whitespace-nowrap">
                     {row.name}
                   </td>
                   <td
                     className={`py-3 pr-4 font-mono-tabular whitespace-nowrap font-medium ${
-                      row.connected ? 'text-[#138808]' : 'text-amber-700'
+                      row.connected ? 'text-[#138808] dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'
                     }`}
                   >
                     {row.status}
                   </td>
-                  <td className="py-3 text-slate-600">{row.notes}</td>
+                  <td className="py-3 text-slate-600 dark:text-slate-300">{row.notes}</td>
                 </tr>
               ))}
             </tbody>

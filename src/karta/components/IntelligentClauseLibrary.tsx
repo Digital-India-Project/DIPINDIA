@@ -102,10 +102,10 @@ export function IntelligentClauseLibrary({
   return (
     <section
       aria-label="Intelligent Clause Library"
-      className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs"
+      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs"
     >
       {/* Header / Toggle Bar */}
-      <div className="px-4 py-3 bg-[#F7F8FA] border-b border-slate-200 flex items-center justify-between gap-3">
+      <div className="px-4 py-3 bg-[#F7F8FA] dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => setIsOpen((v) => !v)}
@@ -115,16 +115,16 @@ export function IntelligentClauseLibrary({
           <BookMarked className="w-4 h-4 text-[#FF671F] shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-[#202124]">
+              <span className="text-xs font-semibold text-[#202124] dark:text-white">
                 Intelligent Clause Library
               </span>
-              <span className="text-[11px] font-mono-tabular text-[#138808] font-medium">
+              <span className="text-[11px] font-mono-tabular text-[#138808] dark:text-emerald-400 font-medium">
                 {recommendedMissingCount > 0
                   ? `${recommendedMissingCount} suggested for ${categoryGroup}`
                   : `${categoryGroup} clauses`}
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 truncate">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate">
               Context-aware Indian clauses numbered &amp; formatted on injection
             </p>
           </div>
@@ -136,7 +136,7 @@ export function IntelligentClauseLibrary({
               type="button"
               onClick={onUndoLastInjection}
               title="Revert last clause injection"
-              className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-[#C2410C] bg-[#FFF5F0] border border-[#FED7AA] rounded hover:bg-[#FFEDD5] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-[#C2410C] dark:text-orange-300 bg-[#FFF5F0] dark:bg-orange-950/40 border border-[#FED7AA] dark:border-orange-800 rounded hover:bg-[#FFEDD5] dark:hover:bg-orange-950/70 transition-colors cursor-pointer"
             >
               <Undo2 className="w-3 h-3" />
               Undo
@@ -146,7 +146,7 @@ export function IntelligentClauseLibrary({
             type="button"
             onClick={() => setIsOpen((v) => !v)}
             aria-label={isOpen ? 'Collapse Clause Library' : 'Expand Clause Library'}
-            className="p-1 text-slate-500 hover:text-[#202124] rounded cursor-pointer"
+            className="p-1 text-slate-500 dark:text-slate-400 hover:text-[#202124] dark:hover:text-white rounded cursor-pointer"
           >
             {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
@@ -158,14 +158,14 @@ export function IntelligentClauseLibrary({
           {/* Search & Topic Filter */}
           <div className="space-y-2">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search indemnity, force majeure, arbitration, rent..."
                 aria-label="Filter clause library"
-                className="w-full h-8 pl-8 pr-3 text-xs bg-white border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/20 focus:border-[#FF671F]"
+                className="w-full h-8 pl-8 pr-3 text-xs bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/20 focus:border-[#FF671F]"
               />
             </div>
 
@@ -180,7 +180,7 @@ export function IntelligentClauseLibrary({
                     className={`px-2 py-1 text-[11px] rounded-md border transition-colors cursor-pointer ${
                       active
                         ? 'bg-[#FF671F] text-white border-[#FF671F] font-semibold'
-                        : 'bg-[#F7F8FA] text-slate-600 border-slate-200 hover:border-[#FF671F]/50 hover:text-[#202124]'
+                        : 'bg-[#F7F8FA] dark:bg-slate-950 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#FF671F]/50 hover:text-[#202124] dark:hover:text-white'
                     }`}
                   >
                     {topic}
@@ -193,7 +193,7 @@ export function IntelligentClauseLibrary({
           {/* Suggested Clause List */}
           <div className="max-h-[340px] overflow-y-auto space-y-2 pr-0.5">
             {filteredClauses.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">
                 No matching clauses for this filter. Try &ldquo;All Suggested&rdquo;.
               </p>
             ) : (
@@ -206,16 +206,16 @@ export function IntelligentClauseLibrary({
                     key={clause.id}
                     className={`p-3 rounded-lg border transition-colors ${
                       clause.isRecommendedForCategory && !clause.alreadyPresentInDraft
-                        ? 'bg-[#FFFDF8] border-[#FED7AA]'
-                        : 'bg-[#F7F8FA] border-slate-200'
+                        ? 'bg-[#FFFDF8] dark:bg-amber-950/30 border-[#FED7AA] dark:border-amber-800/60'
+                        : 'bg-[#F7F8FA] dark:bg-slate-950 border-slate-200 dark:border-slate-800'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2.5">
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <h4 className="text-xs font-semibold text-[#202124]">{clause.title}</h4>
+                          <h4 className="text-xs font-semibold text-[#202124] dark:text-white">{clause.title}</h4>
                           {clause.alreadyPresentInDraft ? (
-                            <span className="text-[10px] font-mono-tabular text-[#138808] font-medium">
+                            <span className="text-[10px] font-mono-tabular text-[#138808] dark:text-emerald-400 font-medium">
                               · Present in draft
                             </span>
                           ) : clause.isRecommendedForCategory ? (
@@ -225,17 +225,17 @@ export function IntelligentClauseLibrary({
                             </span>
                           ) : null}
                         </div>
-                        <p className="text-[11px] text-slate-600 leading-relaxed">
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                           {clause.summary}
                         </p>
-                        <p className="text-[10px] font-mono-tabular text-slate-500">
+                        <p className="text-[10px] font-mono-tabular text-slate-500 dark:text-slate-400">
                           {clause.statutoryBasis}
                         </p>
                       </div>
                     </div>
 
                     {isExpanded && (
-                      <div className="mt-2.5 p-2.5 bg-white border border-slate-200 rounded-lg text-[11.5px] font-editorial leading-relaxed text-[#202124]">
+                      <div className="mt-2.5 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11.5px] font-editorial leading-relaxed text-[#202124] dark:text-slate-100">
                         <p className="font-semibold text-[10.5px] uppercase tracking-wider text-[#FF671F] mb-1">
                           {clause.heading}
                         </p>
@@ -243,13 +243,13 @@ export function IntelligentClauseLibrary({
                       </div>
                     )}
 
-                    <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80">
+                    <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800">
                       <button
                         type="button"
                         onClick={() =>
                           setExpandedClauseId((curr) => (curr === clause.id ? null : clause.id))
                         }
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 hover:text-[#FF671F] cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:text-[#FF671F] cursor-pointer"
                       >
                         <Eye className="w-3 h-3" />
                         {isExpanded ? 'Hide Clause Text' : 'Preview Wording'}
@@ -261,7 +261,7 @@ export function IntelligentClauseLibrary({
                         className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors cursor-pointer ${
                           justInjected
                             ? 'bg-[#138808] text-white'
-                            : 'bg-[#202124] text-white hover:bg-[#FF671F]'
+                            : 'bg-[#202124] dark:bg-slate-700 text-white hover:bg-[#FF671F] dark:hover:bg-[#FF671F]'
                         }`}
                       >
                         {justInjected ? (

@@ -72,6 +72,7 @@ import {
 } from './src/lib/apiSathiAnalytics';
 import { defaultApiSathiRetryQueue } from './src/services/apiSathiQueue';
 import {
+  exportJustPostgresTable,
   probeJustPostgresStatus,
   resolveJustPostgresConfig,
   runSqlSchemaMigrationDirect,
@@ -226,6 +227,64 @@ const requireExpressAdmin: express.RequestHandler = async (req, res, next) => {
     });
   }
   return next();
+};
+
+const requireExpressManagerOrAdmin: express.RequestHandler = async (req, res, next) => {
+  const token = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7).trim()
+    : '';
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      status: 'REJECTED',
+      message: 'Authentication required.',
+      error_code: 'UNAUTHORIZED',
+    });
+  }
+  const verified = await verifyFirebaseIdToken(token).catch(() => null);
+  if (!verified) {
+    return res.status(401).json({
+      success: false,
+      status: 'REJECTED',
+      message: 'Invalid or expired authentication token.',
+      error_code: 'UNAUTHORIZED',
+    });
+  }
+  const uid = String(verified.sub || verified.user_id || '').trim();
+  const email = String(verified.email || '').trim().toLowerCase();
+  const roleClaim = String((verified as Record<string, unknown>).role || '').trim().toLowerCase();
+  const isBootstrap = Boolean(verified.email_verified && EXPRESS_BOOTSTRAP_ADMIN_EMAILS.has(email));
+  const hasTokenRole = roleClaim === 'manager' || roleClaim === 'admin' || roleClaim === 'super_admin';
+
+  if (isBootstrap || hasTokenRole) {
+    return next();
+  }
+
+  // Fallback: inspect persisted Postgres users table for assigned manager/admin role
+  try {
+    const pgCfg = resolveJustPostgresConfig(process.env);
+    if (pgCfg.configured && uid) {
+      const pgUsers = await exportJustPostgresTable('users', process.env);
+      const matched = pgUsers.find(
+        (u) =>
+          String(u.uid || u.id || '') === uid ||
+          (email && String(u.email || '').trim().toLowerCase() === email)
+      );
+      const dbRole = String(matched?.role || '').trim().toLowerCase();
+      if (dbRole === 'manager' || dbRole === 'admin' || dbRole === 'super_admin') {
+        return next();
+      }
+    }
+  } catch {
+    // Fall through to 403 below
+  }
+
+  return res.status(403).json({
+    success: false,
+    status: 'REJECTED',
+    message: 'Operations Manager or Administrator privileges required.',
+    error_code: 'FORBIDDEN',
+  });
 };
 
 // 1. Health check
@@ -2829,6 +2888,55 @@ app.get('/api/postgres/migration-status', async (req, res) => {
         referenceId: `pg_mstat_err_${Date.now()}`,
         data: null,
         errorCode: 'JUSTPOSTGRES_MIGRATION_STATUS_ERROR',
+      })
+    );
+  }
+});
+
+// Non-PII daily submission & revenue summary rows from JustPostgreSQL for Manager/Admin charts
+app.get('/api/postgres/applications-metrics', requireExpressManagerOrAdmin, async (_req, res) => {
+  const cfg = resolveJustPostgresConfig(process.env);
+  if (!cfg.configured) {
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: 'JustPostgreSQL is not configured; using active client database cache.',
+        referenceId: `pg_app_met_${Date.now()}`,
+        data: { configured: false, source: 'unconfigured', rows: [] },
+      })
+    );
+  }
+  try {
+    const rawRows = await exportJustPostgresTable('applications', process.env);
+    const metrics = rawRows.map((row) => {
+      const paymentJson =
+        row.payment_json && typeof row.payment_json === 'object' ? row.payment_json : {};
+      return {
+        id: String(row.id || ''),
+        submissionDate: String(row.submission_date || row.created_at || ''),
+        totalAmount: Number(row.total_amount ?? paymentJson.totalAmount ?? 0) || 0,
+        paymentStatus: String(paymentJson.status || 'Pending'),
+        status: String(row.status || 'Submitted'),
+      };
+    });
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: `Loaded ${metrics.length} application metrics record(s) from JustPostgreSQL.`,
+        referenceId: `pg_app_met_${Date.now()}`,
+        data: { configured: true, source: 'justpostgres', rows: metrics },
+      })
+    );
+  } catch (err: any) {
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: err?.message || 'JustPostgreSQL applications metrics unavailable; falling back cleanly.',
+        referenceId: `pg_app_met_fb_${Date.now()}`,
+        data: { configured: true, source: 'justpostgres', rows: [] },
       })
     );
   }

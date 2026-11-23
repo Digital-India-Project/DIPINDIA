@@ -580,7 +580,7 @@ export function FlippableDocumentPreview({
       </div>
 
       {/* Archival Legal Desk Surface */}
-      <div className="bg-[#E8E3D8] border border-[#D6CEBE] rounded-lg p-3 sm:p-5 space-y-6 print:bg-white print:border-0 print:p-0">
+      <div className="bg-[#E8E3D8] dark:bg-slate-950 border border-[#D6CEBE] dark:border-slate-800 rounded-lg p-3 sm:p-5 space-y-6 print:bg-white print:border-0 print:p-0">
         {viewMode === 'flip' ? (
           <>
             {/* Physical Stacked Paper Deck Effect beneath Active Sheet */}
@@ -588,13 +588,13 @@ export function FlippableDocumentPreview({
               {pages.length > 2 && currentPage < pages.length - 2 && (
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 translate-x-2 translate-y-2 bg-[#F5F1E8] border border-[#C7BFA9] rounded-sm print:hidden"
+                  className="pointer-events-none absolute inset-0 translate-x-2 translate-y-2 bg-[#F5F1E8] dark:bg-slate-800 border border-[#C7BFA9] dark:border-slate-700 rounded-sm print:hidden"
                 />
               )}
               {pages.length > 1 && currentPage < pages.length - 1 && (
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 translate-x-1 translate-y-1 bg-[#FAF7F0] border border-[#C7BFA9] rounded-sm print:hidden"
+                  className="pointer-events-none absolute inset-0 translate-x-1 translate-y-1 bg-[#FAF7F0] dark:bg-slate-900 border border-[#C7BFA9] dark:border-slate-700 rounded-sm print:hidden"
                 />
               )}
               <div className="relative">
@@ -608,19 +608,19 @@ export function FlippableDocumentPreview({
                   type="button"
                   disabled={currentPage === 0}
                   onClick={() => goToPage(currentPage - 1)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-white border border-[#C7BFA9] rounded-md text-[#1C1917] hover:bg-[#FCFBF7] disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-white dark:bg-slate-900 border border-[#C7BFA9] dark:border-slate-700 rounded-md text-[#1C1917] dark:text-slate-100 hover:bg-[#FCFBF7] dark:hover:bg-slate-800 disabled:opacity-40 cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Previous Sheet
                 </button>
-                <span className="text-xs font-mono-tabular text-[#57534E]">
+                <span className="text-xs font-mono-tabular text-[#57534E] dark:text-slate-400">
                   Sheet {currentPage + 1} of {pages.length} · Use ← / → keys or corner curl
                 </span>
                 <button
                   type="button"
                   disabled={currentPage >= pages.length - 1}
                   onClick={() => goToPage(currentPage + 1)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-[#1B365D] text-white rounded-md hover:bg-[#13294B] disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-[#1B365D] dark:bg-indigo-600 text-white rounded-md hover:bg-[#13294B] dark:hover:bg-indigo-500 disabled:opacity-40 cursor-pointer"
                 >
                   Flip to Next Sheet
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -635,7 +635,7 @@ export function FlippableDocumentPreview({
               {spreadRightIdx !== null ? (
                 renderPageSheet(pages[spreadRightIdx] || [], spreadRightIdx, true)
               ) : (
-                <div className="hidden xl:flex flex-col items-center justify-center bg-[#F4F0E6] border border-dashed border-[#C7BFA9] rounded-sm p-8 text-center text-xs text-[#78716C]">
+                <div className="hidden xl:flex flex-col items-center justify-center bg-[#F4F0E6] dark:bg-slate-900/70 border border-dashed border-[#C7BFA9] dark:border-slate-700 rounded-sm p-8 text-center text-xs text-[#78716C] dark:text-slate-400">
                   End of Legal Instrument · {pages.length} Total {pages.length === 1 ? 'Sheet' : 'Sheets'}
                 </div>
               )}
@@ -647,12 +647,12 @@ export function FlippableDocumentPreview({
                   type="button"
                   disabled={spreadLeftIdx === 0}
                   onClick={() => goToPage(spreadLeftIdx - 2)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-white border border-[#C7BFA9] rounded-md text-[#1C1917] hover:bg-[#FCFBF7] disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-white dark:bg-slate-900 border border-[#C7BFA9] dark:border-slate-700 rounded-md text-[#1C1917] dark:text-slate-100 hover:bg-[#FCFBF7] dark:hover:bg-slate-800 disabled:opacity-40 cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Previous Spread
                 </button>
-                <span className="text-xs font-mono-tabular text-[#57534E]">
+                <span className="text-xs font-mono-tabular text-[#57534E] dark:text-slate-400">
                   Pages {spreadLeftIdx + 1}
                   {spreadRightIdx !== null ? `–${spreadRightIdx + 1}` : ''} of {pages.length}
                 </span>
@@ -660,7 +660,7 @@ export function FlippableDocumentPreview({
                   type="button"
                   disabled={spreadLeftIdx + 2 >= pages.length}
                   onClick={() => goToPage(spreadLeftIdx + 2)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-[#1B365D] text-white rounded-md hover:bg-[#13294B] disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-[#1B365D] dark:bg-indigo-600 text-white rounded-md hover:bg-[#13294B] dark:hover:bg-indigo-500 disabled:opacity-40 cursor-pointer"
                 >
                   Next Spread
                   <ChevronRight className="w-3.5 h-3.5" />

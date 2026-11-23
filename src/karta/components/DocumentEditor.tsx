@@ -704,8 +704,8 @@ export function DocumentEditor({
     return (
       <div className="max-w-4xl mx-auto px-6 py-16 text-center space-y-4">
         <FileText className="w-10 h-10 text-[#FF671F] mx-auto" />
-        <h1 className="text-2xl font-bold text-[#202124]">No Document Selected</h1>
-        <p className="text-sm text-slate-600 max-w-md mx-auto">
+        <h1 className="text-2xl font-bold text-[#202124] dark:text-white">No Document Selected</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
           Choose any supported legal template from the Digital India Project library to open the 4-step studio for editing, validation, E-Stamp Simulation overlay, Digital Signature Area generation, and legal guidance.
         </p>
         <button
@@ -721,7 +721,7 @@ export function DocumentEditor({
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12 text-sm text-slate-600">
+      <div className="max-w-7xl mx-auto px-6 py-12 text-sm text-slate-600 dark:text-slate-300">
         Loading document schema and preserved original text...
       </div>
     );
@@ -730,7 +730,7 @@ export function DocumentEditor({
   if (loadError || !template) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-12 space-y-4">
-        <div className="p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-sm text-[#991B1B]">
+        <div className="p-4 bg-[#FEF2F2] dark:bg-rose-950/40 border border-[#FECACA] dark:border-rose-800 rounded-xl text-sm text-[#991B1B] dark:text-rose-300">
           {loadError || 'Template unavailable.'}
         </div>
         <button
@@ -747,9 +747,9 @@ export function DocumentEditor({
 
   const theme = CATEGORY_THEMES[template.categoryGroup] || {
     accentHex: '#FF671F',
-    softBgClass: 'bg-[#FFF5F0]',
-    borderClass: 'border-[#FED7AA]',
-    textClass: 'text-[#FF671F]',
+    softBgClass: 'bg-[#FFF5F0] dark:bg-orange-950/35',
+    borderClass: 'border-[#FED7AA] dark:border-orange-800',
+    textClass: 'text-[#FF671F] dark:text-orange-400',
     shortDesc: '',
   };
 
@@ -776,8 +776,8 @@ export function DocumentEditor({
       num: '2',
       label: 'Validate',
       icon: FileCheck2,
-      activeBg: 'bg-[#202124] text-white border-[#202124]',
-      activeText: 'text-[#202124]',
+      activeBg: 'bg-[#202124] dark:bg-slate-700 text-white border-[#202124] dark:border-slate-600',
+      activeText: 'text-[#202124] dark:text-slate-200',
     },
     {
       id: 'stamp_sign',
@@ -785,7 +785,7 @@ export function DocumentEditor({
       label: 'e-Stamp & Sign',
       icon: Stamp,
       activeBg: 'bg-[#B45309] text-white border-[#B45309]',
-      activeText: 'text-[#B45309]',
+      activeText: 'text-[#B45309] dark:text-amber-400',
     },
     {
       id: 'aid_export',
@@ -793,27 +793,27 @@ export function DocumentEditor({
       label: 'Legal Aid & Export',
       icon: Scale,
       activeBg: 'bg-[#138808] text-white border-[#138808]',
-      activeText: 'text-[#138808]',
+      activeText: 'text-[#138808] dark:text-emerald-400',
     },
   ];
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 py-6 space-y-5">
       {/* Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs print:hidden">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs print:hidden">
         <div className="h-1.5 w-full" style={{ backgroundColor: theme.accentHex }} />
         <div className="p-5 flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2 flex-[1_1_320px] min-w-0">
             <button
               type="button"
               onClick={onBackToLibrary}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-[#FF671F] cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-[#FF671F] dark:hover:text-[#FF8A4C] cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to Document Library
             </button>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <span className={`font-semibold ${theme.textClass}`}>{template.categoryGroup}</span>
               <span aria-hidden="true">·</span>
               <span>{template.rawCategory}</span>
@@ -825,19 +825,19 @@ export function DocumentEditor({
               <span
                 className={
                   template.reviewStatus === 'approved'
-                    ? 'text-[#138808] font-medium'
-                    : 'text-[#B45309] font-medium'
+                    ? 'text-[#138808] dark:text-emerald-400 font-medium'
+                    : 'text-[#B45309] dark:text-amber-400 font-medium'
                 }
               >
                 {template.reviewStatus === 'approved' ? 'Admin-Approved Template' : 'Needs Legal Review'}
               </span>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-bold text-[#202124] tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#202124] dark:text-white tracking-tight">
               {template.title}
             </h1>
-            <p className="text-sm text-slate-600 max-w-3xl">{template.description}</p>
-            <p className="text-xs text-slate-500 font-mono-tabular break-all sm:break-normal">
+            <p className="text-sm text-slate-600 dark:text-slate-300 max-w-3xl">{template.description}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-mono-tabular break-all sm:break-normal">
               Source: {template.sourcePath} · Scope: {template.jurisdictionScope}
             </p>
           </div>
@@ -864,7 +864,7 @@ export function DocumentEditor({
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-[#202124] bg-white border border-slate-200 rounded-lg hover:bg-slate-50 whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               Print
@@ -889,13 +889,13 @@ export function DocumentEditor({
               className={`text-left px-4 py-3 rounded-xl border transition-colors flex items-center justify-between gap-2 cursor-pointer ${
                 active
                   ? s.activeBg
-                  : 'bg-white border-slate-200 text-[#202124] hover:border-slate-300'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-[#202124] dark:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span
                   className={`w-6 h-6 rounded-lg text-xs font-mono-tabular font-semibold inline-flex items-center justify-center shrink-0 ${
-                    active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                    active ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {s.num}
@@ -904,7 +904,7 @@ export function DocumentEditor({
                   <p className="text-xs font-semibold truncate">{s.label}</p>
                   <p
                     className={`text-[11px] truncate ${
-                      active ? 'text-white/85' : 'text-slate-500'
+                      active ? 'text-white/85' : 'text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {s.id === 'form' &&
@@ -928,25 +928,25 @@ export function DocumentEditor({
       </nav>
 
       {/* Jurisdiction & Statutory Disclaimer Strip */}
-      <div className="bg-[#FFFDF8] border border-[#F1E8D9] rounded-xl p-4 space-y-1.5 text-xs text-slate-600 print:hidden">
+      <div className="bg-[#FFFDF8] dark:bg-amber-950/30 border border-[#F1E8D9] dark:border-amber-900/50 rounded-xl p-4 space-y-1.5 text-xs text-slate-600 dark:text-slate-300 print:hidden">
         <div className="flex items-start gap-2.5">
           {template.reviewStatus === 'approved' ? (
-            <ShieldCheck className="w-4 h-4 text-[#138808] shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-[#138808] dark:text-emerald-400 shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-[#B45309] dark:text-amber-400 shrink-0 mt-0.5" />
           )}
           <div className="space-y-1">
-            <p className="font-semibold text-[#202124]">
+            <p className="font-semibold text-[#202124] dark:text-white">
               {template.reviewStatus === 'approved'
                 ? 'Original Clauses Preserved — Unexecuted Draft Only'
                 : 'Unreviewed Repository Template — Advocate Verification Required'}
             </p>
             <p>{template.disclaimer}</p>
             {template.isReconstructedFromPdf && (
-              <p className="text-[#9A3412] font-medium">{PDF_RECONSTRUCTED_NOTICE}</p>
+              <p className="text-[#9A3412] dark:text-orange-300 font-medium">{PDF_RECONSTRUCTED_NOTICE}</p>
             )}
             {template.statutoryWarnings.length > 0 && (
-              <ul className="list-disc pl-4 space-y-0.5 text-[#7C2D12] pt-1">
+              <ul className="list-disc pl-4 space-y-0.5 text-[#7C2D12] dark:text-amber-300 pt-1">
                 {template.statutoryWarnings.map((w, idx) => (
                   <li key={idx}>{w}</li>
                 ))}
@@ -961,17 +961,17 @@ export function DocumentEditor({
         {/* LEFT COLUMN: DocumentEditor Sidebar */}
         <div className="lg:col-span-5 space-y-4 print:hidden">
           {/* Sidebar E-Stamp Simulation & Digital Signature Area Quick Controls */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 shadow-2xs">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3 shadow-2xs">
             {/* E-Stamp Simulation Sidebar Control */}
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Stamp className="w-4 h-4 text-[#B45309] shrink-0" />
+                  <Stamp className="w-4 h-4 text-[#B45309] dark:text-amber-400 shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#202124]">
+                    <p className="text-xs font-semibold text-[#202124] dark:text-white">
                       E-Stamp Reference Sheet
                     </p>
-                    <p className="text-[11px] text-slate-600 truncate">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate">
                       {stampAssessment?.required
                         ? 'Auto-enabled: Stamp paper typically required'
                         : 'Optional: Court-fee / plain paper applies'}
@@ -987,7 +987,7 @@ export function DocumentEditor({
                   className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors cursor-pointer ${
                     isStampOverlayVisible
                       ? 'bg-[#138808] border-[#138808]'
-                      : 'bg-slate-200 border-slate-300'
+                      : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'
                   }`}
                 >
                   <span
@@ -999,11 +999,11 @@ export function DocumentEditor({
               </div>
 
               {isStampOverlayVisible && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-md text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 bg-[#FFFBEB] dark:bg-amber-950/30 border border-[#FDE68A] dark:border-amber-800/60 rounded-md text-xs">
                   <div>
                     <label
                       htmlFor="sidebar_estamp_state"
-                      className="block text-[11px] font-medium text-[#78350F] mb-1"
+                      className="block text-[11px] font-medium text-[#78350F] dark:text-amber-300 mb-1"
                     >
                       State / UT Branding
                     </label>
@@ -1019,7 +1019,7 @@ export function DocumentEditor({
                           state: e.target.value,
                         }));
                       }}
-                      className="w-full h-8 px-2 bg-white border border-[#D6CEBE] rounded text-xs text-[#1C1917]"
+                      className="w-full h-8 px-2 bg-white dark:bg-slate-950 border border-[#D6CEBE] dark:border-slate-700 rounded text-xs text-[#1C1917] dark:text-slate-100"
                     >
                       <option value="">Select State / UT...</option>
                       {INDIAN_STATES_AND_UTS.map((st) => (
@@ -1033,7 +1033,7 @@ export function DocumentEditor({
                   <div>
                     <label
                       htmlFor="sidebar_estamp_value"
-                      className="block text-[11px] font-medium text-[#78350F] mb-1"
+                      className="block text-[11px] font-medium text-[#78350F] dark:text-amber-300 mb-1"
                     >
                       Stamp Duty Value (INR)
                     </label>
@@ -1057,7 +1057,7 @@ export function DocumentEditor({
                           }));
                         }
                       }}
-                      className="w-full h-8 px-2 bg-white border border-[#D6CEBE] rounded text-xs font-mono-tabular text-[#1C1917]"
+                      className="w-full h-8 px-2 bg-white dark:bg-slate-950 border border-[#D6CEBE] dark:border-slate-700 rounded text-xs font-mono-tabular text-[#1C1917] dark:text-slate-100"
                     >
                       {['10', '20', '50', '100', '200', '500', '1000', '2000', '5000'].map((amt) => (
                         <option key={amt} value={amt}>
@@ -1075,12 +1075,12 @@ export function DocumentEditor({
               )}
 
               {/* High-Resolution Stamp Paper Security Pattern Overlay Controls */}
-              <div className="pt-2 border-t border-[#F0ECE1] space-y-2">
+              <div className="pt-2 border-t border-[#F0ECE1] dark:border-slate-800 space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-[#1B365D]">
+                  <span className="text-[11px] font-semibold text-[#1B365D] dark:text-sky-300">
                     Security Background Pattern Overlay
                   </span>
-                  <div className="inline-flex items-center bg-[#F3EFE7] rounded p-0.5 text-[10px]">
+                  <div className="inline-flex items-center bg-[#F3EFE7] dark:bg-slate-950 rounded p-0.5 text-[10px]">
                     <button
                       type="button"
                       onClick={() => {
@@ -1089,8 +1089,8 @@ export function DocumentEditor({
                       }}
                       className={`px-2 py-0.5 rounded transition-colors ${
                         (eStamp.backgroundScope || 'stamp_only') === 'stamp_only'
-                          ? 'bg-white text-[#1B365D] font-semibold shadow-2xs'
-                          : 'text-[#57534E]'
+                          ? 'bg-white dark:bg-slate-800 text-[#1B365D] dark:text-white font-semibold shadow-2xs'
+                          : 'text-[#57534E] dark:text-slate-400'
                       }`}
                     >
                       Stamp Header
@@ -1110,8 +1110,8 @@ export function DocumentEditor({
                       }}
                       className={`px-2 py-0.5 rounded transition-colors ${
                         eStamp.backgroundScope === 'full_page'
-                          ? 'bg-white text-[#1B365D] font-semibold shadow-2xs'
-                          : 'text-[#57534E]'
+                          ? 'bg-white dark:bg-slate-800 text-[#1B365D] dark:text-white font-semibold shadow-2xs'
+                          : 'text-[#57534E] dark:text-slate-400'
                       }`}
                     >
                       Full Sheets
@@ -1144,12 +1144,12 @@ export function DocumentEditor({
                         }}
                         className={`group flex flex-col items-center p-1.5 rounded border text-center transition-colors ${
                           selected
-                            ? 'border-[#1B365D] bg-[#EFF6FF]'
-                            : 'border-[#D6CEBE] bg-white hover:border-[#1B365D]/60'
+                            ? 'border-[#1B365D] dark:border-sky-400 bg-[#EFF6FF] dark:bg-sky-950/50'
+                            : 'border-[#D6CEBE] dark:border-slate-700 bg-white dark:bg-slate-950 hover:border-[#1B365D]/60 dark:hover:border-slate-500'
                         }`}
                       >
                         <span
-                          className="w-full h-7 rounded-xs border border-[#D6CEBE]/80 block mb-1"
+                          className="w-full h-7 rounded-xs border border-[#D6CEBE]/80 dark:border-slate-700 block mb-1"
                           style={
                             pat.url
                               ? {
@@ -1160,7 +1160,7 @@ export function DocumentEditor({
                               : { backgroundColor: '#FFFEFA' }
                           }
                         />
-                        <span className="text-[10px] leading-tight font-medium text-[#1C1917] line-clamp-1">
+                        <span className="text-[10px] leading-tight font-medium text-[#1C1917] dark:text-slate-200 line-clamp-1">
                           {pat.id === 'none'
                             ? 'Plain'
                             : pat.id === 'shcil_emerald'
@@ -1179,14 +1179,14 @@ export function DocumentEditor({
             </div>
 
             {/* Digital Signature Area Sidebar Toggle */}
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 <PenLine className="w-4 h-4 text-[#FF671F] shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-[#202124]">
+                  <p className="text-xs font-semibold text-[#202124] dark:text-white">
                     Digital Signature Area
                   </p>
-                  <p className="text-[11px] text-slate-600 truncate font-mono-tabular">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate font-mono-tabular">
                     {schemaDetection?.summaryText || 'Auto-detects parties & witnesses'}
                   </p>
                 </div>
@@ -1208,7 +1208,7 @@ export function DocumentEditor({
                   className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors cursor-pointer ${
                     isSignatureAreaVisible
                       ? 'bg-[#FF671F] border-[#FF671F]'
-                      : 'bg-slate-200 border-slate-300'
+                      : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'
                   }`}
                 >
                   <span
@@ -1238,31 +1238,31 @@ export function DocumentEditor({
             onUndoLastInjection={handleUndoClauseInjection}
           />
 
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-2xs">
             {studioStep === 'form' && (
             <form onSubmit={handleGenerate} className="space-y-6">
-              <div className="border-b border-slate-200 pb-4 flex items-center justify-between gap-3">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-4 flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-bold text-[#202124]">
+                  <h2 className="text-lg font-bold text-[#202124] dark:text-white">
                     Step 1: Document Variables Form
                   </h2>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Original legal wording stays untouched; values populate every matching slot.
                   </p>
                 </div>
-                <span className="text-xs font-mono-tabular text-slate-500 shrink-0">
+                <span className="text-xs font-mono-tabular text-slate-500 dark:text-slate-400 shrink-0">
                   {template.fields.filter((f) => !f.repeatableGroupId).length} fields
                 </span>
               </div>
 
               {submitError && (
-                <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-lg text-xs text-[#991B1B]">
+                <div className="p-3 bg-[#FEF2F2] dark:bg-rose-950/40 border border-[#FECACA] dark:border-rose-800 rounded-lg text-xs text-[#991B1B] dark:text-rose-300">
                   {submitError}
                 </div>
               )}
 
               {saveMessage && (
-                <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-lg text-xs text-[#065F46] flex items-center gap-2">
+                <div className="p-3 bg-[#ECFDF5] dark:bg-emerald-950/40 border border-[#A7F3D0] dark:border-emerald-800 rounded-lg text-xs text-[#065F46] dark:text-emerald-300 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{saveMessage}</span>
                 </div>
@@ -1271,7 +1271,7 @@ export function DocumentEditor({
               {groupedFields.map(([groupName, fields]) => (
                 <fieldset
                   key={groupName}
-                  className="space-y-4 border-t border-slate-200 pt-4 first:border-t-0 first:pt-0"
+                  className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-4 first:border-t-0 first:pt-0"
                 >
                   <legend className="text-xs font-semibold uppercase tracking-wider text-[#FF671F]">
                     {groupName}
@@ -1290,13 +1290,13 @@ export function DocumentEditor({
                         <div className="flex items-baseline justify-between gap-2">
                           <label
                             htmlFor={inputId}
-                            className="block text-xs font-medium text-[#202124]"
+                            className="block text-xs font-medium text-[#202124] dark:text-slate-200"
                           >
                             {field.label}
                             {field.required && <span className="text-[#FF671F] ml-1">*</span>}
                           </label>
                           {totalOccurrences > 0 && (
-                            <span className="text-[11px] font-mono-tabular text-slate-500 shrink-0">
+                            <span className="text-[11px] font-mono-tabular text-slate-500 dark:text-slate-400 shrink-0">
                               {totalOccurrences}{' '}
                               {totalOccurrences === 1 ? 'slot' : 'occurrences'}
                             </span>
@@ -1315,7 +1315,7 @@ export function DocumentEditor({
                               }))
                             }
                             placeholder={field.placeholder}
-                            className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
                           />
                         ) : field.type === 'select' ? (
                           <select
@@ -1331,7 +1331,7 @@ export function DocumentEditor({
                                 }));
                               }
                             }}
-                            className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
+                            className="w-full h-10 px-3 text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
                           >
                             <option value="">Select {field.label}...</option>
                             {(field.options || []).map((opt) => (
@@ -1352,14 +1352,14 @@ export function DocumentEditor({
                               }))
                             }
                             placeholder={field.placeholder}
-                            className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
+                            className="w-full h-10 px-3 text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
                           />
                         )}
 
                         {field.helperText && (
-                          <p className="text-[11px] text-slate-500">{field.helperText}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{field.helperText}</p>
                         )}
-                        {err && <p className="text-xs text-[#991B1B] font-medium">{err}</p>}
+                        {err && <p className="text-xs text-[#991B1B] dark:text-rose-400 font-medium">{err}</p>}
                       </div>
                     );
                   })}
@@ -1375,13 +1375,13 @@ export function DocumentEditor({
                 if (subFields.length === 0) return null;
 
                 return (
-                  <div key={section.groupId} className="border-t border-slate-200 pt-4 space-y-3">
+                  <div key={section.groupId} className="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <div>
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-[#FF671F]">
                           {section.title}
                         </h3>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
                           Optional repeatable section appended to schedule/attestation
                         </p>
                       </div>
@@ -1394,7 +1394,7 @@ export function DocumentEditor({
                             [section.groupId]: [...(prev[section.groupId] || []), {}],
                           }))
                         }
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-[#FF671F] bg-[#FFF5F0] border border-[#FED7AA] rounded-lg hover:bg-[#FFEDD5] disabled:opacity-40 whitespace-nowrap cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-[#FF671F] dark:text-orange-300 bg-[#FFF5F0] dark:bg-orange-950/40 border border-[#FED7AA] dark:border-orange-800 rounded-lg hover:bg-[#FFEDD5] dark:hover:bg-orange-950/70 disabled:opacity-40 whitespace-nowrap cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Add {section.itemLabel}
@@ -1404,10 +1404,10 @@ export function DocumentEditor({
                     {entries.map((itemVals, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 bg-[#F7F8FA] border border-slate-200 rounded-lg space-y-2.5"
+                        className="p-3.5 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-2.5"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-[#202124]">
+                          <span className="text-xs font-semibold text-[#202124] dark:text-white">
                             {section.itemLabel} #{idx + 1}
                           </span>
                           <button
@@ -1420,7 +1420,7 @@ export function DocumentEditor({
                                 ),
                               }))
                             }
-                            className="text-xs text-[#991B1B] inline-flex items-center gap-1 hover:underline cursor-pointer"
+                            className="text-xs text-[#991B1B] dark:text-rose-400 inline-flex items-center gap-1 hover:underline cursor-pointer"
                           >
                             <Trash2 className="w-3 h-3" />
                             Remove
@@ -1428,7 +1428,7 @@ export function DocumentEditor({
                         </div>
                         {subFields.map((sf) => (
                           <div key={sf.fieldId} className="space-y-1">
-                            <label className="block text-[11px] font-medium text-slate-600">
+                            <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-300">
                               {sf.label}
                             </label>
                             <input
@@ -1442,7 +1442,7 @@ export function DocumentEditor({
                                   return { ...prev, [section.groupId]: arr };
                                 });
                               }}
-                              className="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg text-[#202124]"
+                              className="w-full h-9 px-2.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100"
                             />
                           </div>
                         ))}
@@ -1453,9 +1453,9 @@ export function DocumentEditor({
               })}
 
               {/* Version Label & Submit */}
-              <div className="border-t border-slate-200 pt-4 space-y-3">
+              <div className="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3">
                 <div className="space-y-1">
-                  <label htmlFor="draft_label" className="block text-xs font-medium text-slate-600">
+                  <label htmlFor="draft_label" className="block text-xs font-medium text-slate-600 dark:text-slate-300">
                     Draft Version Label (for Saved Versions / Export Filename)
                   </label>
                   <input
@@ -1463,7 +1463,7 @@ export function DocumentEditor({
                     type="text"
                     value={versionLabel}
                     onChange={(e) => setVersionLabel(e.target.value)}
-                    className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg text-[#202124]"
+                    className="w-full h-9 px-3 text-xs bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100"
                   />
                 </div>
 
@@ -1485,7 +1485,7 @@ export function DocumentEditor({
                         ? 'Disabled in Private Session mode'
                         : 'Save a browser-local copy'
                     }
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium text-[#202124] bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 whitespace-nowrap cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 whitespace-nowrap cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" />
                     Save Locally
@@ -1497,8 +1497,8 @@ export function DocumentEditor({
 
           {studioStep === 'validate' && (
             <div className="space-y-5">
-              <div className="border-b border-slate-200 pb-3">
-                <h2 className="text-lg font-bold text-[#202124]">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h2 className="text-lg font-bold text-[#202124] dark:text-white">
                   Step 2: Validate Draft &amp; Statutory Checks
                 </h2>
               </div>
@@ -1514,11 +1514,11 @@ export function DocumentEditor({
                 onJumpToForm={() => setStudioStep('form')}
                 onReportReady={setValidationReport}
               />
-              <div className="pt-3 border-t border-slate-200 flex justify-between gap-2">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => setStudioStep('form')}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:text-[#202124] cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg hover:text-[#202124] dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                 >
                   ← Back to Form
                 </button>
@@ -1535,30 +1535,30 @@ export function DocumentEditor({
 
           {studioStep === 'stamp_sign' && (
             <div className="space-y-6">
-              <div className="border-b border-slate-200 pb-3">
-                <h2 className="text-lg font-bold text-[#202124]">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h2 className="text-lg font-bold text-[#202124] dark:text-white">
                   Step 3: E-Stamp Simulation &amp; Digital Signature Area
                 </h2>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 dark:text-slate-300">
                   Configure the stamp paper header simulation overlay and generate guided signature, date, and witness blocks.
                 </p>
               </div>
 
               {saveMessage && (
-                <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-lg text-xs text-[#065F46] flex items-center gap-2">
+                <div className="p-3 bg-[#ECFDF5] dark:bg-emerald-950/40 border border-[#A7F3D0] dark:border-emerald-800 rounded-lg text-xs text-[#065F46] dark:text-emerald-300 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{saveMessage}</span>
                 </div>
               )}
 
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#B45309]">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#B45309] dark:text-amber-400">
                   E-Stamp Simulation &amp; Stamp Duty Guide
                 </h3>
                 <EStampPanel value={eStamp} onChange={setEStamp} />
               </div>
 
-              <div className="border-t border-slate-200 pt-5 space-y-4">
+              <div className="border-t border-slate-200 dark:border-slate-800 pt-5 space-y-4">
                 <DigitalSignatureGeneratorControls
                   value={signature}
                   schemaSummary={schemaDetection?.summaryText}
@@ -1575,11 +1575,11 @@ export function DocumentEditor({
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-between gap-2">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => setStudioStep('validate')}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:text-[#202124] cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg hover:text-[#202124] dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                 >
                   ← Back to Validate
                 </button>
@@ -1596,17 +1596,17 @@ export function DocumentEditor({
 
           {studioStep === 'aid_export' && (
             <div className="space-y-6">
-              <div className="border-b border-slate-200 pb-3">
-                <h2 className="text-lg font-bold text-[#202124]">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h2 className="text-lg font-bold text-[#202124] dark:text-white">
                   Step 4: Legal Assistance &amp; Document Export
                 </h2>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 dark:text-slate-300">
                   Review export readiness, consult clause explanations, or download DOCX/PDF with your E-Stamp header and Digital Signature Area.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl space-y-3">
-                <div className="text-xs text-[#065F46] space-y-1">
+              <div className="p-4 bg-[#ECFDF5] dark:bg-emerald-950/40 border border-[#A7F3D0] dark:border-emerald-800 rounded-xl space-y-3">
+                <div className="text-xs text-[#065F46] dark:text-emerald-300 space-y-1">
                   <p className="font-semibold">Ready to Export Draft Package</p>
                   <p className="font-mono-tabular">
                     E-Stamp Overlay:{' '}
@@ -1643,7 +1643,7 @@ export function DocumentEditor({
                     type="button"
                     onClick={handleSaveLocally}
                     disabled={ephemeralMode}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#202124] bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" />
                     Save Locally
@@ -1668,11 +1668,11 @@ export function DocumentEditor({
                 documentExcerpt={activeContent}
               />
 
-              <div className="pt-3 border-t border-slate-200 flex justify-start">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-start">
                 <button
                   type="button"
                   onClick={() => setStudioStep('stamp_sign')}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:text-[#202124] cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg hover:text-[#202124] dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                 >
                   ← Back to e-Stamp &amp; Sign
                 </button>
@@ -1685,13 +1685,13 @@ export function DocumentEditor({
         {/* RIGHT COLUMN: Preserved Document Paper Preview & Editor */}
         <div className="lg:col-span-7 space-y-3">
           {/* Preview Toolbar with Quick Overlay & Signature Area Toggles */}
-          <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-2xs print:hidden">
-            <div className="inline-flex items-center p-1 bg-slate-100 rounded-lg">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-2xs print:hidden">
+            <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
               <button
                 type="button"
                 onClick={() => setPreviewTab('preview')}
                 className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                  previewTab === 'preview' ? 'bg-white text-[#202124] shadow-2xs' : 'text-slate-600'
+                  previewTab === 'preview' ? 'bg-white dark:bg-slate-800 text-[#202124] dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-[#202124] dark:hover:text-slate-200'
                 }`}
               >
                 Completed Preview
@@ -1703,7 +1703,7 @@ export function DocumentEditor({
                   setPreviewTab('edit');
                 }}
                 className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                  previewTab === 'edit' ? 'bg-white text-[#202124] shadow-2xs' : 'text-slate-600'
+                  previewTab === 'edit' ? 'bg-white dark:bg-slate-800 text-[#202124] dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-[#202124] dark:hover:text-slate-200'
                 }`}
               >
                 Edit Generated Text
@@ -1712,7 +1712,7 @@ export function DocumentEditor({
                 type="button"
                 onClick={() => setPreviewTab('original')}
                 className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                  previewTab === 'original' ? 'bg-white text-[#202124] shadow-2xs' : 'text-slate-600'
+                  previewTab === 'original' ? 'bg-white dark:bg-slate-800 text-[#202124] dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-[#202124] dark:hover:text-slate-200'
                 }`}
               >
                 Original Source (Read-Only)
@@ -1725,11 +1725,11 @@ export function DocumentEditor({
                 onClick={toggleStampOverlay}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap cursor-pointer ${
                   isStampOverlayVisible
-                    ? 'bg-[#FFFBEB] border-[#B45309] text-[#92400E]'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-[#B45309]'
+                    ? 'bg-[#FFFBEB] dark:bg-amber-950/40 border-[#B45309] dark:border-amber-700 text-[#92400E] dark:text-amber-300'
+                    : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#B45309]'
                 }`}
               >
-                <Stamp className="w-3.5 h-3.5 text-[#B45309]" />
+                <Stamp className="w-3.5 h-3.5 text-[#B45309] dark:text-amber-400" />
                 {isStampOverlayVisible ? 'E-Stamp Overlay: ON' : '+ E-Stamp Simulation'}
               </button>
 
@@ -1738,8 +1738,8 @@ export function DocumentEditor({
                 onClick={toggleSignatureArea}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap cursor-pointer ${
                   isSignatureAreaVisible
-                    ? 'bg-[#FFF5F0] border-[#FF671F] text-[#C2410C]'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-[#FF671F]'
+                    ? 'bg-[#FFF5F0] dark:bg-orange-950/40 border-[#FF671F] dark:border-orange-700 text-[#C2410C] dark:text-orange-300'
+                    : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#FF671F]'
                 }`}
               >
                 <PenLine className="w-3.5 h-3.5 text-[#FF671F]" />
@@ -1752,8 +1752,8 @@ export function DocumentEditor({
                   onClick={() => setShowLegalTermHelper((v) => !v)}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap cursor-pointer ${
                     showLegalTermHelper
-                      ? 'bg-[#ECFDF5] border-[#138808] text-[#138808]'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-[#138808]'
+                      ? 'bg-[#ECFDF5] dark:bg-emerald-950/40 border-[#138808] dark:border-emerald-700 text-[#138808] dark:text-emerald-300'
+                      : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#138808]'
                   }`}
                 >
                   <BookOpen className="w-3.5 h-3.5" />
@@ -1762,12 +1762,12 @@ export function DocumentEditor({
               )}
 
               {previewTab === 'preview' && !isManualEdit && (
-                <label className="inline-flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer ml-1">
+                <label className="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer ml-1">
                   <input
                     type="checkbox"
                     checked={highlightReplaced}
                     onChange={(e) => setHighlightReplaced(e.target.checked)}
-                    className="rounded border-slate-300 text-[#FF671F]"
+                    className="rounded border-slate-300 dark:border-slate-600 text-[#FF671F]"
                   />
                   <span>Highlight fields</span>
                 </label>
@@ -1817,8 +1817,8 @@ export function DocumentEditor({
               onOpenStampSignStep={() => setStudioStep('stamp_sign')}
             />
           ) : (
-            <div className="bg-white border border-slate-200 rounded-xl p-6 md:p-10 shadow-2xs min-h-[700px] space-y-6 print:border-0 print:shadow-none print:p-0">
-              <div className="border-b border-slate-200 pb-4 text-xs text-slate-500 flex flex-wrap justify-between gap-2">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 md:p-10 shadow-2xs min-h-[700px] space-y-6 print:border-0 print:shadow-none print:p-0">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-4 text-xs text-slate-500 dark:text-slate-400 flex flex-wrap justify-between gap-2">
                 <span>{NON_EXECUTED_STATUS_NOTICE}</span>
                 <span className="font-mono-tabular">
                   State: {formValues['jurisdiction_state'] || eStamp.state || 'Not Specified'} · Date:{' '}
@@ -1827,12 +1827,12 @@ export function DocumentEditor({
               </div>
 
               {previewTab === 'original' ? (
-                <pre className="whitespace-pre-wrap font-editorial text-[15px] leading-[1.75] text-[#202124]">
+                <pre className="whitespace-pre-wrap font-editorial text-[15px] leading-[1.75] text-[#202124] dark:text-slate-200">
                   {template.preservedSourceText}
                 </pre>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Manual edits apply directly to your DOCX/PDF export without altering the library template.
                   </p>
                   <textarea
@@ -1843,7 +1843,7 @@ export function DocumentEditor({
                     }}
                     rows={28}
                     aria-label="Editable completed legal document text"
-                    className="w-full p-4 font-editorial text-[15px] leading-[1.75] bg-[#F7F8FA] border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
+                    className="w-full p-4 font-editorial text-[15px] leading-[1.75] bg-[#F7F8FA] dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
                   />
                 </div>
               )}

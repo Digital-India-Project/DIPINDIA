@@ -22,7 +22,7 @@ import {
   ALL_PERMISSIONS,
   PermissionCode,
 } from '../../lib/rbac';
-import { CANONICAL_WORKFLOW_STATUSES } from '../../lib/workflow';
+import { CANONICAL_WORKFLOW_STATUSES, resolveApplicationVisualState } from '../../lib/workflow';
 import {
   formatINRFromPaise,
   toPaise,
@@ -72,6 +72,8 @@ import {
 import { AdminPaymentsConsole } from '../../components/admin/AdminPaymentsConsole';
 import { InlineSkeletonPulse } from '../../components/common/SkeletonLoaders';
 import { SwipeableActionItem } from '../../components/common/SwipeableActionItem';
+import { ApplicationStatusBadge } from '../../components/dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../../components/dashboard/DownloadReceiptButton';
 import { getPerfSummary, subscribePerfMetrics } from '../../lib/perfMonitor';
 import {
   getApiSathiCallLogs,
@@ -1203,22 +1205,29 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-400">
-                        Applicant: {app.userName} ({app.userMobile}) · {new Date(app.submissionDate).toLocaleDateString()}
+                        Applicant: {app.userName} ({app.userMobile}) · {new Date(app.submissionDate).toLocaleDateString()} · Stage:{' '}
+                        <strong className="text-slate-600 dark:text-slate-300">
+                          {resolveApplicationVisualState(app.status).stageLabel}
+                        </strong>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                       <span className="font-mono font-bold text-slate-900 dark:text-white">₹{app.payment.totalAmount}</span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        {app.status}
-                      </span>
+                      <ApplicationStatusBadge status={app.status} size="xs" />
+                      <DownloadReceiptButton
+                        application={app}
+                        businessSettings={businessSettings}
+                        size="xs"
+                      />
                       <button
+                        type="button"
                         onClick={() => {
                           setSelectedAppId(app.id);
                           setAdminAppStatus(app.status);
                           setActiveTab('applications');
                         }}
-                        className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold cursor-pointer"
+                        className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold cursor-pointer whitespace-nowrap"
                       >
                         Inspect →
                       </button>
@@ -1337,20 +1346,27 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
                     <div className="p-4 text-xs space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono font-bold text-[#FF671F]">{app.id}</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                          {app.status}
-                        </span>
+                        <ApplicationStatusBadge status={app.status} size="xs" />
                       </div>
                       <div className="font-bold text-slate-900 dark:text-white">{app.serviceName}</div>
                       <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
                         <span>{app.userName} · {app.userMobile}</span>
                         <span>{SOURCE_LABELS[app.sourceChannel || 'web_b2c'] || 'Web B2C'}</span>
                       </div>
-                      <div className="text-[11px] text-slate-500">
-                        Officer:{' '}
-                        <strong className="text-slate-700 dark:text-slate-300">
-                          {app.assignedOperatorName || 'Unassigned'}
-                        </strong>
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 pt-1">
+                        <span>
+                          Officer:{' '}
+                          <strong className="text-slate-700 dark:text-slate-300">
+                            {app.assignedOperatorName || 'Unassigned'}
+                          </strong>
+                          {' · '}
+                          Stage: <strong className="text-slate-700 dark:text-slate-300">{resolveApplicationVisualState(app.status).stageLabel}</strong>
+                        </span>
+                        <DownloadReceiptButton
+                          application={app}
+                          businessSettings={businessSettings}
+                          size="xs"
+                        />
                       </div>
                     </div>
                   </SwipeableActionItem>
@@ -1383,7 +1399,12 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
                   filteredApps.map((app) => (
                     <tr key={app.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                       <td className="p-3.5 font-mono font-bold text-[#FF671F]">{app.id}</td>
-                      <td className="p-3.5 font-semibold text-slate-800 dark:text-slate-200">{app.serviceName}</td>
+                      <td className="p-3.5">
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">{app.serviceName}</div>
+                        <div className="text-[10px] text-slate-500">
+                          Stage: {resolveApplicationVisualState(app.status).stageLabel}
+                        </div>
+                      </td>
                       <td className="p-3.5 font-semibold text-slate-600 dark:text-slate-300">
                         {SOURCE_LABELS[app.sourceChannel || 'web_b2c'] || 'Web B2C'}
                       </td>
@@ -1397,21 +1418,27 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
                         </span>
                       </td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                          {app.status}
-                        </span>
+                        <ApplicationStatusBadge status={app.status} size="xs" />
                       </td>
                       <td className="p-3.5 text-right">
-                        <button
-                          onClick={() => {
-                            setSelectedAppId(app.id);
-                            setAdminAppStatus(app.status);
-                            setAdminAppRemark('');
-                          }}
-                          className="text-[#FF671F] hover:underline font-bold cursor-pointer"
-                        >
-                          Manage Dossier
-                        </button>
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <DownloadReceiptButton
+                            application={app}
+                            businessSettings={businessSettings}
+                            size="xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedAppId(app.id);
+                              setAdminAppStatus(app.status);
+                              setAdminAppRemark('');
+                            }}
+                            className="text-[#FF671F] hover:underline font-bold cursor-pointer whitespace-nowrap"
+                          >
+                            Manage Dossier
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -1421,20 +1448,32 @@ export const AdminDashboard: React.FC<{ initialTab?: string; onNavigate: (route:
           </div>
 
           {selectedApp && (
-            <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-lg space-y-5 text-xs">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg space-y-5 text-xs">
+              <div className="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
                   <span className="font-mono font-bold text-[#FF671F]">
                     {selectedApp.id} · {SOURCE_LABELS[selectedApp.sourceChannel || 'web_b2c']}
                   </span>
-                  <h3 className="text-base font-bold text-slate-900">{selectedApp.serviceName}</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{selectedApp.serviceName}</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Stage: <strong>{resolveApplicationVisualState(selectedApp.status).stageLabel}</strong> · Applicant: {selectedApp.userName}
+                  </p>
                 </div>
-                <button
-                  onClick={() => setSelectedAppId(null)}
-                  className="text-slate-400 hover:text-slate-700 font-bold cursor-pointer"
-                >
-                  Close
-                </button>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <ApplicationStatusBadge status={selectedApp.status} size="sm" />
+                  <DownloadReceiptButton
+                    application={selectedApp}
+                    businessSettings={businessSettings}
+                    size="xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAppId(null)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold cursor-pointer ml-1"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

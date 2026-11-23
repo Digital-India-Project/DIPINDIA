@@ -93,21 +93,21 @@ export function EStampPanel({ value, onChange }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="p-3.5 bg-[#FFFDF8] border border-[#F1E8D9] rounded-xl text-xs text-slate-700 flex items-start gap-2.5">
+      <div className="p-3.5 bg-[#FFFDF8] dark:bg-amber-950/30 border border-[#F1E8D9] dark:border-amber-900/50 rounded-xl text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2.5">
         <Info className="w-4 h-4 text-[#FF671F] shrink-0 mt-0.5" />
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <strong className="text-[#202124]">
+            <strong className="text-[#202124] dark:text-white">
               e-Stamp Provider: {providerStatus?.eStampProvider.name || 'DIP-Desk e-Stamp Facilitation'}
             </strong>
-            <span className="text-slate-400">·</span>
-            <span className="font-mono-tabular text-[11px] text-[#138808] font-medium">
+            <span className="text-slate-400 dark:text-slate-500">·</span>
+            <span className="font-mono-tabular text-[11px] text-[#138808] dark:text-emerald-400 font-medium">
               {providerStatus?.eStampProvider.verifyConfigured
                 ? 'Live Verification API Connected'
                 : 'SHCIL Layout + DIP-Desk Facilitation'}
             </span>
           </div>
-          <p className="text-slate-600 leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
             Required drafts display the 12-field India Non-Judicial e-Stamp reference header. Attach an existing{' '}
             <span className="font-mono-tabular">IN-</span> SHCIL certificate or request e-Stamp procurement through Digital India Project.
           </p>
@@ -141,30 +141,30 @@ export function EStampPanel({ value, onChange }: Props) {
             }
             className={`text-left p-3 rounded-xl border transition-colors cursor-pointer ${
               value.mode === opt.id
-                ? 'bg-orange-50/70 border-[#FF671F] text-[#202124] ring-1 ring-[#FF671F]/25'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-[#FF671F]/50'
+                ? 'bg-orange-50/70 dark:bg-orange-950/35 border-[#FF671F] text-[#202124] dark:text-white ring-1 ring-[#FF671F]/25'
+                : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-[#FF671F]/50 dark:hover:border-orange-700'
             }`}
           >
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#202124]">
-              <Stamp className={`w-3.5 h-3.5 ${value.mode === opt.id ? 'text-[#FF671F]' : 'text-slate-500'}`} />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#202124] dark:text-white">
+              <Stamp className={`w-3.5 h-3.5 ${value.mode === opt.id ? 'text-[#FF671F]' : 'text-slate-500 dark:text-slate-400'}`} />
               <span>{opt.title}</span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">{opt.desc}</p>
+            <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{opt.desc}</p>
           </button>
         ))}
       </div>
 
       {value.mode !== 'none' && (
-        <div className="p-4 bg-[#F7F8FA] border border-slate-200 rounded-xl space-y-4 text-xs">
+        <div className="p-4 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Governing State / UT (Government of ___)
               </label>
               <select
                 value={value.state}
                 onChange={(e) => onChange({ ...value, state: e.target.value })}
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               >
                 <option value="">Select State / UT...</option>
                 {INDIAN_STATES_AND_UTS.map((s) => (
@@ -176,7 +176,7 @@ export function EStampPanel({ value, onChange }: Props) {
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Stamp Duty Amount (Rs.)
               </label>
               <input
@@ -184,13 +184,13 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.denominationInr}
                 onChange={(e) => onChange({ ...value, denominationInr: e.target.value })}
                 placeholder="e.g., 100 or 500"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg font-mono-tabular focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono-tabular focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               />
             </div>
 
             {value.mode === 'existing_certificate' && (
               <div className="sm:col-span-2 space-y-2">
-                <label className="block font-medium text-[#202124]">
+                <label className="block font-medium text-[#202124] dark:text-slate-200">
                   Certificate No. (SHCIL)
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -199,7 +199,7 @@ export function EStampPanel({ value, onChange }: Props) {
                     value={value.certificateNumber}
                     onChange={(e) => onChange({ ...value, certificateNumber: e.target.value })}
                     placeholder="e.g., IN-KA12345678901234W"
-                    className="flex-1 min-w-[200px] h-9 px-2.5 font-mono-tabular bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                    className="flex-1 min-w-[200px] h-9 px-2.5 font-mono-tabular bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
                   />
                   <button
                     type="button"
@@ -220,16 +220,16 @@ export function EStampPanel({ value, onChange }: Props) {
                   <div
                     className={`p-3 rounded-lg border text-xs flex items-start gap-2 ${
                       verifyResult.verifiedByProvider
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
                         : verifyResult.validFormat
-                        ? 'bg-amber-50 border-amber-200 text-amber-900'
-                        : 'bg-red-50 border-red-200 text-red-900'
+                        ? 'bg-amber-50 dark:bg-amber-950/35 border-amber-200 dark:border-amber-800/70 text-amber-900 dark:text-amber-200'
+                        : 'bg-red-50 dark:bg-rose-950/40 border-red-200 dark:border-rose-800 text-red-900 dark:text-rose-200'
                     }`}
                   >
                     {verifyResult.verifiedByProvider ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#138808] shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-[#138808] dark:text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                     )}
                     <div className="space-y-0.5">
                       <p className="font-semibold">
@@ -249,19 +249,19 @@ export function EStampPanel({ value, onChange }: Props) {
             )}
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Certificate Issued Date
               </label>
               <input
                 type="date"
                 value={value.purchaseDate}
                 onChange={(e) => onChange({ ...value, purchaseDate: e.target.value })}
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Consideration Price (Rs.)
               </label>
               <input
@@ -269,12 +269,12 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.considerationPriceInr || ''}
                 onChange={(e) => onChange({ ...value, considerationPriceInr: e.target.value })}
                 placeholder="e.g., 0 or 25,00,000"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg font-mono-tabular"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono-tabular"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Purchased by / First Party
               </label>
               <input
@@ -282,23 +282,23 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.purchasedBy}
                 onChange={(e) => onChange({ ...value, purchasedBy: e.target.value })}
                 placeholder="Name on stamp certificate"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">Second Party</label>
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Second Party</label>
               <input
                 type="text"
                 value={value.secondParty || ''}
                 onChange={(e) => onChange({ ...value, secondParty: e.target.value })}
                 placeholder="Counterparty name if applicable"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Description of Document (Article)
               </label>
               <input
@@ -306,12 +306,12 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.articleDescription}
                 onChange={(e) => onChange({ ...value, articleDescription: e.target.value })}
                 placeholder="e.g., Article 4 Affidavit / Article 5 Agreement"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Description (Document Title)
               </label>
               <input
@@ -319,12 +319,12 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.documentSubDescription || ''}
                 onChange={(e) => onChange({ ...value, documentSubDescription: e.target.value })}
                 placeholder="Short instrument summary"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Stamp Duty Paid By
               </label>
               <input
@@ -332,12 +332,12 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.stampDutyPaidBy || ''}
                 onChange={(e) => onChange({ ...value, stampDutyPaidBy: e.target.value })}
                 placeholder="Same as First Party if blank"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-[#202124] mb-1">
+              <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">
                 Account / Unique Doc. Reference
               </label>
               <input
@@ -345,20 +345,20 @@ export function EStampPanel({ value, onChange }: Props) {
                 value={value.accountReference || ''}
                 onChange={(e) => onChange({ ...value, accountReference: e.target.value })}
                 placeholder="Optional SHCIL account ref"
-                className="w-full h-9 px-2.5 bg-white border border-slate-200 rounded-lg font-mono-tabular"
+                className="w-full h-9 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono-tabular"
               />
             </div>
           </div>
 
           {actionError && (
-            <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg text-red-800">
+            <div className="p-2.5 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800 rounded-lg text-red-800 dark:text-rose-300">
               {actionError}
             </div>
           )}
 
           {/* Request e-Stamp Quote / Main Portal Facilitation Handoff */}
-          <div className="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <div className="text-[11px] text-slate-600">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-[11px] text-slate-600 dark:text-slate-300">
               Need an official e-Stamp issued for this draft?
             </div>
             <button
@@ -377,16 +377,16 @@ export function EStampPanel({ value, onChange }: Props) {
           </div>
 
           {quoteResult && (
-            <div className="p-3 bg-white border border-emerald-200 rounded-lg space-y-2">
+            <div className="p-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 rounded-lg space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-semibold text-[#138808]">
+                <span className="font-semibold text-[#138808] dark:text-emerald-400">
                   Quote Reference: <span className="font-mono-tabular">{quoteResult.quoteId}</span>
                 </span>
-                <span className="font-mono-tabular text-[11px] text-slate-600">
+                <span className="font-mono-tabular text-[11px] text-slate-600 dark:text-slate-300">
                   Est. Duty: Rs. {quoteResult.estimatedDutyInr}/- ({quoteResult.state})
                 </span>
               </div>
-              <p className="text-slate-600">{quoteResult.message}</p>
+              <p className="text-slate-600 dark:text-slate-300">{quoteResult.message}</p>
               <a
                 href={quoteResult.handoffUrl}
                 target="_blank"
@@ -400,20 +400,20 @@ export function EStampPanel({ value, onChange }: Props) {
           )}
 
           {/* Reference Stamp Thumbnail Card */}
-          <div className="pt-3 border-t border-slate-200 flex items-center gap-3">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center gap-3">
             {!imgFailed ? (
               <img
                 src="/assets/aistudio/stamp-sample_c88c690a.jpg"
                 alt="SHCIL India Non-Judicial e-Stamp reference sheet"
                 referrerPolicy="no-referrer"
                 onError={() => setImgFailed(true)}
-                className="w-16 h-20 object-contain border border-slate-200 bg-white rounded-lg shrink-0"
+                className="w-16 h-20 object-contain border border-slate-200 dark:border-slate-700 bg-white rounded-lg shrink-0"
               />
             ) : (
-              <div className="w-16 h-20 border border-slate-200 bg-slate-100 rounded-lg shrink-0" />
+              <div className="w-16 h-20 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0" />
             )}
-            <div className="text-[11px] text-slate-600 space-y-0.5">
-              <p className="font-semibold text-[#202124]">
+            <div className="text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+              <p className="font-semibold text-[#202124] dark:text-white">
                 Reference Sample Active (12-Field SHCIL Format)
               </p>
               <p>
@@ -426,9 +426,9 @@ export function EStampPanel({ value, onChange }: Props) {
       )}
 
       {/* Indicative State Stamp Duty Reference */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2.5">
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
-          <h4 className="text-xs font-semibold text-[#202124]">
+          <h4 className="text-xs font-semibold text-[#202124] dark:text-white">
             Indicative State Stamp Duty Reference (Verify Current Tariff Before Purchase)
           </h4>
           <span className="inline-flex items-center gap-1 text-[11px] font-mono-tabular text-[#FF671F]">
@@ -438,28 +438,28 @@ export function EStampPanel({ value, onChange }: Props) {
         </div>
 
         {matchedGuide ? (
-          <div className="text-xs space-y-1.5 text-slate-600">
-            <p className="font-medium text-[#202124]">
+          <div className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300">
+            <p className="font-medium text-[#202124] dark:text-white">
               {matchedGuide.state} — {matchedGuide.portalName}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
               <div>
-                Affidavit: <strong className="text-[#202124]">{matchedGuide.affidavitIndicative}</strong>
+                Affidavit: <strong className="text-[#202124] dark:text-slate-100">{matchedGuide.affidavitIndicative}</strong>
               </div>
               <div>
-                Agreement: <strong className="text-[#202124]">{matchedGuide.agreementIndicative}</strong>
+                Agreement: <strong className="text-[#202124] dark:text-slate-100">{matchedGuide.agreementIndicative}</strong>
               </div>
               <div>
-                POA: <strong className="text-[#202124]">{matchedGuide.poaIndicative}</strong>
+                POA: <strong className="text-[#202124] dark:text-slate-100">{matchedGuide.poaIndicative}</strong>
               </div>
               <div>
-                Rent / Lease: <strong className="text-[#202124]">{matchedGuide.leaseIndicative}</strong>
+                Rent / Lease: <strong className="text-[#202124] dark:text-slate-100">{matchedGuide.leaseIndicative}</strong>
               </div>
             </div>
-            <p className="text-[11px] text-amber-800 pt-1">{matchedGuide.notes}</p>
+            <p className="text-[11px] text-amber-800 dark:text-amber-300 pt-1">{matchedGuide.notes}</p>
           </div>
         ) : (
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Select a state above (such as Karnataka, Delhi (NCT), Maharashtra, Uttar Pradesh, Tamil Nadu, or Gujarat) to view indicative non-judicial e-Stamp reference notes.
           </p>
         )}

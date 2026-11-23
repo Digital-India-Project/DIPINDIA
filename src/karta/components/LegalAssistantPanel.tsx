@@ -69,13 +69,13 @@ export function LegalAssistantPanel({
 
   return (
     <div className="space-y-4">
-      <div className="p-3.5 bg-[#FFF5F0] border border-[#FED7AA] rounded-xl text-xs text-[#9A3412] flex items-start gap-2.5">
+      <div className="p-3.5 bg-[#FFF5F0] dark:bg-orange-950/35 border border-[#FED7AA] dark:border-orange-800 rounded-xl text-xs text-[#9A3412] dark:text-orange-200 flex items-start gap-2.5">
         <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#FF671F]" />
         <div className="space-y-1">
-          <strong className="block text-[#202124]">
+          <strong className="block text-[#202124] dark:text-white">
             Informational Indian Legal Assistance Only — Not Formal Legal Advice
           </strong>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-slate-300">
             Responses explain Indian statutory context, stamp duty/registration steps, and clause meanings based on your current draft. Always verify final legal strategy with an Advocate enrolled under the Advocates Act, 1961.
           </p>
         </div>
@@ -83,9 +83,9 @@ export function LegalAssistantPanel({
 
       {/* Quick Context Strip */}
       {(documentTitle || jurisdictionState) && (
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600 font-mono-tabular bg-[#F7F8FA] border border-slate-200 rounded-lg px-3 py-2">
-          <span className="inline-flex items-center gap-1 text-[#202124] font-semibold">
-            <BookOpen className="w-3.5 h-3.5 text-[#138808]" />
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600 dark:text-slate-300 font-mono-tabular bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2">
+          <span className="inline-flex items-center gap-1 text-[#202124] dark:text-white font-semibold">
+            <BookOpen className="w-3.5 h-3.5 text-[#138808] dark:text-emerald-400" />
             Context:
           </span>
           {documentTitle && <span>{documentTitle}</span>}
@@ -106,7 +106,7 @@ export function LegalAssistantPanel({
 
       {/* Quick Prompt Actions */}
       <div className="space-y-1.5">
-        <span className="text-[11px] font-medium text-slate-600 flex items-center gap-1">
+        <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-[#FF671F]" />
           Suggested Guidance Queries
         </span>
@@ -117,7 +117,7 @@ export function LegalAssistantPanel({
               type="button"
               disabled={loading}
               onClick={() => void sendQuestion(prompt)}
-              className="text-left px-3 py-1.5 text-xs text-[#202124] bg-white border border-slate-200 rounded-lg hover:border-[#FF671F] hover:bg-[#FFF5F0] transition-colors disabled:opacity-50 cursor-pointer"
+              className="text-left px-3 py-1.5 text-xs text-[#202124] dark:text-slate-100 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-[#FF671F] hover:bg-[#FFF5F0] dark:hover:border-orange-500 dark:hover:bg-orange-950/35 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {prompt}
             </button>
@@ -127,14 +127,14 @@ export function LegalAssistantPanel({
 
       {/* Conversation Transcript */}
       {messages.length > 0 && (
-        <div className="space-y-3 max-h-[380px] overflow-y-auto p-3 bg-[#F7F8FA] border border-slate-200 rounded-xl">
+        <div className="space-y-3 max-h-[380px] overflow-y-auto p-3 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
           {messages.map((m, idx) => (
             <div
               key={idx}
               className={`p-3 rounded-xl text-xs leading-relaxed ${
                 m.role === 'user'
-                  ? 'bg-[#202124] text-white ml-6'
-                  : 'bg-white border border-slate-200 text-[#202124] mr-4'
+                  ? 'bg-[#202124] dark:bg-indigo-600 text-white ml-6'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[#202124] dark:text-slate-100 mr-4'
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-1 opacity-80 text-[11px] font-mono-tabular">
@@ -147,7 +147,7 @@ export function LegalAssistantPanel({
             </div>
           ))}
           {loading && (
-            <div className="p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-600">
+            <div className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-600 dark:text-slate-300">
               Reviewing draft clauses and Indian statutory framework...
             </div>
           )}
@@ -155,7 +155,7 @@ export function LegalAssistantPanel({
       )}
 
       {error && (
-        <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-lg text-xs text-[#991B1B] space-y-1">
+        <div className="p-3 bg-[#FEF2F2] dark:bg-rose-950/40 border border-[#FECACA] dark:border-rose-800 rounded-lg text-xs text-[#991B1B] dark:text-rose-300 space-y-1">
           <p className="font-semibold flex items-center gap-1.5">
             <Scale className="w-3.5 h-3.5 shrink-0" />
             Legal Assistance Unavailable
@@ -178,7 +178,7 @@ export function LegalAssistantPanel({
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about clauses, stamp duty, registration, BNS/BNSS/BSA 2023 updates, or witness rules..."
           aria-label="Ask Indian legal assistance question"
-          className="flex-1 h-10 px-3 text-xs bg-white border border-slate-300 rounded-lg text-[#202124] focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
+          className="flex-1 h-10 px-3 text-xs bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F]"
         />
         <button
           type="submit"

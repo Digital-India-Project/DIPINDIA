@@ -51,11 +51,14 @@ import { openExternalSafeUrl } from '../../lib/navigationController';
 import {
   getApplicationProgress,
   getKycVerificationProgress,
+  resolveApplicationVisualState,
 } from '../../lib/workflow';
 import {
   ApplicationProgressTracker,
   KycVerificationProgressBanner,
 } from '../../components/dashboard/StatusProgressBars';
+import { ApplicationStatusBadge } from '../../components/dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../../components/dashboard/DownloadReceiptButton';
 import { PaymentStatus } from '../../components/dashboard/PaymentStatus';
 import {
   PaymentStatusOverview,
@@ -497,85 +500,25 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     }
   };
 
-  // Compute Statistics
+  // Compute Statistics aligned with Pending / Processing / Completed visual buckets
   const totalApps = userApplications.length;
-  const pendingApps = userApplications.filter((a) =>
-    ['Submitted', 'Payment Pending', 'Awaiting Payment', 'Payment Confirmed', 'Payment Successful', 'Under Review', 'Assigned'].includes(a.status)
+  const visualPendingApps = userApplications.filter(
+    (a) => resolveApplicationVisualState(a.status).bucket === 'Pending'
   ).length;
-  const inProgressApps = userApplications.filter((a) =>
-    ['Document Verification', 'Resubmitted', 'Processing', 'Application Processing', 'Submitted to Provider', 'Submitted to External Authority', 'Awaiting External Authority', 'Awaiting External Approval', 'Verification Pending'].includes(a.status)
+  const visualProcessingApps = userApplications.filter(
+    (a) => resolveApplicationVisualState(a.status).bucket === 'Processing'
   ).length;
   const docsRequiredApps = userApplications.filter((a) =>
     ['Documents Required', 'Correction Required'].includes(a.status)
   ).length;
-  const completedApps = userApplications.filter((a) => a.status === 'Completed').length;
+  const completedApps = userApplications.filter(
+    (a) => resolveApplicationVisualState(a.status).bucket === 'Completed'
+  ).length;
 
   const filteredApps = userApplications.filter((a) => {
     if (statusFilter === 'all') return true;
     return a.status.toLowerCase().replace(/\s+/g, '-') === statusFilter;
   });
-
-  const getStatusBadge = (status: ApplicationStatus) => {
-    switch (status) {
-      case 'Completed':
-        return {
-          bg: 'bg-[#EAF7EC] dark:bg-emerald-950/50',
-          text: 'text-[#138808] dark:text-emerald-300',
-          border: 'border-[#138808]/20 dark:border-emerald-800',
-          icon: CheckCircle2,
-        };
-      case 'Processing':
-      case 'Application Processing':
-      case 'Submitted to Provider':
-      case 'Submitted to External Authority':
-      case 'Payment Confirmed':
-      case 'Payment Successful':
-      case 'Resubmitted':
-        return {
-          bg: 'bg-[#FFF5EE] dark:bg-orange-950/40',
-          text: 'text-[#C2410C] dark:text-orange-300',
-          border: 'border-[#FF671F]/30 dark:border-orange-800',
-          icon: Clock,
-        };
-      case 'Documents Required':
-      case 'Correction Required':
-      case 'Payment Pending':
-      case 'Awaiting Payment':
-        return {
-          bg: 'bg-[#FEF2F2] dark:bg-rose-950/40',
-          text: 'text-[#E53935] dark:text-rose-300',
-          border: 'border-[#E53935]/30 dark:border-rose-800',
-          icon: AlertTriangle,
-        };
-      case 'Rejected':
-      case 'Cancelled':
-        return {
-          bg: 'bg-rose-50 dark:bg-rose-950/40',
-          text: 'text-rose-700 dark:text-rose-300',
-          border: 'border-rose-200 dark:border-rose-800',
-          icon: XCircle,
-        };
-      case 'Document Verification':
-      case 'Under Review':
-      case 'Assigned':
-      case 'Awaiting External Authority':
-      case 'Awaiting External Approval':
-      case 'Verification Pending':
-        return {
-          bg: 'bg-[#FFFBEB] dark:bg-amber-950/40',
-          text: 'text-[#B45309] dark:text-amber-300',
-          border: 'border-[#FFC928]/40 dark:border-amber-800',
-          icon: Clock,
-        };
-      default:
-        return {
-          bg: 'bg-slate-100 dark:bg-slate-800',
-          text: 'text-slate-700 dark:text-slate-200',
-          border: 'border-slate-200 dark:border-slate-700',
-          icon: Clock,
-        };
-    }
-  };
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
@@ -948,29 +891,31 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
 
                 {/* Pending */}
                 <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Pending Review
+                  <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block">
+                    Pending
                   </span>
-                  <div className="text-2xl font-black text-[#D97706] font-mono">{pendingApps + inProgressApps}</div>
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400">Verification in progress</span>
+                  <div className="text-2xl font-black text-amber-700 dark:text-amber-300 font-mono">{visualPendingApps}</div>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-400">
+                    {docsRequiredApps > 0 ? `${docsRequiredApps} awaiting action` : 'Review & verification queue'}
+                  </span>
                 </div>
 
-                {/* Action Required */}
+                {/* Processing */}
                 <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Attention Required
+                  <span className="text-[11px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider block">
+                    Processing
                   </span>
-                  <div className="text-2xl font-black text-[#E53935] font-mono">{docsRequiredApps}</div>
-                  <span className="text-[10px] text-red-600 dark:text-red-400">Docs requested</span>
+                  <div className="text-2xl font-black text-sky-700 dark:text-sky-300 font-mono">{visualProcessingApps}</div>
+                  <span className="text-[10px] text-sky-700 dark:text-sky-400">Active desk &amp; filing</span>
                 </div>
 
                 {/* Completed */}
                 <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-[11px] font-bold text-[#138808] dark:text-emerald-400 uppercase tracking-wider block">
                     Completed
                   </span>
-                  <div className="text-2xl font-black text-[#138808] font-mono">{completedApps}</div>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400">Certificates available</span>
+                  <div className="text-2xl font-black text-[#138808] dark:text-emerald-300 font-mono">{completedApps}</div>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-400">Certificates available</span>
                 </div>
               </div>
 
@@ -1240,8 +1185,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                     </div>
                   ) : (
                     userApplications.slice(0, 3).map((app) => {
-                      const badge = getStatusBadge(app.status);
-                      const Icon = badge.icon;
+                      const visual = resolveApplicationVisualState(app.status);
                       const appProgress = getApplicationProgress(app.status);
                       const paymentBadgeState = getRealtimePaymentBadgeStatus(app);
                       const cancellable = canCitizenCancel(app.status);
@@ -1286,20 +1230,24 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400 text-[11px] tabular-nums">
                                   <span>
-                                    Submitted on {new Date(app.submissionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    Submitted {new Date(app.submissionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                   </span>
+                                  <span aria-hidden="true">·</span>
+                                  <span>Stage: <strong className="text-slate-700 dark:text-slate-200">{visual.stageLabel}</strong></span>
                                   <span aria-hidden="true">·</span>
                                   <span>Fee ₹{app.payment.totalAmount}</span>
                                   <PaymentStatus status={paymentBadgeState} size="sm" />
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-3 shrink-0">
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold border whitespace-nowrap ${badge.bg} ${badge.text} ${badge.border}`}>
-                                  <Icon className="w-3 h-3" />
-                                  <span>{app.status}</span>
-                                </span>
-                                <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                <ApplicationStatusBadge status={app.status} size="sm" />
+                                <DownloadReceiptButton
+                                  application={app}
+                                  businessSettings={businessSettings}
+                                  size="xs"
+                                />
+                                <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500 hidden sm:inline" />
                               </div>
                             </div>
 
@@ -1373,8 +1321,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               ) : (
                 <div className="space-y-3">
                   {filteredApps.map((app) => {
-                    const badge = getStatusBadge(app.status);
-                    const Icon = badge.icon;
+                    const visual = resolveApplicationVisualState(app.status);
                     const appProgress = getApplicationProgress(app.status);
                     const cancellable = canCitizenCancel(app.status);
                     return (
@@ -1415,10 +1362,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                               <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{app.serviceName}</span>
                             </div>
 
-                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold border self-start sm:self-auto whitespace-nowrap ${badge.bg} ${badge.text} ${badge.border}`}>
-                              <Icon className="w-3.5 h-3.5" />
-                              <span>{app.status}</span>
-                            </span>
+                            <ApplicationStatusBadge status={app.status} size="sm" className="self-start sm:self-auto" />
                           </div>
 
                           <ApplicationProgressTracker progress={appProgress} variant="compact" />
@@ -1437,6 +1381,8 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                             <div className="flex flex-wrap items-center gap-2.5 text-slate-500 dark:text-slate-400 text-[11px] tabular-nums">
                               <span>Submitted: <strong className="text-slate-700 dark:text-slate-200">{new Date(app.submissionDate).toLocaleDateString()}</strong></span>
                               <span aria-hidden="true">·</span>
+                              <span>Stage: <strong className="text-slate-700 dark:text-slate-200">{visual.stageLabel}</strong></span>
+                              <span aria-hidden="true">·</span>
                               <span className="inline-flex items-center gap-1.5">
                                 <span>Fee: <strong className="text-slate-700 dark:text-slate-200">₹{app.payment.totalAmount}</strong></span>
                                 <PaymentStatus status={getRealtimePaymentBadgeStatus(app)} size="sm" />
@@ -1449,10 +1395,19 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                               )}
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex flex-wrap items-center gap-2 shrink-0">
+                              <DownloadReceiptButton
+                                application={app}
+                                businessSettings={businessSettings}
+                                size="sm"
+                              />
                               {app.completionFileName && (
                                 <button
-                                  onClick={() => void handleDownloadCompletionCertificate(app)}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    void handleDownloadCompletionCertificate(app);
+                                  }}
                                   className="bg-[#138808] hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer whitespace-nowrap"
                                 >
                                   <Download className="w-3.5 h-3.5" />
@@ -1461,7 +1416,11 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                               )}
 
                               <button
-                                onClick={() => setSelectedApp(app)}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedApp(app);
+                                }}
                                 className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs px-3.5 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap"
                               >
                                 View Dossier & Timeline →
@@ -1495,21 +1454,21 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                     <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1 tabular-nums">
                       <span>Applicant: {activeSelectedApp.userName} ({activeSelectedApp.userMobile})</span>
                       <span aria-hidden="true">·</span>
+                      <span>Stage: <strong className="text-slate-700 dark:text-slate-200">{resolveApplicationVisualState(activeSelectedApp.status).stageLabel}</strong></span>
+                      <span aria-hidden="true">·</span>
                       <span>Fee ₹{activeSelectedApp.payment.totalAmount}</span>
                       <PaymentStatus status={getRealtimePaymentBadgeStatus(activeSelectedApp)} size="sm" />
                     </div>
                   </div>
 
-                  {(() => {
-                    const b = getStatusBadge(activeSelectedApp.status);
-                    const Icon = b.icon;
-                    return (
-                      <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border whitespace-nowrap ${b.bg} ${b.text} ${b.border}`}>
-                        <Icon className="w-4 h-4" />
-                        <span>{activeSelectedApp.status}</span>
-                      </span>
-                    );
-                  })()}
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <ApplicationStatusBadge status={activeSelectedApp.status} size="sm" />
+                    <DownloadReceiptButton
+                      application={activeSelectedApp}
+                      businessSettings={businessSettings}
+                      size="sm"
+                    />
+                  </div>
                 </div>
 
                 {/* Detailed Visual Application Status & Lifecycle Progress */}
@@ -2815,14 +2774,21 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                     {invoiceNo}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {matchedApp && (
+                    <DownloadReceiptButton
+                      application={matchedApp}
+                      businessSettings={businessSettings}
+                      size="sm"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => window.print()}
                     className="bg-[#FF671F] hover:bg-[#E55B1B] text-white font-bold px-3.5 py-2 rounded-xl inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>Print / Save PDF</span>
+                    <span>Print Invoice</span>
                   </button>
                   <button
                     type="button"

@@ -210,10 +210,10 @@ export function LibraryBrowser({
 
   return (
     <div className="space-y-8 pb-14">
-      {/* DIP-Desk Light Hero Section matching digitalindiaproject.com */}
-      <section className="bg-white border-b border-slate-200 relative overflow-hidden">
+      {/* DIP-Desk Hero Section matching digitalindiaproject.com */}
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 relative overflow-hidden">
         <div
-          className="absolute inset-x-0 top-0 h-44 pointer-events-none opacity-60"
+          className="absolute inset-x-0 top-0 h-44 pointer-events-none opacity-60 dark:opacity-80"
           style={{
             background:
               'radial-gradient(circle at 15% 20%, rgba(255,103,31,0.08), transparent 45%), radial-gradient(circle at 85% 30%, rgba(19,136,8,0.07), transparent 42%)',
@@ -224,22 +224,22 @@ export function LibraryBrowser({
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <div className="lg:col-span-7 flex flex-col justify-between space-y-5">
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                 <span className="font-semibold text-[#FF671F] uppercase tracking-wider">
                   Digital India Project · Legal Add-on
                 </span>
-                <span aria-hidden="true">·</span>
-                <span className="font-mono-tabular text-slate-500">
+                <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
+                <span className="font-mono-tabular text-slate-500 dark:text-slate-400">
                   {providerStatus?.subdomainHost || 'legal.digitalindiaproject.com'}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-[#202124] leading-[1.15] tracking-tight text-balance">
+              <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-[#202124] dark:text-white leading-[1.15] tracking-tight text-balance">
                 Indian Legal Document Studio, Validation &amp; e-Stamp Desk
               </h1>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                 Draft verified Indian legal instruments from the{' '}
-                <span className="font-mono-tabular font-semibold text-[#202124]">karta-files</span>{' '}
+                <span className="font-mono-tabular font-semibold text-[#202124] dark:text-white">karta-files</span>{' '}
                 archive without altering legal wording. Run automated validation checks, attach or request SHCIL e-Stamps, place visual signatures, and export print-ready DOCX/PDF.
               </p>
             </div>
@@ -255,7 +255,7 @@ export function LibraryBrowser({
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search affidavits, leave & license, Sec 138 notices, GPA, wills, sale deeds, GST..."
                     aria-label="Search legal documents"
-                    className="w-full h-12 pl-11 pr-10 bg-[#F7F8FA] border border-slate-200 rounded-xl text-sm text-[#202124] placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F] transition-colors"
+                    className="w-full h-12 pl-11 pr-10 bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25 focus:border-[#FF671F] transition-colors"
                   />
                   {query && (
                     <button
@@ -266,7 +266,7 @@ export function LibraryBrowser({
                         setPage(1);
                       }}
                       aria-label="Clear template search"
-                      className="absolute right-3 p-1 rounded-md text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-3 p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -289,19 +289,19 @@ export function LibraryBrowser({
 
           {/* Right: Institutional Archive Photo + 4 DIP Service Tiles */}
           <div className="lg:col-span-5 flex flex-col justify-between gap-3">
-            <div className="h-[196px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative shadow-2xs">
+            <div className="h-[196px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 relative shadow-2xs">
               {!heroImgFailed ? (
                 <img
                   src="/assets/images/hero_legal_archive_1794958413624.jpg"
                   alt="Indian legal volumes and drafted documents on a legal desk"
                   referrerPolicy="no-referrer"
                   onError={() => setHeroImgFailed(true)}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover dark:brightness-90"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50">
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950">
                   <FileText className="w-8 h-8 text-[#FF671F] mb-2" />
-                  <p className="text-sm font-semibold text-[#202124]">
+                  <p className="text-sm font-semibold text-[#202124] dark:text-slate-100">
                     Digital India Project Legal Desk
                   </p>
                 </div>
@@ -309,25 +309,25 @@ export function LibraryBrowser({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-              <div className="p-2.5 rounded-xl bg-[#F7F8FA] border border-slate-200 text-[#202124]">
+              <div className="p-2.5 rounded-xl bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#202124] dark:text-slate-100">
                 <BookOpen className="w-3.5 h-3.5 text-[#FF671F] mb-1" />
                 <strong className="block font-semibold">Flippable A4</strong>
-                <span className="text-slate-500">Multi-page sheets</span>
+                <span className="text-slate-500 dark:text-slate-400">Multi-page sheets</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#F7F8FA] border border-slate-200 text-[#202124]">
+              <div className="p-2.5 rounded-xl bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#202124] dark:text-slate-100">
                 <Stamp className="w-3.5 h-3.5 text-[#FF671F] mb-1" />
                 <strong className="block font-semibold">SHCIL e-Stamp</strong>
-                <span className="text-slate-500">Stamp &amp; verify</span>
+                <span className="text-slate-500 dark:text-slate-400">Stamp &amp; verify</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#F7F8FA] border border-slate-200 text-[#202124]">
-                <FileCheck2 className="w-3.5 h-3.5 text-[#138808] mb-1" />
+              <div className="p-2.5 rounded-xl bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#202124] dark:text-slate-100">
+                <FileCheck2 className="w-3.5 h-3.5 text-[#138808] dark:text-emerald-400 mb-1" />
                 <strong className="block font-semibold">Legal Validator</strong>
-                <span className="text-slate-500">BNS &amp; blanks</span>
+                <span className="text-slate-500 dark:text-slate-400">BNS &amp; blanks</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#F7F8FA] border border-slate-200 text-[#202124]">
-                <Scale className="w-3.5 h-3.5 text-[#138808] mb-1" />
+              <div className="p-2.5 rounded-xl bg-[#F7F8FA] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#202124] dark:text-slate-100">
+                <Scale className="w-3.5 h-3.5 text-[#138808] dark:text-emerald-400 mb-1" />
                 <strong className="block font-semibold">Legal Aid</strong>
-                <span className="text-slate-500">Clause guidance</span>
+                <span className="text-slate-500 dark:text-slate-400">Clause guidance</span>
               </div>
             </div>
           </div>
@@ -336,55 +336,55 @@ export function LibraryBrowser({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
         {/* Public Advisory Strip */}
-        <div className="bg-[#FFFDF8] border border-[#F1E8D9] rounded-xl px-4 py-3 text-xs text-slate-700 flex items-start gap-2.5">
+        <div className="bg-[#FFFDF8] dark:bg-amber-950/25 border border-[#F1E8D9] dark:border-amber-900/50 rounded-xl px-4 py-3 text-xs text-slate-700 dark:text-amber-100/90 flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 text-[#FF671F] shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong className="text-[#202124]">Add-on Service Advisory:</strong> Generated drafts preserve legal text for rapid preparation. Documents remain unexecuted drafts until e-stamped via SHCIL / State GRAS, verified by an Advocate, and signed or registered as required by Indian law.
+            <strong className="text-[#202124] dark:text-white">Add-on Service Advisory:</strong> Generated drafts preserve legal text for rapid preparation. Documents remain unexecuted drafts until e-stamped via SHCIL / State GRAS, verified by an Advocate, and signed or registered as required by Indian law.
           </p>
         </div>
 
         {/* Repository Summary Metrics */}
         {report && (
           <section aria-label="Library statistics" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Active Templates
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#202124] font-mono-tabular">
+              <p className="mt-1 text-2xl font-semibold text-[#202124] dark:text-white font-mono-tabular">
                 {report.totalTemplatesCreated.toLocaleString('en-IN')}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 of {report.totalFilesDiscovered.toLocaleString('en-IN')} catalogued records
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#138808]">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#138808] dark:text-emerald-400">
                 Verified Templates
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#138808] font-mono-tabular">
+              <p className="mt-1 text-2xl font-semibold text-[#138808] dark:text-emerald-400 font-mono-tabular">
                 {report.approvedTemplatesCount.toLocaleString('en-IN')}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">Reviewed clauses &amp; mappings</p>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Reviewed clauses &amp; mappings</p>
             </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
               <p className="text-xs font-semibold uppercase tracking-wider text-[#FF671F]">
                 Practice Categories
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#202124] font-mono-tabular">
+              <p className="mt-1 text-2xl font-semibold text-[#202124] dark:text-white font-mono-tabular">
                 {CATEGORY_GROUPS.length}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 {report.rawCategories.length} archive source folders
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
               <p className="text-xs font-semibold uppercase tracking-wider text-[#FF671F]">
                 Export Formats
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#202124] font-mono-tabular">
+              <p className="mt-1 text-2xl font-semibold text-[#202124] dark:text-white font-mono-tabular">
                 DOCX &amp; PDF
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 A4 print-ready with e-Stamp layout
               </p>
             </div>
@@ -393,12 +393,12 @@ export function LibraryBrowser({
 
         {/* Citizen & Legal Practice Categories Directory */}
         <section className="space-y-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-2.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
             <div>
-              <h2 className="text-xl font-display font-bold text-[#202124]">
+              <h2 className="text-xl font-display font-bold text-[#202124] dark:text-white">
                 Citizen &amp; Legal Document Categories
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Select any practice area below to filter templates and open the Document Studio.
               </p>
             </div>
@@ -433,21 +433,21 @@ export function LibraryBrowser({
                   }}
                   className={`text-left rounded-xl border overflow-hidden transition-all flex flex-col justify-between cursor-pointer ${
                     selected
-                      ? 'bg-orange-50/70 border-[#FF671F] ring-2 ring-[#FF671F]/20'
-                      : 'bg-white border-slate-200 hover:border-[#FF671F]/60'
+                      ? 'bg-orange-50/70 dark:bg-orange-950/35 border-[#FF671F] ring-2 ring-[#FF671F]/20'
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-[#FF671F]/60 dark:hover:border-[#FF671F]/70'
                   }`}
                 >
                   <div className="h-1 w-full" style={{ backgroundColor: selected ? '#FF671F' : theme.accentHex }} />
                   <div className="p-3.5 space-y-1.5 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className={`text-xs font-semibold leading-snug ${selected ? 'text-[#FF671F]' : 'text-[#202124]'}`}>
+                      <span className={`text-xs font-semibold leading-snug ${selected ? 'text-[#FF671F]' : 'text-[#202124] dark:text-slate-100'}`}>
                         {grp}
                       </span>
-                      <span className="text-[11px] font-mono-tabular font-semibold text-slate-500 shrink-0">
+                      <span className="text-[11px] font-mono-tabular font-semibold text-slate-500 dark:text-slate-400 shrink-0">
                         {grpMeta ? grpMeta.processed : '—'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
                       {theme.shortDesc}
                     </p>
                   </div>
@@ -458,10 +458,10 @@ export function LibraryBrowser({
         </section>
 
         {/* Filter Toolbar */}
-        <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3.5 shadow-2xs">
+        <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3.5 shadow-2xs">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
-              <div className="inline-flex flex-wrap items-center p-1 bg-slate-100 border border-slate-200 rounded-lg max-w-full">
+              <div className="inline-flex flex-wrap items-center p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg max-w-full">
                 {REVIEW_FILTERS.map((rf) => (
                   <button
                     key={rf.value}
@@ -473,7 +473,7 @@ export function LibraryBrowser({
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       reviewStatus === rf.value
                         ? 'bg-[#FF671F] text-white shadow-2xs'
-                        : 'text-slate-600 hover:text-[#202124]'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-[#202124] dark:hover:text-white'
                     }`}
                   >
                     {rf.label}
@@ -488,7 +488,7 @@ export function LibraryBrowser({
                   setPage(1);
                 }}
                 aria-label="Filter by source format"
-                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] w-full sm:w-auto min-w-[140px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="h-9 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-[#202124] dark:text-slate-100 w-full sm:w-auto min-w-[140px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               >
                 {FORMAT_FILTERS.map((ff) => (
                   <option key={ff.value} value={ff.value}>
@@ -504,7 +504,7 @@ export function LibraryBrowser({
                   setPage(1);
                 }}
                 aria-label="Filter by repository folder category"
-                className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-[#202124] w-full sm:w-auto min-w-[180px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
+                className="h-9 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-[#202124] dark:text-slate-100 w-full sm:w-auto min-w-[180px] max-w-full focus:outline-none focus:ring-2 focus:ring-[#FF671F]/25"
               >
                 <option value="all">All Source Folders ({rawCategoriesForGroup.length})</option>
                 {rawCategoriesForGroup.map((rc) => (
@@ -525,7 +525,7 @@ export function LibraryBrowser({
                   Clear filters
                 </button>
               )}
-              <p className="text-xs text-slate-500 font-mono-tabular whitespace-nowrap shrink-0">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono-tabular whitespace-nowrap shrink-0">
                 Showing {items.length} of {total.toLocaleString('en-IN')} templates
               </p>
             </div>
@@ -536,9 +536,9 @@ export function LibraryBrowser({
             <div
               role="group"
               aria-label="Filter templates by tag"
-              className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2"
+              className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2"
             >
-              <span className="text-xs font-semibold text-slate-500 mr-1 whitespace-nowrap shrink-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1 whitespace-nowrap shrink-0">
                 Tags:
               </span>
               <button
@@ -550,8 +550,8 @@ export function LibraryBrowser({
                 }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedTag === 'all'
-                    ? 'bg-[#202124] text-white border-[#202124]'
-                    : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
+                    ? 'bg-[#202124] dark:bg-white text-white dark:text-slate-950 border-[#202124] dark:border-white'
+                    : 'bg-[#F7F8FA] dark:bg-slate-800 text-[#202124] dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#FF671F] hover:text-[#FF671F]'
                 }`}
               >
                 <span>All Tags</span>
@@ -570,14 +570,14 @@ export function LibraryBrowser({
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       active
                         ? 'bg-[#FF671F] text-white border-[#FF671F]'
-                        : 'bg-[#F7F8FA] text-[#202124] border-slate-200 hover:border-[#FF671F] hover:text-[#FF671F]'
+                        : 'bg-[#F7F8FA] dark:bg-slate-800 text-[#202124] dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#FF671F] hover:text-[#FF671F]'
                     }`}
                   >
                     <span>{tag}</span>
                     {count > 0 && (
                       <span
                         className={`font-mono-tabular text-[11px] ${
-                          active ? 'text-white/90' : 'text-slate-500'
+                          active ? 'text-white/90' : 'text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         {count.toLocaleString('en-IN')}
@@ -593,7 +593,7 @@ export function LibraryBrowser({
         {/* Results Grid */}
         <section aria-live="polite">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 flex items-center gap-2">
+            <div className="p-4 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800 rounded-xl text-sm text-red-800 dark:text-rose-200 flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -604,22 +604,22 @@ export function LibraryBrowser({
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-44 bg-white border border-slate-200 rounded-xl p-5 animate-pulse"
+                  className="h-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 animate-pulse"
                 />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-10 sm:p-12 text-center space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200 text-[#FF671F] flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-10 sm:p-12 text-center space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800 text-[#FF671F] flex items-center justify-center mx-auto">
                 <Search className="w-5 h-5" />
               </div>
               <div className="space-y-1.5 max-w-md mx-auto">
-                <p className="text-base font-semibold text-[#202124]">
+                <p className="text-base font-semibold text-[#202124] dark:text-white">
                   {query.trim()
                     ? `No matching templates found for "${query.trim()}"`
                     : 'No matching legal templates found'}
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {selectedTag !== 'all' || categoryGroup !== 'all'
                     ? 'No templates matched the active search and category filter combination. Try clearing your search query or switching back to All Categories.'
                     : 'Try searching by document title or tag (e.g., Affidavit, Business, Personal, Property, NDA, GST).'}
@@ -634,7 +634,7 @@ export function LibraryBrowser({
                       setDebouncedQuery('');
                       setPage(1);
                     }}
-                    className="px-4 py-2 text-xs font-semibold text-[#202124] bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-[#202124] dark:text-slate-100 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     Clear Search Query
                   </button>
@@ -646,7 +646,7 @@ export function LibraryBrowser({
                       setSelectedTag('all');
                       setPage(1);
                     }}
-                    className="px-4 py-2 text-xs font-semibold text-[#202124] bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-[#202124] dark:text-slate-100 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     All Categories
                   </button>
@@ -665,8 +665,8 @@ export function LibraryBrowser({
               {items.map((tpl) => {
                 const theme = CATEGORY_THEMES[tpl.categoryGroup] || {
                   accentHex: '#FF671F',
-                  softBgClass: 'bg-orange-50',
-                  borderClass: 'border-orange-200',
+                  softBgClass: 'bg-orange-50 dark:bg-orange-950/40',
+                  borderClass: 'border-orange-200 dark:border-orange-800',
                   textClass: 'text-[#FF671F]',
                   shortDesc: '',
                 };
@@ -675,13 +675,13 @@ export function LibraryBrowser({
                     key={tpl.id}
                     type="button"
                     onClick={() => onSelectTemplate(tpl.id)}
-                    className="group text-left bg-white border border-slate-200 hover:border-[#FF671F] rounded-xl overflow-hidden flex flex-col justify-between transition-all shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF671F] cursor-pointer"
+                    className="group text-left bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-[#FF671F] dark:hover:border-[#FF671F] rounded-xl overflow-hidden flex flex-col justify-between transition-all shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF671F] cursor-pointer"
                   >
                     <div className="h-1 w-full" style={{ backgroundColor: theme.accentHex }} />
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                       <div className="space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
-                          <span className="font-semibold text-[#202124]">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                          <span className="font-semibold text-[#202124] dark:text-slate-200">
                             {tpl.rawCategory}
                           </span>
                           <span aria-hidden="true">·</span>
@@ -692,24 +692,24 @@ export function LibraryBrowser({
                           <span
                             className={
                               tpl.reviewStatus === 'approved'
-                                ? 'text-[#138808] font-semibold'
-                                : 'text-amber-700'
+                                ? 'text-[#138808] dark:text-emerald-400 font-semibold'
+                                : 'text-amber-700 dark:text-amber-400'
                             }
                           >
                             {tpl.reviewStatus === 'approved' ? 'Verified' : 'Needs Review'}
                           </span>
                         </div>
 
-                        <h3 className="text-base font-display font-bold text-[#202124] group-hover:text-[#FF671F] leading-snug line-clamp-2 transition-colors">
+                        <h3 className="text-base font-display font-bold text-[#202124] dark:text-white group-hover:text-[#FF671F] leading-snug line-clamp-2 transition-colors">
                           {tpl.title}
                         </h3>
 
-                        <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
                           {tpl.description}
                         </p>
 
                         {tpl.tags && tpl.tags.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500 pt-0.5">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                             {tpl.tags.slice(0, 4).map((t, idx) => (
                               <span key={t} className="inline-flex items-center gap-2">
                                 {idx > 0 && <span aria-hidden="true">·</span>}
@@ -718,8 +718,8 @@ export function LibraryBrowser({
                                     t === 'Popular'
                                       ? 'font-semibold text-[#FF671F]'
                                       : t === 'New'
-                                      ? 'font-semibold text-[#138808]'
-                                      : 'text-slate-600 font-medium'
+                                      ? 'font-semibold text-[#138808] dark:text-emerald-400'
+                                      : 'text-slate-600 dark:text-slate-300 font-medium'
                                   }
                                 >
                                   {t}
@@ -730,8 +730,8 @@ export function LibraryBrowser({
                         )}
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="text-slate-500 font-mono-tabular">
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                        <span className="text-slate-500 dark:text-slate-400 font-mono-tabular">
                           {tpl.fieldCount} fields · v{tpl.version}
                           {tpl.isReconstructedFromPdf ? ' · PDF' : ''}
                         </span>
@@ -749,8 +749,8 @@ export function LibraryBrowser({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
-              <span className="text-xs text-slate-500 font-mono-tabular">
+            <div className="mt-8 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-5">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono-tabular">
                 Page {page} of {totalPages}
               </span>
               <div className="flex items-center gap-2">
@@ -758,7 +758,7 @@ export function LibraryBrowser({
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white border border-slate-200 rounded-lg text-[#202124] disabled:opacity-40 hover:border-[#FF671F] cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 disabled:opacity-40 hover:border-[#FF671F] cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Previous
@@ -767,7 +767,7 @@ export function LibraryBrowser({
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white border border-slate-200 rounded-lg text-[#202124] disabled:opacity-40 hover:border-[#FF671F] cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 disabled:opacity-40 hover:border-[#FF671F] cursor-pointer"
                 >
                   Next
                   <ChevronRight className="w-3.5 h-3.5" />

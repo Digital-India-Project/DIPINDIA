@@ -106,55 +106,55 @@ export function SignaturePad({ value, onChange }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg text-xs text-[#92400E] flex items-start gap-2">
-        <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-[#B45309]" />
+      <div className="p-3 bg-[#FFFBEB] dark:bg-amber-950/35 border border-[#FDE68A] dark:border-amber-800/60 rounded-lg text-xs text-[#92400E] dark:text-amber-200 flex items-start gap-2">
+        <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-[#B45309] dark:text-amber-400" />
         <div>
-          <strong className="text-[#78350F]">Draft Visual Signature Only (Not Aadhaar e-Sign / DSC):</strong>{' '}
+          <strong className="text-[#78350F] dark:text-amber-300">Draft Visual Signature Only (Not Aadhaar e-Sign / DSC):</strong>{' '}
           Aadhaar e-Sign / DSC APIs are not configured. Capturing a signature embeds a visual placeholder into your exported DOCX/PDF; execute final documents via wet ink or a licensed CCA e-Sign ESP.
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
         <div>
-          <label className="block font-medium text-[#202124] mb-1">Executant / Signer Name</label>
+          <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Executant / Signer Name</label>
           <input
             type="text"
             value={value.signerName}
             onChange={(e) => onChange({ ...value, signerName: e.target.value })}
             placeholder="Full legal name"
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
         <div>
-          <label className="block font-medium text-[#202124] mb-1">Signer Role</label>
+          <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Signer Role</label>
           <input
             type="text"
             value={value.signerRole}
             onChange={(e) => onChange({ ...value, signerRole: e.target.value })}
             placeholder="e.g., Deponent / Licensor / Executant"
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
         <div>
-          <label className="block font-medium text-[#202124] mb-1">Place of Signing</label>
+          <label className="block font-medium text-[#202124] dark:text-slate-200 mb-1">Place of Signing</label>
           <input
             type="text"
             value={value.signedAtPlace}
             onChange={(e) => onChange({ ...value, signedAtPlace: e.target.value })}
             placeholder="e.g., Silvassa / Bengaluru"
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <div className="inline-flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200">
+          <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setMode('draw')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md ${
-                mode === 'draw' ? 'bg-white text-[#202124] shadow-2xs' : 'text-slate-600'
+              className={`px-3 py-1 text-xs font-semibold rounded-md cursor-pointer ${
+                mode === 'draw' ? 'bg-white dark:bg-slate-800 text-[#202124] dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-[#202124] dark:hover:text-slate-200'
               }`}
             >
               Draw Signature
@@ -162,8 +162,8 @@ export function SignaturePad({ value, onChange }: Props) {
             <button
               type="button"
               onClick={() => setMode('type')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md ${
-                mode === 'type' ? 'bg-white text-[#202124] shadow-2xs' : 'text-slate-600'
+              className={`px-3 py-1 text-xs font-semibold rounded-md cursor-pointer ${
+                mode === 'type' ? 'bg-white dark:bg-slate-800 text-[#202124] dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-[#202124] dark:hover:text-slate-200'
               }`}
             >
               Type Signature
@@ -181,7 +181,7 @@ export function SignaturePad({ value, onChange }: Props) {
         </div>
 
         {mode === 'draw' ? (
-          <div className="bg-white border border-slate-200 rounded-xl p-2">
+          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2">
             <canvas
               ref={canvasRef}
               width={480}
@@ -190,9 +190,9 @@ export function SignaturePad({ value, onChange }: Props) {
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
               onPointerLeave={handlePointerUp}
-              className="w-full h-28 bg-[#F7F8FA] rounded-lg border border-dashed border-slate-300 touch-none cursor-crosshair"
+              className="w-full h-28 bg-[#F7F8FA] rounded-lg border border-dashed border-slate-300 dark:border-slate-600 touch-none cursor-crosshair"
             />
-            <p className="mt-1.5 text-[11px] text-slate-500 flex items-center gap-1">
+            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <PenTool className="w-3 h-3" />
               Draw inside the box above with mouse, trackpad, or touch.
             </p>
@@ -204,10 +204,10 @@ export function SignaturePad({ value, onChange }: Props) {
               value={typedText}
               onChange={(e) => generateTypedSignaturePng(e.target.value)}
               placeholder="Type your name to render signature..."
-              className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-lg text-[#202124]"
+              className="w-full h-10 px-3 text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
             {value.signatureDataUrl && (
-              <div className="p-2 bg-white border border-slate-200 rounded-lg inline-block">
+              <div className="p-2 bg-white border border-slate-200 dark:border-slate-700 rounded-lg inline-block">
                 <img
                   src={value.signatureDataUrl}
                   alt="Generated draft signature preview"
@@ -221,23 +221,23 @@ export function SignaturePad({ value, onChange }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
         <div>
-          <label className="block font-medium text-slate-700 mb-1">Witness 1 Name (Optional)</label>
+          <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">Witness 1 Name (Optional)</label>
           <input
             type="text"
             value={value.witness1Name || ''}
             onChange={(e) => onChange({ ...value, witness1Name: e.target.value })}
             placeholder="Independent Witness 1 full name"
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
         <div>
-          <label className="block font-medium text-slate-700 mb-1">Witness 2 Name (Optional)</label>
+          <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">Witness 2 Name (Optional)</label>
           <input
             type="text"
             value={value.witness2Name || ''}
             onChange={(e) => onChange({ ...value, witness2Name: e.target.value })}
             placeholder="Independent Witness 2 full name"
-            className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-[#202124]"
+            className="w-full h-9 px-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[#202124] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
       </div>

@@ -2,9 +2,17 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { Application, ApplicationStatus } from '../../types';
-import { computeSlaHoursRemaining } from '../../lib/workflow';
+import { computeSlaHoursRemaining, resolveApplicationVisualState } from '../../lib/workflow';
 import { isSuperAdminRole, normalizeRole } from '../../lib/rbac';
 import { SwipeableActionItem } from '../../components/common/SwipeableActionItem';
+import { ApplicationStatusBadge } from '../../components/dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../../components/dashboard/DownloadReceiptButton';
+import { InlineSkeletonPulse } from '../../components/common/SkeletonLoaders';
+const RevenueChart = React.lazy(() =>
+  import('../../components/charts/RevenueChart').then((m) => ({
+    default: m.RevenueChart,
+  }))
+);
 import {
   Shield,
   Users,
@@ -35,9 +43,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const { user, can } = useAuth();
   const {
     applications,
+    transactions,
     operatorEnrollments,
     partners,
     tickets,
+    businessSettings,
     assignOperator,
     bulkAssignOperator,
     updateApplicationStatus,
@@ -229,6 +239,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         </div>
       </div>
 
+      {/* Daily Application Submissions & Payment Revenue Trends */}
+      <React.Suspense fallback={<InlineSkeletonPulse className="h-72 w-full rounded-2xl" />}>
+        <RevenueChart applications={applications} transactions={transactions} />
+      </React.Suspense>
+
       {actionBanner && (
         <div
           className={`p-3 rounded-xl text-xs font-semibold border flex items-center gap-2 ${
@@ -343,10 +358,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
                             app.status === 'Completed'
-                              ? 'bg-emerald-50 text-[#138808]'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-[#138808] dark:text-emerald-300'
                               : sla.isOverdue
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-amber-50 text-amber-800'
+                              ? 'bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300'
+                              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
                           }`}
                         >
                           {app.status === 'Completed' ? 'Closed' : sla.label}
@@ -355,16 +370,21 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       <div>
                         <div className="font-bold text-slate-900 dark:text-white">{app.serviceName}</div>
                         <div className="text-[11px] text-slate-500">
-                          {app.userName} · {app.userMobile}
+                          {app.userName} · {app.userMobile} · Stage: {resolveApplicationVisualState(app.status).stageLabel}
                         </div>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[10px]">
-                          {app.status}
-                        </span>
-                        <span className="text-slate-500">
-                          Officer: <strong className="text-slate-700 dark:text-slate-300">{app.assignedOperatorName || 'Unassigned'}</strong>
-                        </span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] pt-1">
+                        <div className="flex items-center gap-2">
+                          <ApplicationStatusBadge status={app.status} size="xs" />
+                          <span className="text-slate-500">
+                            Officer: <strong className="text-slate-700 dark:text-slate-300">{app.assignedOperatorName || 'Unassigned'}</strong>
+                          </span>
+                        </div>
+                        <DownloadReceiptButton
+                          application={app}
+                          businessSettings={businessSettings}
+                          size="xs"
+                        />
                       </div>
                     </div>
                   </SwipeableActionItem>
@@ -399,13 +419,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       <td className="p-3.5">
                         <div className="font-bold text-slate-900 dark:text-white">{app.serviceName}</div>
                         <div className="text-[11px] text-slate-500">
-                          {app.userName} · {app.userMobile}
+                          {app.userName} · {app.userMobile} · Stage: {resolveApplicationVisualState(app.status).stageLabel}
                         </div>
                       </td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[11px]">
-                          {app.status}
-                        </span>
+                        <ApplicationStatusBadge status={app.status} size="xs" />
                       </td>
                       <td className="p-3.5 text-slate-600 dark:text-slate-300">
                         {app.assignedOperatorName || (
@@ -416,25 +434,32 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                         <span
                           className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                             app.status === 'Completed'
-                              ? 'bg-emerald-50 text-[#138808]'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-[#138808] dark:text-emerald-300'
                               : sla.isOverdue
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-amber-50 text-amber-800'
+                              ? 'bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300'
+                              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
                           }`}
                         >
                           {app.status === 'Completed' ? 'Closed' : sla.label}
                         </span>
                       </td>
                       <td className="p-3.5 text-right">
-                        {!['Completed', 'Cancelled', 'Rejected'].includes(app.status) && (
-                          <button
-                            type="button"
-                            onClick={() => handleEscalateCorrection(app)}
-                            className="text-[11px] font-bold text-[#FF671F] hover:underline cursor-pointer"
-                          >
-                            Request Correction
-                          </button>
-                        )}
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <DownloadReceiptButton
+                            application={app}
+                            businessSettings={businessSettings}
+                            size="xs"
+                          />
+                          {!['Completed', 'Cancelled', 'Rejected'].includes(app.status) && (
+                            <button
+                              type="button"
+                              onClick={() => handleEscalateCorrection(app)}
+                              className="text-[11px] font-bold text-[#FF671F] hover:underline cursor-pointer whitespace-nowrap"
+                            >
+                              Request Correction
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -532,8 +557,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     }
                   >
                     <div className="p-4 cursor-pointer flex items-start justify-between gap-3 text-xs">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -545,12 +570,18 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                         </div>
                         <div className="text-[11px] text-slate-500 pl-5">
                           Applicant: {app.userName} · Current Officer:{' '}
-                          <strong>{app.assignedOperatorName || 'Unassigned'}</strong>
+                          <strong>{app.assignedOperatorName || 'Unassigned'}</strong> · Stage:{' '}
+                          {resolveApplicationVisualState(app.status).stageLabel}
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        {app.status}
-                      </span>
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <ApplicationStatusBadge status={app.status} size="xs" />
+                        <DownloadReceiptButton
+                          application={app}
+                          businessSettings={businessSettings}
+                          size="xs"
+                        />
+                      </div>
                     </div>
                   </SwipeableActionItem>
                 );

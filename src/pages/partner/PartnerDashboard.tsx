@@ -4,7 +4,10 @@ import { useData } from '../../context/DataContext';
 import { PartnerType, Service } from '../../types';
 import { formatINRFromPaise } from '../../lib/finance';
 import { normalizeRole } from '../../lib/rbac';
+import { resolveApplicationVisualState } from '../../lib/workflow';
 import { SwipeableActionItem } from '../../components/common/SwipeableActionItem';
+import { ApplicationStatusBadge } from '../../components/dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../../components/dashboard/DownloadReceiptButton';
 import {
   Handshake,
   Copy,
@@ -45,6 +48,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
     commissionLedger,
     settlementRequests,
     notifications,
+    businessSettings,
     registerPartner,
     addPartnerCustomer,
     requestPartnerSettlement,
@@ -631,19 +635,26 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
                       },
                     }}
                   >
-                    <div className="p-4 space-y-1.5">
+                    <div className="p-4 space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono font-bold text-[#FF671F]">{a.id}</span>
-                        <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-bold text-[10px]">
-                          {a.status}
-                        </span>
+                        <ApplicationStatusBadge status={a.status} size="xs" />
                       </div>
                       <div className="font-bold text-slate-900 dark:text-white">{a.serviceName}</div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-500">
-                        <span>Applicant: {a.userName}</span>
-                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                          ₹{a.payment.totalAmount}
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                        <span>
+                          Applicant: {a.userName} · Stage: {resolveApplicationVisualState(a.status).stageLabel}
                         </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                            ₹{a.payment.totalAmount}
+                          </span>
+                          <DownloadReceiptButton
+                            application={a}
+                            businessSettings={businessSettings}
+                            size="xs"
+                          />
+                        </div>
                       </div>
                     </div>
                   </SwipeableActionItem>
@@ -651,7 +662,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
               </div>
 
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full min-w-[600px] text-left tabular-nums">
+                <table className="w-full min-w-[680px] text-left tabular-nums">
                   <thead className="bg-slate-50 dark:bg-slate-800/60 text-[10px] uppercase font-bold text-slate-500">
                     <tr>
                       <th className="p-3.5">Application ID</th>
@@ -659,16 +670,31 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({
                       <th className="p-3.5">Service</th>
                       <th className="p-3.5">Status</th>
                       <th className="p-3.5">Amount</th>
+                      <th className="p-3.5 text-right">Receipt</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {myPartnerApps.map((a) => (
-                      <tr key={a.id}>
+                      <tr key={a.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
                         <td className="p-3.5 font-mono font-bold text-[#FF671F]">{a.id}</td>
                         <td className="p-3.5 font-semibold text-slate-900 dark:text-white">{a.userName}</td>
-                        <td className="p-3.5">{a.serviceName}</td>
-                        <td className="p-3.5 font-bold">{a.status}</td>
+                        <td className="p-3.5">
+                          <div>{a.serviceName}</div>
+                          <div className="text-[10px] text-slate-500">
+                            Stage: {resolveApplicationVisualState(a.status).stageLabel}
+                          </div>
+                        </td>
+                        <td className="p-3.5">
+                          <ApplicationStatusBadge status={a.status} size="xs" />
+                        </td>
                         <td className="p-3.5 font-mono">₹{a.payment.totalAmount}</td>
+                        <td className="p-3.5 text-right">
+                          <DownloadReceiptButton
+                            application={a}
+                            businessSettings={businessSettings}
+                            size="xs"
+                          />
+                        </td>
                       </tr>
                     ))}
                   </tbody>

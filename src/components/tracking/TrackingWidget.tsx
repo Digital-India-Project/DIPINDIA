@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { Application, ApplicationStatus } from '../../types';
+import { Application } from '../../types';
 import { issueSignedFileDownloadUrl, uploadFileToR2 } from '../../services/backendApi';
 import {
   Search,
-  CheckCircle2,
   Clock,
   AlertTriangle,
   FileText,
@@ -15,6 +14,9 @@ import {
 import { InlineSkeletonPulse, TrackingResultSkeleton } from '../common/SkeletonLoaders';
 import { trackInteraction } from '../../lib/perfMonitor';
 import { openExternalSafeUrl } from '../../lib/navigationController';
+import { ApplicationStatusBadge } from '../dashboard/ApplicationStatusBadge';
+import { DownloadReceiptButton } from '../dashboard/DownloadReceiptButton';
+import { resolveApplicationVisualState } from '../../lib/workflow';
 
 interface TrackingWidgetProps {
   initialAppId?: string;
@@ -22,7 +24,7 @@ interface TrackingWidgetProps {
 }
 
 export const TrackingWidget: React.FC<TrackingWidgetProps> = ({ initialAppId = '', onNavigateToApply }) => {
-  const { trackApplication, uploadAdditionalDocument } = useData();
+  const { trackApplication, uploadAdditionalDocument, businessSettings } = useData();
   const [appId, setAppId] = useState(initialAppId);
   const [contact, setContact] = useState('');
   const [loading, setLoading] = useState(false);
@@ -113,23 +115,6 @@ export const TrackingWidget: React.FC<TrackingWidgetProps> = ({ initialAppId = '
       setUploadError(err?.message || 'Document upload failed.');
     } finally {
       setUploadSubmitting(false);
-    }
-  };
-
-  const getStatusBadge = (status: ApplicationStatus) => {
-    switch (status) {
-      case 'Completed':
-        return { bg: 'bg-[#EAF7EC]', text: 'text-[#138808]', border: 'border-[#138808]/20', icon: CheckCircle2 };
-      case 'Application Processing':
-      case 'Submitted to External Authority':
-        return { bg: 'bg-[#FFF5EE]', text: 'text-[#FF671F]', border: 'border-[#FF671F]/30', icon: Clock };
-      case 'Documents Required':
-        return { bg: 'bg-[#FEF2F2]', text: 'text-[#E53935]', border: 'border-[#E53935]/30', icon: AlertTriangle };
-      case 'Document Verification':
-      case 'Under Review':
-        return { bg: 'bg-[#FFFBEB]', text: 'text-[#D97706]', border: 'border-[#FFC928]/40', icon: Clock };
-      default:
-        return { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200', icon: Clock };
     }
   };
 
@@ -235,25 +220,25 @@ export const TrackingWidget: React.FC<TrackingWidgetProps> = ({ initialAppId = '
                   <span className="text-slate-400">·</span>
                   <span className="text-xs font-semibold text-slate-800">{application.serviceName}</span>
                 </div>
-                <div className="text-xs text-slate-500 flex flex-wrap items-center gap-3">
+                <div className="text-xs text-slate-500 flex flex-wrap items-center gap-2.5 tabular-nums">
                   <span>Applicant: <strong className="text-slate-700">{application.userName}</strong></span>
+                  <span aria-hidden="true">·</span>
                   <span>Submitted: <strong className="text-slate-700">{new Date(application.submissionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
-                  <span>Payment: <strong className="text-[#138808]">Paid (₹{application.payment.totalAmount})</strong></span>
+                  <span aria-hidden="true">·</span>
+                  <span>Stage: <strong className="text-slate-700">{resolveApplicationVisualState(application.status).stageLabel}</strong></span>
+                  <span aria-hidden="true">·</span>
+                  <span>Payment: <strong className="text-[#138808]">₹{application.payment.totalAmount}</strong></span>
                 </div>
               </div>
 
-              {/* Status Badge */}
-              <div>
-                {(() => {
-                  const b = getStatusBadge(application.status);
-                  const Icon = b.icon;
-                  return (
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold ${b.bg} ${b.text} ${b.border}`}>
-                      <Icon className="w-3.5 h-3.5" />
-                      <span>{application.status}</span>
-                    </div>
-                  );
-                })()}
+              {/* Status Badge & Printable PDF Receipt */}
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <ApplicationStatusBadge status={application.status} size="sm" />
+                <DownloadReceiptButton
+                  application={application}
+                  businessSettings={businessSettings}
+                  size="sm"
+                />
               </div>
             </div>
 
