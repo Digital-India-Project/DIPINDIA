@@ -8,6 +8,7 @@ import {
   syncCatalogueToJustPostgres,
   type JustPostgresStatusResponse,
 } from '../../services/backendApi';
+import { checkAndRunPostgresMigrationsOnStartup } from '../../lib/dbMigrations';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -60,12 +61,21 @@ export const PostgresDbConsole: React.FC = () => {
     setErrorMsg(null);
     setStatusMsg(null);
     try {
+      const autoRes = await checkAndRunPostgresMigrationsOnStartup({
+        force: true,
+        isAdminSession: true,
+      });
+      if (autoRes.ok) {
+        setStatusMsg(autoRes.message || 'JustPostgreSQL check-and-run migration completed cleanly.');
+        await loadStatus();
+        return;
+      }
       const res = await runJustPostgresMigration();
       if (res.ok) {
         setStatusMsg(res.message || 'PostgreSQL schema migration executed cleanly.');
         await loadStatus();
       } else {
-        setErrorMsg(res.message || 'Schema migration failed.');
+        setErrorMsg(autoRes.message || res.message || 'Schema migration failed.');
       }
     } catch (err: any) {
       setErrorMsg(err?.message || 'Unable to run PostgreSQL schema migration.');

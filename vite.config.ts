@@ -15,6 +15,14 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/',
     publicDir: 'public',
+    define: {
+      'process.env.JUSTPOSTGRES_REST_URL': JSON.stringify(
+        env.JUSTPOSTGRES_REST_URL || env.VITE_JUSTPOSTGRES_REST_URL || process.env.JUSTPOSTGRES_REST_URL || ''
+      ),
+      'process.env.JUSTPOSTGRES_ANON_KEY': JSON.stringify(
+        env.JUSTPOSTGRES_ANON_KEY || env.VITE_JUSTPOSTGRES_ANON_KEY || process.env.JUSTPOSTGRES_ANON_KEY || ''
+      ),
+    },
     plugins: [
       react(),
       tailwindcss(),

@@ -20,6 +20,7 @@ export const JUSTPOSTGRES_TABLES = [
   'api_sathi_verifications',
   'audit_logs',
   'backups',
+  'schema_migrations',
 ] as const;
 
 export type JustPostgresTable = (typeof JUSTPOSTGRES_TABLES)[number];

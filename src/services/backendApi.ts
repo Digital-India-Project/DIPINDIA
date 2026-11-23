@@ -1448,3 +1448,19 @@ export async function exportJustPostgresBackup() {
   }>('/api/admin/postgres/export-json', { method: 'GET' });
 }
 
+export async function ensureJustPostgresMigrated(params?: {
+  coreOnly?: boolean;
+  forceSeed?: boolean;
+}) {
+  return apiRequest<{
+    ok: boolean;
+    initialized: boolean;
+    appliedMigrations: string[];
+    collections: Record<string, { table: string; exists: boolean; rowCount: number; seededCount: number; note: string }>;
+    message: string;
+  }>('/api/admin/postgres/ensure-migrated', {
+    method: 'POST',
+    body: JSON.stringify(params || {}),
+  });
+}
+

@@ -16,6 +16,7 @@ import { useVoiceCommands } from './hooks/useVoiceCommands';
 import { flushOfflineQueue } from './lib/offlineQueue';
 import { initializeWorkspaceIfEmpty } from './lib/legacySeeds';
 import { ensureActiveDatabasePopulatedIfEmpty } from './lib/firestoreRecreate';
+import { checkAndRunPostgresMigrationsOnStartup } from './lib/dbMigrations';
 import { auth, db } from './services/firebase';
 import {
   captureInitialNavigationTiming,
@@ -317,8 +318,13 @@ function MainApp() {
   }, [isOnline, user?.id]);
 
   useEffect(() => {
+    void checkAndRunPostgresMigrationsOnStartup().catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (authLoading || !user?.id || !auth.currentUser?.uid) return;
     if (isSuperAdminRole(user.role) && auth.currentUser.emailVerified) {
+      void checkAndRunPostgresMigrationsOnStartup({ isAdminSession: true }).catch(() => {});
       void ensureActiveDatabasePopulatedIfEmpty({
         user,
         businessSettings,

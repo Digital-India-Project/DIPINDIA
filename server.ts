@@ -75,6 +75,7 @@ import {
   probeJustPostgresStatus,
   resolveJustPostgresConfig,
   runSqlSchemaMigrationDirect,
+  upsertJustPostgresRows,
 } from './server/postgres/justPostgresClient';
 import {
   exportAllJustPostgresData,
@@ -2577,6 +2578,262 @@ app.get('/api/integrations/status', (_req, res) => {
   );
 });
 
+// Browser-safe JustPostgreSQL anon client configuration & non-PII migration status
+const CORE_PG_TABLES = ['users', 'services', 'applications', 'business_settings'] as const;
+
+let cachedMigrationStatus: { expiresAt: number; payload: any } | null = null;
+
+function buildCoreCollectionsReport(
+  tableStats: Array<{ table: string; rowCount: number; exists: boolean; error?: string }>,
+  seededCounts?: Partial<Record<(typeof CORE_PG_TABLES)[number], number>>
+) {
+  const byName = new Map(tableStats.map((t) => [t.table, t]));
+  const result = {} as Record<
+    (typeof CORE_PG_TABLES)[number],
+    {
+      table: (typeof CORE_PG_TABLES)[number];
+      exists: boolean;
+      rowCount: number;
+      seededCount: number;
+      note: string;
+    }
+  >;
+
+  for (const table of CORE_PG_TABLES) {
+    const stat = byName.get(table);
+    const exists = Boolean(stat?.exists);
+    const rowCount = Number(stat?.rowCount || 0);
+    const seededCount = Number(seededCounts?.[table] || 0);
+    result[table] = {
+      table,
+      exists,
+      rowCount,
+      seededCount,
+      note: exists
+        ? rowCount > 0
+          ? `Ready (${rowCount} records)`
+          : table === 'applications'
+          ? 'Schema ready (0 citizen filings yet)'
+          : 'Table exists (awaiting initial documents)'
+        : stat?.error || 'Table missing',
+    };
+  }
+  return result;
+}
+
+async function computePostgresMigrationStatusSnapshot(forceFresh = false) {
+  const now = Date.now();
+  if (!forceFresh && cachedMigrationStatus && cachedMigrationStatus.expiresAt > now) {
+    return cachedMigrationStatus.payload;
+  }
+
+  const probe = await probeJustPostgresStatus(process.env);
+  const byName = new Map(probe.tableStats.map((t) => [t.table, t]));
+  const collections = buildCoreCollectionsReport(probe.tableStats);
+
+  const missingTables = CORE_PG_TABLES.filter((t) => !collections[t].exists);
+  const unseededTables = (['users', 'services', 'business_settings'] as const).filter(
+    (t) => collections[t].exists && collections[t].rowCount === 0
+  );
+  const schemaMigrationsStat = byName.get('schema_migrations');
+  const initialized =
+    probe.configured &&
+    probe.healthState === 'connected' &&
+    missingTables.length === 0 &&
+    unseededTables.length === 0;
+
+  const payload = {
+    configured: probe.configured,
+    directPgConfigured: probe.directPgConfigured,
+    restConfigured: probe.restConfigured,
+    hasAnonKey: probe.hasAnonKey,
+    endpointHost: probe.endpointHost,
+    transportMode: probe.transportMode,
+    healthState: probe.healthState,
+    initialized,
+    needsMigration: probe.configured && !initialized,
+    missingTables,
+    unseededTables,
+    schemaMigrationsReady: Boolean(schemaMigrationsStat?.exists),
+    appliedVersionsCount: Number(schemaMigrationsStat?.rowCount || 0),
+    collections,
+    message: probe.message,
+    checkedAt: probe.checkedAt,
+  };
+
+  cachedMigrationStatus = {
+    expiresAt: now + 15_000,
+    payload,
+  };
+  return payload;
+}
+
+async function ensureJustPostgresCoreMigrated(params: {
+  actorUid: string;
+  actorEmail: string;
+  coreOnly?: boolean;
+  forceSeed?: boolean;
+}) {
+  cachedMigrationStatus = null;
+  let status = await probeJustPostgresStatus(process.env);
+  if (!status.configured) {
+    return {
+      ok: false,
+      initialized: false,
+      appliedMigrations: [] as string[],
+      collections: buildCoreCollectionsReport(status.tableStats),
+      message: status.message,
+      status,
+    };
+  }
+
+  const appliedMigrations: string[] = [];
+  const byName = new Map<string, (typeof status.tableStats)[number]>(
+    status.tableStats.map((t) => [t.table, t])
+  );
+  const hasMissingStructure = [...CORE_PG_TABLES, 'admins', 'schema_migrations'].some(
+    (t) => !byName.get(t)?.exists
+  );
+
+  if (hasMissingStructure && status.directPgConfigured) {
+    await runSqlSchemaMigrationDirect(readPostgresSchemaSql(), process.env);
+    appliedMigrations.push('0001_justpostgres_schema', '0002_justpostgres_init_core');
+    status = await probeJustPostgresStatus(process.env);
+  }
+
+  const refreshedMap = new Map(status.tableStats.map((t) => [t.table, t]));
+  const coreTablesReady = CORE_PG_TABLES.every((t) => Boolean(refreshedMap.get(t)?.exists));
+
+  if (!coreTablesReady) {
+    return {
+      ok: false,
+      initialized: false,
+      appliedMigrations,
+      collections: buildCoreCollectionsReport(status.tableStats),
+      message:
+        status.healthState === 'api_not_enabled'
+          ? status.message
+          : 'Core PostgreSQL tables are missing and DATABASE_URL is not configured for automated DDL. Run migrations/postgres/0001_justpostgres_schema.sql and 0002_justpostgres_init_core.sql in your JustPostgres SQL Editor.',
+      status,
+    };
+  }
+
+  const needsSeed =
+    Boolean(params.forceSeed) ||
+    Number(refreshedMap.get('services')?.rowCount || 0) === 0 ||
+    Number(refreshedMap.get('business_settings')?.rowCount || 0) === 0 ||
+    Number(refreshedMap.get('users')?.rowCount || 0) === 0;
+
+  const seededCounts: Partial<Record<(typeof CORE_PG_TABLES)[number], number>> = {};
+
+  if (needsSeed) {
+    const syncResults = await seedCanonicalDataToJustPostgres({
+      actorUid: params.actorUid,
+      actorEmail: params.actorEmail,
+      env: process.env,
+      coreOnly: Boolean(params.coreOnly),
+    });
+    seededCounts.users = syncResults.users?.upserted || 0;
+    seededCounts.services = syncResults.services?.upserted || 0;
+    seededCounts.business_settings = syncResults.business_settings?.upserted || 0;
+    seededCounts.applications = 0;
+
+    if (refreshedMap.get('schema_migrations')?.exists) {
+      await upsertJustPostgresRows(
+        'schema_migrations',
+        [
+          {
+            version: '0001_justpostgres_schema',
+            description: 'Core and operational PostgreSQL tables with RLS',
+          },
+          {
+            version: '0002_justpostgres_init_core',
+            description: 'Extended core columns, indexes, BusinessSettings, and bootstrap Super Admin',
+          },
+          {
+            version: '0003_initial_core_documents',
+            description: 'Seeded initial Services catalog, BusinessSettings, RBAC matrix, and Super Admin user',
+          },
+        ],
+        'version',
+        process.env
+      ).catch(() => {});
+    }
+    appliedMigrations.push('0003_initial_core_documents');
+    status = await probeJustPostgresStatus(process.env);
+  }
+
+  cachedMigrationStatus = null;
+  const finalCollections = buildCoreCollectionsReport(status.tableStats, seededCounts);
+  const initialized =
+    CORE_PG_TABLES.every((t) => finalCollections[t].exists) &&
+    finalCollections.services.rowCount > 0 &&
+    finalCollections.business_settings.rowCount > 0 &&
+    finalCollections.users.rowCount > 0;
+
+  return {
+    ok: initialized,
+    initialized,
+    appliedMigrations,
+    collections: finalCollections,
+    message:
+      appliedMigrations.length > 0
+        ? `JustPostgreSQL schema and core documents verified (${appliedMigrations.join(', ')} applied).`
+        : 'JustPostgreSQL schema and core collections are already up to date.',
+    status,
+  };
+}
+
+// Strictly returns only public anon client configuration — never service_role or DATABASE_URL
+app.get('/api/postgres/client-config', (_req, res) => {
+  const cfg = resolveJustPostgresConfig(process.env);
+  const clientConfigured = Boolean(cfg.restUrl && cfg.anonKey);
+  return res.json(
+    buildStandardResponse({
+      success: true,
+      status: 'SUCCESS',
+      message: clientConfigured
+        ? 'JustPostgreSQL public client configuration loaded.'
+        : 'JustPostgreSQL public client configuration is pending env vars.',
+      referenceId: `pg_cfg_${Date.now()}`,
+      data: {
+        configured: clientConfigured,
+        restUrl: clientConfigured ? cfg.restUrl : '',
+        anonKey: clientConfigured ? cfg.anonKey : '',
+        endpointHost: cfg.endpointHost || '',
+      },
+    })
+  );
+});
+
+// Non-PII startup readiness endpoint for core JustPostgreSQL tables
+app.get('/api/postgres/migration-status', async (req, res) => {
+  try {
+    const forceFresh = req.query.force === '1' || req.query.fresh === 'true';
+    const snapshot = await computePostgresMigrationStatusSnapshot(forceFresh);
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: snapshot.message,
+        referenceId: `pg_mstat_${Date.now()}`,
+        data: snapshot,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Unable to inspect JustPostgreSQL migration status.',
+        referenceId: `pg_mstat_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_MIGRATION_STATUS_ERROR',
+      })
+    );
+  }
+});
+
 // Remote PostgreSQL (JustPostgres REST Proxy Routes — Strictly Admin Authenticated & Server-Side Key Only)
 app.get('/api/admin/postgres/status', requireExpressAdmin, async (_req, res) => {
   try {
@@ -2637,6 +2894,7 @@ app.post('/api/admin/postgres/run-migration', requireExpressAdmin, async (_req, 
   try {
     const sql = readPostgresSchemaSql();
     const result = await runSqlSchemaMigrationDirect(sql, process.env);
+    cachedMigrationStatus = null;
     return res.json(
       buildStandardResponse({
         success: true,
@@ -2655,6 +2913,65 @@ app.post('/api/admin/postgres/run-migration', requireExpressAdmin, async (_req, 
         referenceId: `pg_mig_err_${Date.now()}`,
         data: null,
         errorCode: 'JUSTPOSTGRES_MIGRATION_ERROR',
+      })
+    );
+  }
+});
+
+app.post('/api/admin/postgres/ensure-migrated', requireExpressAdmin, async (req, res) => {
+  try {
+    const actor = await resolveExpressAdminFromRequest(req);
+    if (!actor) {
+      return res.status(401).json(
+        buildStandardResponse({
+          success: false,
+          status: 'REJECTED',
+          message: 'Verified admin identity required.',
+          referenceId: `pg_ens_auth_${Date.now()}`,
+          data: null,
+          errorCode: 'UNAUTHORIZED',
+        })
+      );
+    }
+
+    const result = await ensureJustPostgresCoreMigrated({
+      actorUid: actor.uid,
+      actorEmail: actor.email || 'allindiadigitalseva@gmail.com',
+      coreOnly: Boolean(req.body?.coreOnly),
+      forceSeed: Boolean(req.body?.forceSeed),
+    });
+
+    if (!result.ok) {
+      return res.status(400).json(
+        buildStandardResponse({
+          success: false,
+          status: 'FAILED',
+          message: result.message,
+          referenceId: `pg_ens_fail_${Date.now()}`,
+          data: result,
+          errorCode: result.status.healthState.toUpperCase(),
+        })
+      );
+    }
+
+    return res.json(
+      buildStandardResponse({
+        success: true,
+        status: 'SUCCESS',
+        message: result.message,
+        referenceId: `pg_ens_${Date.now()}`,
+        data: result,
+      })
+    );
+  } catch (err: any) {
+    return res.status(500).json(
+      buildStandardResponse({
+        success: false,
+        status: 'FAILED',
+        message: err?.message || 'Unable to check and apply JustPostgreSQL migrations.',
+        referenceId: `pg_ens_err_${Date.now()}`,
+        data: null,
+        errorCode: 'JUSTPOSTGRES_ENSURE_MIGRATED_ERROR',
       })
     );
   }
@@ -3281,6 +3598,26 @@ async function startServer() {
 
   app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Digital India Project server active on http://0.0.0.0:${PORT}`);
+
+    // Non-blocking startup migration check for JustPostgreSQL when configured
+    const pgCfg = resolveJustPostgresConfig(process.env);
+    if (pgCfg.configured) {
+      void ensureJustPostgresCoreMigrated({
+        actorUid: 'bootstrap-super-admin',
+        actorEmail: 'allindiadigitalseva@gmail.com',
+        coreOnly: false,
+      })
+        .then((res) => {
+          if (res.appliedMigrations.length > 0) {
+            console.log(
+              `[JustPostgreSQL] Applied startup migrations: ${res.appliedMigrations.join(', ')}`
+            );
+          }
+        })
+        .catch(() => {
+          // Do not interrupt server startup if remote DB is temporarily unreachable
+        });
+    }
   });
 }
 

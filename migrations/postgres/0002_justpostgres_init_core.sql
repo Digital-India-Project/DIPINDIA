@@ -127,5 +127,19 @@ INSERT INTO public.admins (id, uid, granted_by)
 VALUES ('bootstrap-super-admin', 'bootstrap-super-admin', 'bootstrap-super-admin')
 ON CONFLICT (id) DO NOTHING;
 
--- 6. Reload PostgREST schema cache (safe no-op if channel has no listeners)
+-- 6. Schema Migration Version Registry
+CREATE TABLE IF NOT EXISTS public.schema_migrations (
+  version TEXT PRIMARY KEY,
+  description TEXT NOT NULL,
+  applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.schema_migrations ENABLE ROW LEVEL SECURITY;
+
+INSERT INTO public.schema_migrations (version, description)
+VALUES
+  ('0001_justpostgres_schema', 'Initial tables and RLS for core and operational collections'),
+  ('0002_justpostgres_init_core', 'Extended core columns, indexes, BusinessSettings, and bootstrap Super Admin')
+ON CONFLICT (version) DO NOTHING;
+
+-- 7. Reload PostgREST schema cache (safe no-op if channel has no listeners)
 NOTIFY pgrst, 'reload schema';
