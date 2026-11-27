@@ -24,6 +24,10 @@ import {
 } from '../../src/data/catalogue';
 import { generateDigitalProductPayload } from '../../src/data/catalogue/digitalGenerators';
 import { canAccessApplication, isSuperAdminRole } from '../../src/lib/rbac';
+import {
+  sanitizeContentDispositionFilename,
+  validateSafeRedirectUrl,
+} from '../../src/lib/urlSafety';
 import { ApplicationStatus, CouponRecord, ServiceFormField } from '../../src/types';
 import {
   buildCashfreeUnconfiguredMessage,
@@ -1244,10 +1248,26 @@ v1Router.post('/payments/orders', requireAuth, async (c) => {
   let paymentSessionId = `sim_session_${Date.now()}`;
   let cfOrderId: string | undefined;
   let orderExpiryTime = new Date(Date.now() + cfConfig.expiryMinutes * 60_000).toISOString();
-  const resolvedReturnUrl =
-    typeof body?.returnUrl === 'string' && body.returnUrl.trim()
-      ? body.returnUrl.trim()
-      : `${cfConfig.appDomain}/?cf_order_id={order_id}`;
+  const defaultReturnUrl = `${cfConfig.appDomain}/?cf_order_id={order_id}`;
+  const safeReturn = validateSafeRedirectUrl(body?.returnUrl, {
+    appDomain: cfConfig.appDomain,
+    fallbackUrl: defaultReturnUrl,
+    allowHttpLocalhost: !cfConfig.isProductionRuntime,
+  });
+  if (body?.returnUrl !== undefined && String(body.returnUrl).trim() && !safeReturn.valid) {
+    return c.json(
+      buildApiResponse({
+        success: false,
+        status: 'FAILED',
+        message: safeReturn.reason || 'Invalid returnUrl supplied for checkout.',
+        requestId: reqId,
+        data: null,
+        errorCode: 'INVALID_RETURN_URL',
+      }),
+      400
+    );
+  }
+  const resolvedReturnUrl = safeReturn.url || defaultReturnUrl;
 
   if (cfConfig.configured) {
     const cfOrder = await createCashfreePgOrder(cfConfig, {
@@ -3428,6 +3448,23 @@ v1Router.post('/products/:slug/purchase', requireAuth, async (c) => {
   let orderStatus: 'PAID' | 'CREATED' = allowSandboxConfirm ? 'PAID' : 'CREATED';
 
   if (cfConfig.configured) {
+    const safeDigitalReturn = validateSafeRedirectUrl(body?.returnUrl, {
+      appDomain: cfConfig.appDomain,
+      allowHttpLocalhost: !cfConfig.isProductionRuntime,
+    });
+    if (body?.returnUrl !== undefined && String(body.returnUrl).trim() && !safeDigitalReturn.valid) {
+      return c.json(
+        buildApiResponse({
+          success: false,
+          status: 'FAILED',
+          message: safeDigitalReturn.reason || 'Invalid returnUrl supplied for checkout.',
+          requestId: reqId,
+          data: null,
+          errorCode: 'INVALID_RETURN_URL',
+        }),
+        400
+      );
+    }
     const cfOrder = await createCashfreePgOrder(cfConfig, {
       orderId,
       amountInr: checkout.totalInr,
@@ -3436,7 +3473,7 @@ v1Router.post('/products/:slug/purchase', requireAuth, async (c) => {
       customerEmail: String(body?.customerEmail || user.email || 'customer@digitalindiaproject.com'),
       customerPhone: String(body?.customerPhone || '9876543210'),
       orderNote: `Digital Download: ${product.name}`,
-      returnUrl: typeof body?.returnUrl === 'string' ? body.returnUrl : undefined,
+      returnUrl: safeDigitalReturn.valid && safeDigitalReturn.url ? safeDigitalReturn.url : undefined,
     });
     if (!cfOrder.ok || !cfOrder.paymentSessionId) {
       return c.json(
@@ -3622,11 +3659,15 @@ v1Router.get('/products/:slug/download', requireAuth, async (c) => {
     if (resolvedBucket.bucket) {
       const r2Obj = await resolvedBucket.bucket.get(product.digitalAsset.r2ObjectKey);
       if (r2Obj) {
-        const ext = product.digitalAsset.r2ObjectKey.split('.').pop() || 'bin';
+        const ext = sanitizeContentDispositionFilename(
+          product.digitalAsset.r2ObjectKey.split('.').pop() || 'bin',
+          'bin'
+        );
+        const r2DownloadName = sanitizeContentDispositionFilename(`${product.slug}.${ext}`, 'product.bin');
         return new Response(r2Obj.body as unknown as BodyInit, {
           headers: {
             'Content-Type': r2Obj.httpMetadata?.contentType || 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${product.slug}.${ext}"`,
+            'Content-Disposition': `attachment; filename="${r2DownloadName}"`,
             'Cache-Control': 'no-store, private',
           },
         });
@@ -3643,7 +3684,7 @@ v1Router.get('/products/:slug/download', requireAuth, async (c) => {
   return new Response(generated.content, {
     headers: {
       'Content-Type': generated.contentType,
-      'Content-Disposition': `attachment; filename="${generated.fileName}"`,
+      'Content-Disposition': `attachment; filename="${sanitizeContentDispositionFilename(generated.fileName)}"`,
       'Cache-Control': 'no-store, private',
     },
   });

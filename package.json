@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
     "db:init:postgres": "tsx server/postgres/initJustPostgres.ts",
     "db:init:postgres:dry": "tsx server/postgres/initJustPostgres.ts --dry-run"
   },

@@ -7,6 +7,7 @@ import { recordAuditEvent } from '../services/auditService';
 import { COMPLETE_CATALOGUE_ITEMS } from '../../src/data/catalogue';
 import { findCatalogueItem, resolveAuthoritativeCheckout } from '../../src/lib/catalogueServer';
 import { canAccessApplication, isSuperAdminRole } from '../../src/lib/rbac';
+import { isSafeDeliverableUrl } from '../../src/lib/urlSafety';
 import { calculatePartnerCommission, fromPaise, toPaise } from '../../src/lib/finance';
 import { createCashfreeRefund, loadEffectiveCashfreeConfig } from '../services/cashfreeService';
 import { reconcileRefundOutcome } from '../services/paymentReconciliation';
@@ -842,6 +843,20 @@ unifiedRouter.post(
           requestId: reqId,
           data: null,
           errorCode: 'MISSING_COMPLETION_URL',
+        }),
+        400
+      );
+    }
+
+    if (!isSafeDeliverableUrl(fileUrl, c.env.ENVIRONMENT !== 'production')) {
+      return c.json(
+        buildApiResponse({
+          success: false,
+          status: 'FAILED',
+          message: 'completionFileUrl must be an internal /api/ route or https:// URL.',
+          requestId: reqId,
+          data: null,
+          errorCode: 'INVALID_COMPLETION_URL',
         }),
         400
       );

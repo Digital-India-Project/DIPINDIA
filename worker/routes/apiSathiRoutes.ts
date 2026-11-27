@@ -4,6 +4,7 @@ import { buildApiResponse } from '../middleware/security';
 import { requireAuth } from '../middleware/auth';
 import { DatabaseRegistry } from '../config/database';
 import { isSuperAdminRole } from '../../src/lib/rbac';
+import { validateSafeRedirectUrl } from '../../src/lib/urlSafety';
 import { recordAuditEvent, recordInfraEvent } from '../services/auditService';
 import {
   aggregateApiSathiUsage,
@@ -757,10 +758,12 @@ apiSathiRouter.post('/digilocker/init', requireAuth, async (c) => {
   const cleanMobile = typeof body?.mobile === 'string' ? body.mobile : undefined;
   const cleanEmail = typeof body?.emailId === 'string' ? body.emailId : (!cleanMobile ? user.email : undefined);
   const appDomain = (c.env.APP_DOMAIN || 'https://digitalindiaproject.com').replace(/\/+$/, '');
-  const redirectionUrl =
-    typeof body?.redirectionUrl === 'string' && body.redirectionUrl.startsWith('http')
-      ? body.redirectionUrl
-      : `${appDomain}/operator-enroll?digilocker=done`;
+  const safeRedirect = validateSafeRedirectUrl(body?.redirectionUrl, {
+    appDomain,
+    fallbackUrl: `${appDomain}/operator-enroll?digilocker=done`,
+    allowHttpLocalhost: c.env.ENVIRONMENT !== 'production',
+  });
+  const redirectionUrl = safeRedirect.url;
 
   try {
     const res = await initAadhaarDigilocker(client, {

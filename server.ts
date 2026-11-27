@@ -4,6 +4,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import { validateFormSubmission } from './src/lib/formEngine';
+import {
+  expressSecurityHeadersMiddleware,
+  createExpressRateLimiter,
+} from './server/middleware/expressSecurity';
+import {
+  sanitizeContentDispositionFilename,
+  validateSafeRedirectUrl,
+} from './src/lib/urlSafety';
 import { createKartaRouter } from './server/karta/kartaRouter';
 import {
   getAvailableAiProviders,
@@ -92,6 +100,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(expressSecurityHeadersMiddleware);
+app.use('/api', createExpressRateLimiter({ maxRequests: 120, windowMs: 60_000 }));
 
 app.use(
   express.json({
@@ -428,6 +439,17 @@ app.post('/api/payments/create-order', async (req, res) => {
   }
 
   if (cfConfig.configured) {
+    const safeReturn = validateSafeRedirectUrl(returnUrl, {
+      appDomain: cfConfig.appDomain,
+      allowHttpLocalhost: !cfConfig.isProductionRuntime,
+    });
+    if (returnUrl !== undefined && String(returnUrl).trim() && !safeReturn.valid) {
+      return res.status(400).json({
+        success: false,
+        error: safeReturn.reason || 'Invalid returnUrl.',
+        errorCode: 'INVALID_RETURN_URL',
+      });
+    }
     try {
       const cfOrder = await createCashfreePgOrder(cfConfig, {
         orderId,
@@ -437,7 +459,7 @@ app.post('/api/payments/create-order', async (req, res) => {
         customerEmail: String(customerEmail || 'applicant@digitalindiaproject.com'),
         customerPhone: String(customerPhone || '9876543210'),
         orderNote: String(serviceName || 'Digital India Project Service Fee'),
-        returnUrl: typeof returnUrl === 'string' ? returnUrl : undefined,
+        returnUrl: safeReturn.valid && safeReturn.url ? safeReturn.url : undefined,
       });
 
       if (!cfOrder.ok || !cfOrder.paymentSessionId) {
@@ -542,7 +564,7 @@ app.post('/api/payments/verify', async (req, res) => {
     });
   }
 
-  const sandboxApproved = simulateSandboxSuccess === true;
+  const sandboxApproved = !cfConfig.isProductionRuntime && simulateSandboxSuccess === true;
   const existingOrder = localCashfreeOrderStore.get(cleanOrderId);
   if (sandboxApproved && existingOrder) {
     localCashfreeOrderStore.set(cleanOrderId, {
@@ -653,6 +675,19 @@ app.post('/api/v1/payments/orders', async (req, res) => {
   const orderId = `CF_ORD_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
 
   if (cfConfig.configured) {
+    const safeReturn = validateSafeRedirectUrl(body.returnUrl, {
+      appDomain: cfConfig.appDomain,
+      allowHttpLocalhost: !cfConfig.isProductionRuntime,
+    });
+    if (body.returnUrl !== undefined && String(body.returnUrl).trim() && !safeReturn.valid) {
+      return res.status(400).json({
+        success: false,
+        status: 'FAILED',
+        message: safeReturn.reason || 'Invalid returnUrl.',
+        data: null,
+        error_code: 'INVALID_RETURN_URL',
+      });
+    }
     const cfOrder = await createCashfreePgOrder(cfConfig, {
       orderId,
       amountInr: totalInr,
@@ -661,7 +696,7 @@ app.post('/api/v1/payments/orders', async (req, res) => {
       customerEmail: String(body.customerEmail || 'applicant@digitalindiaproject.com'),
       customerPhone: String(body.customerPhone || '9876543210'),
       orderNote: String(body.serviceName || 'Digital India Project Service Fee'),
-      returnUrl: typeof body.returnUrl === 'string' ? body.returnUrl : undefined,
+      returnUrl: safeReturn.valid && safeReturn.url ? safeReturn.url : undefined,
       idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : undefined,
     });
 
@@ -2098,6 +2133,13 @@ app.post('/api/v1/apisathi/digilocker/init', async (req, res) => {
   }
   const client = createApiSathiClient({ apiKey: key });
   const uid = String(body.uid || `dip_${actor.id.replace(/[^\w.@-]/g, '').slice(0, 32)}_${Date.now().toString(36)}`);
+  const isProdRuntime = isProductionEnvironment(process.env);
+  const appDomain = (process.env.APP_DOMAIN || 'https://digitalindiaproject.com').replace(/\/+$/, '');
+  const safeRedirect = validateSafeRedirectUrl(body.redirectionUrl, {
+    appDomain,
+    fallbackUrl: `${appDomain}/operator-enroll?digilocker=done`,
+    allowHttpLocalhost: !isProdRuntime,
+  });
   try {
     const resInit = await initAadhaarDigilocker(client, {
       uid,
@@ -2105,7 +2147,7 @@ app.post('/api/v1/apisathi/digilocker/init', async (req, res) => {
       emailId: body.emailId,
       firstName: body.firstName,
       lastName: body.lastName,
-      redirectionUrl: body.redirectionUrl,
+      redirectionUrl: safeRedirect.url,
       isHideExplanationScreen: true,
     });
     const txId = String(resInit.data?.transaction_id || '');
@@ -3315,9 +3357,33 @@ app.post('/api/v1/quotes', (req, res) => {
   });
 });
 
-app.post('/api/v1/products/:slug/purchase', (req, res) => {
+app.post('/api/v1/products/:slug/purchase', async (req, res) => {
   const slug = String(req.params.slug || '').trim();
   const body = req.body || {};
+  const cfConfig = resolveCashfreeConfig(process.env, body.preferredMode);
+
+  if (cfConfig.isProductionRuntime) {
+    const authHdr = req.headers.authorization;
+    const token = authHdr?.startsWith('Bearer ') ? authHdr.slice(7).trim() : '';
+    const verified = token ? await verifyFirebaseIdToken(token).catch(() => null) : null;
+    if (!verified) {
+      return res.status(401).json({
+        success: false,
+        status: 'REJECTED',
+        message: 'Authentication required in production.',
+        error_code: 'UNAUTHORIZED',
+      });
+    }
+    if (!cfConfig.configured) {
+      return res.status(503).json({
+        success: false,
+        status: 'FAILED',
+        message: 'Cashfree gateway credentials are not configured in production.',
+        error_code: 'CASHFREE_NOT_CONFIGURED',
+      });
+    }
+  }
+
   const product = findCatalogueItem(slug, localCatalogueItems);
   if (!product || (product.productType !== 'digital_product' && product.category !== 'digital-products')) {
     return res.status(404).json({ success: false, message: 'Digital product not found', error_code: 'PRODUCT_NOT_FOUND' });
@@ -3337,9 +3403,68 @@ app.post('/api/v1/products/:slug/purchase', (req, res) => {
     });
   }
   const orderId = `DIG_ORD_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+  if (cfConfig.configured) {
+    const safeReturn = validateSafeRedirectUrl(body.returnUrl, {
+      appDomain: cfConfig.appDomain,
+      allowHttpLocalhost: !cfConfig.isProductionRuntime,
+    });
+    if (body.returnUrl !== undefined && String(body.returnUrl).trim() && !safeReturn.valid) {
+      return res.status(400).json({
+        success: false,
+        status: 'FAILED',
+        message: safeReturn.reason || 'Invalid returnUrl.',
+        error_code: 'INVALID_RETURN_URL',
+      });
+    }
+    const cfOrder = await createCashfreePgOrder(cfConfig, {
+      orderId,
+      amountInr: checkout.totalInr,
+      customerId: String(body.customerId || 'digital_customer'),
+      customerName: String(body.customerName || 'Digital Customer'),
+      customerEmail: String(body.customerEmail || 'customer@digitalindiaproject.com'),
+      customerPhone: String(body.customerPhone || '9876543210'),
+      orderNote: `Digital Download: ${product.name}`,
+      returnUrl: safeReturn.valid && safeReturn.url ? safeReturn.url : undefined,
+    });
+    if (!cfOrder.ok || !cfOrder.paymentSessionId) {
+      return res.status(502).json({
+        success: false,
+        status: 'FAILED',
+        message: cfOrder.errorMessage || 'Failed to initiate Cashfree digital order',
+        error_code: cfOrder.errorCode || 'CASHFREE_ORDER_CREATION_FAILED',
+      });
+    }
+    localCashfreeOrderStore.set(orderId, {
+      status: 'CREATED',
+      paid: false,
+      totalInr: checkout.totalInr,
+      paymentSessionId: cfOrder.paymentSessionId,
+      updatedAt: new Date().toISOString(),
+      serviceSlug: product.slug,
+      customerEmail: String(body.customerEmail || ''),
+    });
+    return res.status(201).json({
+      success: true,
+      status: 'PENDING',
+      message: 'Digital product order created — complete Cashfree payment to unlock download.',
+      data: {
+        orderId,
+        paymentSessionId: cfOrder.paymentSessionId,
+        orderStatus: 'CREATED',
+        productSlug: product.slug,
+        productName: product.name,
+        totalInr: checkout.totalInr,
+        breakdown: checkout.breakdown,
+        downloadUrl: `/api/v1/products/${encodeURIComponent(product.slug)}/download?orderId=${encodeURIComponent(orderId)}`,
+      },
+    });
+  }
+
+  const allowSandboxUnlock = !cfConfig.isProductionRuntime && body.simulateSandboxSuccess !== false;
   localCashfreeOrderStore.set(orderId, {
-    status: 'PAID',
-    paid: true,
+    status: allowSandboxUnlock ? 'PAID' : 'CREATED',
+    paid: allowSandboxUnlock,
     totalInr: checkout.totalInr,
     paymentSessionId: `sim_dig_${Date.now()}`,
     updatedAt: new Date().toISOString(),
@@ -3348,11 +3473,13 @@ app.post('/api/v1/products/:slug/purchase', (req, res) => {
   });
   return res.status(201).json({
     success: true,
-    status: 'SUCCESS',
-    message: 'Digital product unlocked for instant download.',
+    status: allowSandboxUnlock ? 'SUCCESS' : 'PENDING',
+    message: allowSandboxUnlock
+      ? 'Digital product unlocked for instant download.'
+      : 'Sandbox digital product order created.',
     data: {
       orderId,
-      orderStatus: 'PAID',
+      orderStatus: allowSandboxUnlock ? 'PAID' : 'CREATED',
       productSlug: product.slug,
       productName: product.name,
       totalInr: checkout.totalInr,
@@ -3407,7 +3534,10 @@ const handleLocalProductDownload: express.RequestHandler = async (req, res) => {
     product.name
   );
   res.setHeader('Content-Type', payload.contentType);
-  res.setHeader('Content-Disposition', `attachment; filename="${payload.fileName}"`);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${sanitizeContentDispositionFilename(payload.fileName)}"`
+  );
   res.setHeader('Cache-Control', 'no-store, private');
   return res.send(payload.content);
 };

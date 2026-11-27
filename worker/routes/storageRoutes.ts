@@ -6,6 +6,7 @@ import { FileService } from '../services/fileService';
 import { DatabaseRegistry } from '../config/database';
 import { LOGICAL_BUCKET_CATALOG, type LogicalBucketKey, StorageRegistry } from '../config/storage';
 import { canAccessApplication, isSuperAdminRole } from '../../src/lib/rbac';
+import { sanitizeContentDispositionFilename } from '../../src/lib/urlSafety';
 
 export const storageRouter = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
@@ -410,7 +411,7 @@ storageRouter.get('/files/:id/download', async (c) => {
   return new Response(obj.body as unknown as BodyInit, {
     headers: {
       'Content-Type': meta.mimeType || 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${meta.originalFilename}"`,
+      'Content-Disposition': `attachment; filename="${sanitizeContentDispositionFilename(meta.originalFilename)}"`,
       'Cache-Control': 'no-store, private',
     },
   });

@@ -18,6 +18,7 @@ import {
 import { processCashfreeWebhookEvent, runCashfreeReconciliationSweep } from '../services/paymentReconciliation';
 import { fromPaise } from '../../src/lib/finance';
 import { isSuperAdminRole } from '../../src/lib/rbac';
+import { sanitizeContentDispositionFilename } from '../../src/lib/urlSafety';
 import { slugifyBlogTitle, estimateReadingTime } from '../../src/lib/blogSeo';
 import {
   CATALOGUE_CATEGORIES,
@@ -244,7 +245,7 @@ adminRouter.get('/backups/:id/download', requirePermission('settings.manage'), a
   return new Response(found.content, {
     headers: {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Content-Disposition': `attachment; filename="${found.record.id}.json"`,
+      'Content-Disposition': `attachment; filename="${sanitizeContentDispositionFilename(`${found.record.id}.json`, 'backup.json')}"`,
       'Cache-Control': 'no-store, private',
     },
   });

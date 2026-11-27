@@ -6,6 +6,7 @@ import {
   rateLimitMiddleware,
   securityHeadersMiddleware,
 } from './middleware/security';
+import { sanitizeContentDispositionFilename } from '../src/lib/urlSafety';
 import { handleCashfreeWebhookGet, handleCashfreeWebhookPost, v1Router } from './routes/v1';
 import { apiSathiRouter, processWorkerApiSathiRetryQueue } from './routes/apiSathiRoutes';
 import { adminRouter } from './routes/adminRoutes';
@@ -414,11 +415,15 @@ app.get('/api/products/:slug/download', async (c) => {
     if (resolvedBucket.bucket) {
       const r2Obj = await resolvedBucket.bucket.get(product.digitalAsset.r2ObjectKey);
       if (r2Obj) {
-        const ext = product.digitalAsset.r2ObjectKey.split('.').pop() || 'bin';
+        const ext = sanitizeContentDispositionFilename(
+          product.digitalAsset.r2ObjectKey.split('.').pop() || 'bin',
+          'bin'
+        );
+        const r2DownloadName = sanitizeContentDispositionFilename(`${product.slug}.${ext}`, 'product.bin');
         return new Response(r2Obj.body as unknown as BodyInit, {
           headers: {
             'Content-Type': r2Obj.httpMetadata?.contentType || 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${product.slug}.${ext}"`,
+            'Content-Disposition': `attachment; filename="${r2DownloadName}"`,
             'Cache-Control': 'no-store, private',
           },
         });
@@ -434,7 +439,7 @@ app.get('/api/products/:slug/download', async (c) => {
   return new Response(generated.content, {
     headers: {
       'Content-Type': generated.contentType,
-      'Content-Disposition': `attachment; filename="${generated.fileName}"`,
+      'Content-Disposition': `attachment; filename="${sanitizeContentDispositionFilename(generated.fileName)}"`,
       'Cache-Control': 'no-store, private',
     },
   });
@@ -513,7 +518,7 @@ app.post('/api/payments/verify', async (c) => {
     );
   }
 
-  const sandboxApproved = body?.simulateSandboxSuccess === true;
+  const sandboxApproved = !cfConfig.isProductionRuntime && body?.simulateSandboxSuccess === true;
   return c.json({
     success: true,
     orderId,
